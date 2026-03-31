@@ -112,10 +112,10 @@ const Dashboard = () => {
                     </div>
                     <nav className="mt-6 px-4">
                         {navItems.map((item) => (
-                             <a href="#" 
+                             <button 
                                 key={item.label} 
                                 onClick={() => setActiveNav(item.label)}
-                                className={`flex items-center px-4 py-3 my-2 rounded-lg transition-colors duration-200 
+                                className={`w-full text-left flex items-center px-4 py-3 my-2 rounded-lg transition-colors duration-200 
                                     ${activeNav === item.label 
                                         ? 'bg-[var(--theme-primary)] text-white shadow-md' 
                                         : 'text-gray-600 hover:bg-[var(--theme-secondary)]'}`}>
@@ -133,7 +133,7 @@ const Dashboard = () => {
                                     </motion.span>
                                 )}
                                 </AnimatePresence>
-                            </a>
+                            </button>
                         ))}
                     </nav>
                 </div>

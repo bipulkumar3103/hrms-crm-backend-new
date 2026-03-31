@@ -1,4 +1,4 @@
-#!/home/user/hrms-crm-backend/.venv/bin/python
+#!/home/user/hrms-crm-backend-new/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

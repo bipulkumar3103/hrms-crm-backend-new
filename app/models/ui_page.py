@@ -10,8 +10,8 @@ class UIPage(db.Model):
     route = db.Column(db.String(255), nullable=False) # e.g., '/reports/financials'
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
 
-    # Relationship to the permissions
-    permissions = db.relationship('PagePermission', back_populates='page', lazy='dynamic', cascade="all, delete-orphan")
+    # Relationship to the permissions (many-to-many with Role through PagePermission)
+    roles = db.relationship('app.models.role.Role', secondary='page_permission', back_populates='pages', lazy='dynamic')
 
     def __repr__(self):
         return f'<UIPage {self.name} ({self.route})>'
@@ -21,22 +21,11 @@ class UIPage(db.Model):
         if not user or self.company_id != user.company_id:
             return False
 
-        # Superadmins have universal access within their scope (though this might need refinement)
         if user.has_role('superadmin'):
             return True
 
-        # Get all role IDs for this page
-        allowed_role_ids = {p.role_id for p in self.permissions}
-
-        if not allowed_role_ids:
-            # If a page has no specific permissions, deny access by default for security.
-            # Alternatively, you could allow access to all authenticated users of the company.
-            # Denying by default is the safer option.
+        allowed_roles = self.roles.all()
+        if not allowed_roles:
             return False
 
-        # Check if the user has any of the allowed roles
-        user_role_ids = {role.id for role in user.roles}
-
-        # The `isdisjoint` method returns True if the two sets have no common elements.
-        # So, we return the opposite (not isdisjoint) to indicate if there is an overlap.
-        return not allowed_role_ids.isdisjoint(user_role_ids)
+        return any(user.has_role(role.name) for role in allowed_roles)

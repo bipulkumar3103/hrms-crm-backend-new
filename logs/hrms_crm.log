@@ -1,1 +1,22 @@
-2026-03-26 16:41:17,701 INFO: HRMS-CRM startup [in /home/user/hrms-crm-backend/app/__init__.py:39]
+2026-03-31 08:43:12,837 INFO: Headers: X-Forwarded-Proto: http
+X-Forwarded-Port: 3000
+X-Forwarded-For: 127.0.0.1
+X-Goog-Workstations-Endpoint: workstations-3ade512d-0ae6-4951-848d-d4ecaa666c8a.asia-east1-c.c.monospace-10.internal.:980
+X-Forwarded-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
+Sec-User-Ip: 106.219.162.157
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Referer: https://3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev/
+Connection: close
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc0OTQ2NTkyLCJqdGkiOiI4ZDZjNjdjYy0wZWJlLTQ3Y2YtYjBiNy1mZjhmNzFlODcyNWIiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NDk0NjU5MiwiY3NyZiI6IjRjN2I2ZTMyLWJlYzctNGU4YS1iYzdlLTkzMTg4NDc2N2Q4ZiIsImV4cCI6MTc3NDk0NzQ5Miwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.IQ1Eh0_dSwor7GryAjgKafF9fVWWCkg9Y3IjsMK5-9o
+Accept-Language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7
+Accept-Encoding: gzip, deflate, br, zstd
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
+
+ [in /home/user/hrms-crm-backend-new/app/__init__.py:55]

@@ -68,22 +68,17 @@ def upload_company_logo_onboarding():
 
     try:
         s3_service = S3Service()
-        # The service handles resizing, uploading, and returns a dict of URLs
         logo_urls = s3_service.upload_logo(file, company.id)
 
-        # Save the correct URLs from the service to the database
         company.logo_original_url = logo_urls.get('original')
         company.logo_large_url = logo_urls.get('large')
         company.logo_medium_url = logo_urls.get('medium')
-        # Use 'default' from S3 service for 'small' in the DB model as per user's final reqs
         company.logo_small_url = logo_urls.get('default')
 
-        # Mark the profile as fully complete only after the logo is uploaded
         company.profile_complete = True
         
         db.session.commit()
 
-        # Create a new token that reflects the final profile_complete status
         roles = [role.name for role in current_user.roles]
         new_token = create_access_token(
             identity=str(current_user.id),
@@ -103,30 +98,44 @@ def upload_company_logo_onboarding():
     except Exception as e:
         db.session.rollback()
         logger.error(f"ERROR uploading logo: {e}", exc_info=True)
-        # Provide a more specific error message if possible
         return jsonify({"message": f"An internal error occurred during file upload: {e}"}), 500
 
 @onboarding_blueprint.route('/check-status', methods=['GET'])
 @jwt_required()
 def check_onboarding_status():
+    print("\n--- PRINT DEBUG: [1/4] /check-status endpoint hit ---")
     user = get_current_user()
     if not user:
+        print("--- PRINT DEBUG: ERROR - User not found in JWT token. ---")
         return jsonify({"message": "User not found"}), 404
-        
-    # Check if the user is associated with a company
-    if not user.company_id:
-        return jsonify({
-            "has_company": False,
-            "profile_complete": False,
-            "roles": [role.name for role in user.roles]
-        }), 200
-        
-    return jsonify({
-        "has_company": True,
-        "company_id": user.company_id,
-        "profile_complete": user.company.profile_complete,
-        "roles": [role.name for role in user.roles]
-    }), 200
+    
+    print(f"--- PRINT DEBUG: [2/4] User found from JWT: ID={user.id}, Email={user.email} ---")
+
+    # THIS IS THE FIX: Safely check for company and profile completeness
+    profile_complete = False
+    has_company = user.company is not None
+    company_id = user.company_id
+    
+    print(f"--- PRINT DEBUG: [3/4] Checking for user's company... Has Company? {has_company} ---")
+    
+    if has_company:
+        profile_complete = user.company.profile_complete
+        print(f"--- PRINT DEBUG: Company found. Profile Complete Status: {profile_complete} ---")
+    else:
+        print("--- PRINT DEBUG: No company associated with this user. This is the cause of the previous crash. ---")
+    
+    roles = [role.name for role in user.roles]
+    response_data = {
+        "has_company": has_company,
+        "company_id": company_id,
+        "profile_complete": profile_complete,
+        "roles": roles
+    }
+    
+    print(f"--- PRINT DEBUG: [4/4] Sending final JSON response to frontend: ---")
+    print(response_data)
+    
+    return jsonify(response_data), 200
 
 @onboarding_blueprint.route('/google/create-company', methods=['POST'])
 @jwt_required()
@@ -145,24 +154,20 @@ def create_company_google():
     if not company_name or not company_domain:
         return jsonify({"message": "Company name and domain are required"}), 400
         
-    # Check if domain is already taken
     if Company.query.filter_by(domain=company_domain).first():
         return jsonify({"message": "A company with this domain already exists."}), 409
         
     try:
-        # Create the new company
         new_company = Company(
             name=company_name,
             domain=company_domain,
             profile_complete=False
         )
         db.session.add(new_company)
-        db.session.flush() # Get the ID before committing
+        db.session.flush() 
         
-        # Associate user with company and assign superadmin role
         user.company_id = new_company.id
         
-        # Ensure superadmin role exists and assign it
         superadmin_role = Role.query.filter_by(name='superadmin').first()
         if not superadmin_role:
             superadmin_role = Role(name='superadmin')
@@ -174,7 +179,6 @@ def create_company_google():
             
         db.session.commit()
         
-        # Generate a new token with updated roles and company info
         user_roles = [role.name for role in user.roles]
         access_token = create_access_token(
             identity=str(user.id),

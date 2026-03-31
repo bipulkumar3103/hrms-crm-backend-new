@@ -10,8 +10,8 @@ class Role(db.Model):
     users = db.relationship('User', secondary=user_roles, lazy='subquery',
                             back_populates='roles')
 
-    # Relationship to the PagePermission model
-    page_permissions = db.relationship('PagePermission', back_populates='role', lazy='dynamic')
+    # Relationship to the UIPage model using a fully qualified path
+    pages = db.relationship('app.models.ui_page.UIPage', secondary='page_permission', back_populates='roles', lazy='dynamic')
 
     def __repr__(self):
         return f'<Role {self.name}>'

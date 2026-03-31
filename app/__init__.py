@@ -1,3 +1,4 @@
+
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,22 +8,30 @@ from app.config import config
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 db = SQLAlchemy()
 migrate = Migrate()
 bcrypt = Bcrypt()
 jwt = JWTManager()
 
-
 def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+
+    # Apply the ProxyFix middleware to handle X-Forwarded- headers
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1
+    )
 
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     jwt.init_app(app)
+    
+    # Import and initialize google auth
+    from app.auth import google
+    google.init_app(app)
 
     # Configure logging
     if not app.debug and not app.testing:
@@ -53,8 +62,6 @@ def create_app(config_name='default'):
     from app.models.company import Company
     from app.models.employee import Employee
     from app.models.ui_page import UIPage
-    from app.models.ui_metadata import UIMetadata
-    from app.models.metadata_engine import MetaDataEngine
     from app.models.page_permission import PagePermission
 
 
@@ -63,8 +70,7 @@ def create_app(config_name='default'):
     from app.routes.uploads import uploads_bp
     from app.api.company import company_blueprint
     from app.auth.google import google_blueprint
-    from app.api.employees import employee_blueprint
-    from app.api.ui_metadata import ui_metadata_blueprint
+    from app.api.employees import employees_blueprint
     from app.api.users import users_blueprint
 
 
@@ -81,8 +87,7 @@ def create_app(config_name='default'):
     app.register_blueprint(uploads_bp, url_prefix='/api/v1/uploads')
     app.register_blueprint(company_blueprint, url_prefix='/api/v1/company')
     app.register_blueprint(google_blueprint, url_prefix='/api/v1/auth')
-    app.register_blueprint(employee_blueprint, url_prefix='/api/v1/employees')
-    app.register_blueprint(ui_metadata_blueprint, url_prefix='/api/v1/ui-metadata')
+    app.register_blueprint(employees_blueprint, url_prefix='/api/v1/employees')
     app.register_blueprint(users_blueprint, url_prefix='/api/v1/users')
 
     with app.app_context():

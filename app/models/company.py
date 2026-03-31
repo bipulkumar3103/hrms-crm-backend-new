@@ -1,7 +1,7 @@
 from app import db
 
 class Company(db.Model):
-    __tablename__ = 'companies'
+    __tablename__ = 'company'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     domain = db.Column(db.String(128), unique=True, nullable=False)
