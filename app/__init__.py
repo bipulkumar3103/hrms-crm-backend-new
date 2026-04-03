@@ -72,6 +72,7 @@ def create_app(config_name='default'):
     from app.auth.google import google_blueprint
     from app.api.employees import employees_blueprint
     from app.api.users import users_blueprint
+    from app.api.ui import ui_blueprint
 
 
     @jwt.user_lookup_loader

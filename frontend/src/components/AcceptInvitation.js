@@ -1,70 +1,53 @@
-
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { api } from '../utils/api';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import { FiLock, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
+
+const api = axios.create({ baseURL: '/api/v1' });
 
 const AcceptInvitation = () => {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const token = searchParams.get('token');
+    // Read token directly from URL — no React Router needed
+    const token = new URLSearchParams(window.location.search).get('token');
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [theme, setTheme] = useState({
-        name: '',
+        name: 'Your Organization',
         logo_medium_url: '',
-        theme_primary_color: '#000000',
-        theme_secondary_color: '#ffffff',
-        theme_accent_color: '#6366f1', // Default accent
-        theme_bg_color: '#f9fafb', // Default bg
-        theme_text_color: '#1f2937' // Default text
+        theme_primary_color: '#3730A3',
+        theme_secondary_color: '#EEF2FF',
     });
 
     useEffect(() => {
-        if (!token) {
-            setError('No invitation token found. Please use the link from your invitation.');
-            return;
-        }
-
+        if (!token) return;
         const fetchBranding = async () => {
             try {
-                const response = await api.get(`/company/branding/${token}`);
-                setTheme(response.data);
-            } catch (err) {
-                console.error("Failed to fetch company branding:", err);
-                // Don't set a user-facing error for this, just use the default theme
+                const res = await api.get(`/company/branding/${token}`);
+                setTheme(res.data);
+            } catch {
+                // silently use defaults
             }
         };
-
         fetchBranding();
     }, [token]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
-
-        if (password !== confirmPassword) {
-            setError('Passwords do not match.');
-            return;
-        }
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters long.');
-            return;
-        }
+        if (password !== confirmPassword) return setError('Passwords do not match.');
+        if (password.length < 8) return setError('Password must be at least 8 characters long.');
 
         setIsLoading(true);
         try {
-            const response = await api.post('/auth/accept-invitation', {
-                token,
-                password,
-            });
-            setSuccess(response.data.message + ' You will be redirected to login shortly.');
+            await api.post('/auth/accept-invitation', { token, password });
+            setSuccess(true);
+            // After 3s redirect to root (login)
             setTimeout(() => {
-                navigate('/login');
+                window.location.href = '/';
             }, 3000);
         } catch (err) {
             setError(err.response?.data?.error || 'An unknown error occurred.');
@@ -72,83 +55,129 @@ const AcceptInvitation = () => {
             setIsLoading(false);
         }
     };
-    
-    // Dynamic styles based on theme
-    const dynamicStyles = {
-        container: {
-            backgroundColor: theme.theme_bg_color || '#f9fafb',
-            color: theme.theme_text_color || '#1f2937'
-        },
-        button: {
-            backgroundColor: theme.theme_primary_color || '#4f46e5',
-        },
-        focusRing: {
-            '--tw-ring-color': theme.theme_primary_color || '#4f46e5'
-        }
-    };
+
+    const primary = theme.theme_primary_color || '#3730A3';
+    const secondary = theme.theme_secondary_color || '#EEF2FF';
+
+    if (!token) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center p-8">
+                    <FiAlertCircle size={48} className="mx-auto mb-4 text-red-500" />
+                    <h2 className="text-xl font-bold text-gray-800">Invalid Invitation Link</h2>
+                    <p className="text-gray-500 mt-2">No token found. Please use the full link from your invitation email.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div style={dynamicStyles.container} className="min-h-screen flex flex-col justify-center items-center">
-            <div className="max-w-md w-full mx-auto text-center">
-                {theme.logo_medium_url && (
-                    <img src={theme.logo_medium_url} alt={`${theme.name} Logo`} className="mx-auto h-12 w-auto mb-4" />
-                )}
-                <h2 className="text-3xl font-bold">Set Your Password for {theme.name}</h2>
-                <p className="mt-2 text-sm">
-                    Complete your account setup by creating a secure password.
-                </p>
+        <div className="min-h-screen flex" style={{ background: `linear-gradient(145deg, #020617 0%, #1e1b4b 40%, #312E81 80%, ${primary} 100%)` }}>
+            {/* Left — decorative panel */}
+            <div className="hidden lg:flex flex-1 flex-col justify-center items-center p-12 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="absolute border border-white rounded-2xl"
+                            style={{ width: `${80 + i * 60}px`, height: `${80 + i * 60}px`, top: `${10 + i * 10}%`, left: `${5 + i * 8}%`, transform: `rotate(${i * 12}deg)`, opacity: 0.4 - i * 0.05 }} />
+                    ))}
+                </div>
+                <div className="relative z-10 text-center">
+                    {theme.logo_medium_url && (
+                        <img src={theme.logo_medium_url} alt={theme.name} className="h-14 mx-auto mb-8 object-contain" />
+                    )}
+                    <h1 className="text-4xl font-bold text-white tracking-tight leading-tight">
+                        Welcome to<br />{theme.name}
+                    </h1>
+                    <p className="text-white/60 mt-4 text-base max-w-xs mx-auto leading-relaxed">
+                        You've been invited to join the team. Set your password below to activate your account.
+                    </p>
+                </div>
             </div>
-            <div className="max-w-md w-full mx-auto mt-8 bg-white p-8 border border-gray-200 rounded-xl shadow-lg">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label htmlFor="password" style={{color: dynamicStyles.container.color}} className="block text-sm font-medium">
-                            New Password
-                        </label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            required
-                            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            style={dynamicStyles.focusRing}
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            disabled={!token || isLoading}
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="confirm-password" style={{color: dynamicStyles.container.color}} className="block text-sm font-medium">
-                            Confirm New Password
-                        </label>
-                        <input
-                            id="confirm-password"
-                            name="confirm-password"
-                            type="password"
-                            required
-                            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            style={dynamicStyles.focusRing}
-                            placeholder="••••••••"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            disabled={!token || isLoading}
-                        />
-                    </div>
 
-                    {error && <p className="text-sm text-red-600 bg-red-100 p-3 rounded-md">{error}</p>}
-                    {success && <p className="text-sm text-green-600 bg-green-100 p-3 rounded-md">{success}</p>}
+            {/* Right — form panel */}
+            <div className="w-full lg:w-[480px] bg-white flex flex-col justify-center px-10 py-12">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
 
-                    <div>
-                        <button
-                            type="submit"
-                            style={dynamicStyles.button}
-                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
-                            disabled={!token || isLoading}
-                        >
-                            {isLoading ? 'Activating Account...' : 'Set Password & Activate'}
-                        </button>
-                    </div>
-                </form>
+                    {success ? (
+                        <div className="text-center">
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}
+                                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                                style={{ backgroundColor: secondary }}>
+                                <FiCheckCircle size={40} style={{ color: primary }} />
+                            </motion.div>
+                            <h2 className="text-2xl font-bold text-gray-800">Account Activated!</h2>
+                            <p className="text-gray-500 mt-2 text-sm">Your account is ready. Redirecting you to login…</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="mb-8">
+                                <div className="w-11 h-11 rounded-2xl flex items-center justify-center mb-5"
+                                    style={{ backgroundColor: secondary }}>
+                                    <FiLock style={{ color: primary }} size={22} />
+                                </div>
+                                <h2 className="text-2xl font-bold tracking-tight text-gray-800">Set Your Password</h2>
+                                <p className="text-gray-500 text-sm mt-1">Create a secure password to activate your account at <strong>{theme.name}</strong>.</p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-600 mb-1.5">New Password</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            required
+                                            minLength={8}
+                                            value={password}
+                                            onChange={e => { setPassword(e.target.value); setError(''); }}
+                                            placeholder="Minimum 8 characters"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none transition-all text-[14px] pr-12"
+                                            style={{ '--tw-ring-color': primary }}
+                                            onFocus={e => e.target.style.boxShadow = `0 0 0 3px ${primary}25`}
+                                            onBlur={e => e.target.style.boxShadow = 'none'}
+                                        />
+                                        <button type="button" onClick={() => setShowPassword(p => !p)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-600 mb-1.5">Confirm Password</label>
+                                    <input
+                                        type="password"
+                                        required
+                                        value={confirmPassword}
+                                        onChange={e => { setConfirmPassword(e.target.value); setError(''); }}
+                                        placeholder="Re-enter your password"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none transition-all text-[14px]"
+                                        onFocus={e => e.target.style.boxShadow = `0 0 0 3px ${primary}25`}
+                                        onBlur={e => e.target.style.boxShadow = 'none'}
+                                    />
+                                </div>
+
+                                {error && (
+                                    <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                                        className="flex items-center gap-2.5 p-3.5 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium">
+                                        <FiAlertCircle className="flex-shrink-0" size={16} />
+                                        {error}
+                                    </motion.div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full py-3.5 rounded-xl text-white font-bold text-[14px] transition-all disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                                    style={{ backgroundColor: primary, boxShadow: `0 4px 14px ${primary}40` }}
+                                >
+                                    {isLoading ? (
+                                        <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Activating Account…</>
+                                    ) : 'Activate & Set Password'}
+                                </button>
+                            </form>
+                        </>
+                    )}
+                </motion.div>
             </div>
         </div>
     );

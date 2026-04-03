@@ -1,31 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { FiHome, FiUsers, FiSettings, FiBarChart2, FiChevronLeft, FiChevronRight, FiBell, FiUser, FiPlus, FiX, FiCopy, FiCheck } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../utils/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  FiBox, FiUsers, FiSettings, FiHome, FiBarChart2, 
+  FiBell, FiChevronDown, FiLogOut, FiInfo, FiGrid, 
+  FiMessageSquare, FiPieChart, FiMonitor, FiCheckCircle,
+  FiArrowRight, FiArrowLeft, FiUser, FiPlus, FiX, FiCopy, FiCheck
+} from 'react-icons/fi';
+import PremiumLoader from '../PremiumLoader';
+import { useAlert } from '../../context/AlertContext';
+import UserProfile from './UserProfile';
+import OrganizationProfile from './OrganizationProfile';
 
 const StatCard = ({ icon, label, value, color }) => (
     <motion.div 
-        className={`bg-white rounded-xl shadow-lg p-6 flex items-center space-x-4 border-l-4`}
-        style={{ borderLeftColor: color }}
-        whileHover={{ scale: 1.05, boxShadow: "0px 10px 20px rgba(0,0,0,0.1)" }}
-        transition={{ type: "spring", stiffness: 300 }}
+        className="p-6 rounded-[20px] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 flex items-center space-x-4"
+        style={{ borderLeft: `5px solid ${color}` }}
+        whileHover={{ y: -4, boxShadow: '0 12px 24px -10px rgba(0,0,0,0.06)' }}
     >
-        <div className={`p-3 rounded-full`} style={{ backgroundColor: `${color}20` }}>
-            {React.createElement(icon, { size: 24, style: { color } })}
+        <div className={`p-4 rounded-[14px]`} style={{ backgroundColor: `${color}20`, color: color }}>
+            {React.createElement(icon, { size: 22 })}
         </div>
         <div>
-            <p className="text-sm font-medium text-gray-500">{label}</p>
-            <p className="text-2xl font-bold" style={{ color: 'var(--theme-text)'}}>{value}</p>
+            <p className="text-[13.5px] font-medium text-gray-500 mb-0.5">{label}</p>
+            <p className="text-2xl font-bold tracking-tight text-gray-800">{value}</p>
         </div>
     </motion.div>
 );
 
 const Dashboard = () => {
+    const { showAlert } = useAlert();
+    // --- Data State ---
     const [company, setCompany] = useState(null);
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [activeNav, setActiveNav] = useState('Dashboard');
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Invitation State
+    // --- UI State (Dribbble Layout) ---
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('Overview');
+
+    const notifRef = useRef(null);
+    const profileRef = useRef(null);
+
+    // --- Admin Feature State ---
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [invitationLink, setInvitationLink] = useState('');
     const [isCopied, setIsCopied] = useState(false);
@@ -37,6 +55,12 @@ const Dashboard = () => {
     });
     const [isInviting, setIsInviting] = useState(false);
 
+    const [isMailConfigModalOpen, setIsMailConfigModalOpen] = useState(false);
+    const [isSavingMailConfig, setIsSavingMailConfig] = useState(false);
+    const [mailConfigData, setMailConfigData] = useState({
+        smtp_host: '', smtp_port: '', smtp_username: '', smtp_password: '', smtp_from_email: ''
+    });
+
     useEffect(() => {
         const fetchCompanyData = async () => {
             try {
@@ -44,19 +68,47 @@ const Dashboard = () => {
                 setCompany(response.data);
                 
                 const root = document.documentElement;
-                root.style.setProperty('--theme-primary', response.data.theme_primary_color || '#4338ca');
-                root.style.setProperty('--theme-secondary', response.data.theme_secondary_color || '#c7d2fe');
-                root.style.setProperty('--theme-accent', response.data.theme_accent_color || '#db2777');
-                root.style.setProperty('--theme-bg', response.data.theme_bg_color || '#f5f3ff');
-                root.style.setProperty('--theme-text', response.data.theme_text_color || '#1f2937');
-
+                root.style.setProperty('--theme-primary', response.data.theme_primary_color || '#2bb6cb');
+                root.style.setProperty('--theme-secondary', response.data.theme_secondary_color || '#e4f5f8');
+                root.style.setProperty('--theme-accent', response.data.theme_accent_color || '#1e293b');
+                root.style.setProperty('--theme-bg', response.data.theme_bg_color || '#f0f4f8');
+                root.style.setProperty('--theme-text', response.data.theme_text_color || '#0f172a');
             } catch (error) {
                 console.error("Failed to fetch company data", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchCompanyData();
     }, []);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notifRef.current && !notifRef.current.contains(event.target)) setIsNotifOpen(false);
+            if (profileRef.current && !profileRef.current.contains(event.target)) setIsProfileOpen(false);
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleMailConfigSubmit = async (e) => {
+        e.preventDefault();
+        setIsSavingMailConfig(true);
+        try {
+            await api.post('/company/mail-config', mailConfigData);
+            setCompany({ ...company, smtp_host: mailConfigData.smtp_host });
+            setIsMailConfigModalOpen(false);
+            setInvitationLink('');
+            setIsInviteModalOpen(true);
+            showAlert("Mail server provisioned successfully.", "success");
+        } catch (error) {
+            showAlert(error.response?.data?.message || "Failed to provision mail server.", "error");
+        } finally {
+            setIsSavingMailConfig(false);
+        }
+    };
 
     const handleInviteSubmit = async (e) => {
         e.preventDefault();
@@ -64,8 +116,13 @@ const Dashboard = () => {
         try {
             const response = await api.post('/users/invite', inviteData);
             setInvitationLink(response.data.invitation_link);
+            if (response.data.email_sent) {
+                showAlert(`Invitation sent! An email has been delivered to ${inviteData.email}.`, "success");
+            } else {
+                showAlert("Invitation link generated. Email not sent (mail not configured).", "info");
+            }
         } catch (error) {
-            alert(error.response?.data?.error || "Failed to send invitation");
+            showAlert(error.response?.data?.error || "Failed to send invitation", "error");
         } finally {
             setIsInviting(false);
         }
@@ -74,208 +131,424 @@ const Dashboard = () => {
     const copyToClipboard = () => {
         navigator.clipboard.writeText(invitationLink);
         setIsCopied(true);
+        showAlert("Secure link copied to clipboard!", "success");
         setTimeout(() => setIsCopied(false), 2000);
     };
 
-    const sidebarVariants = {
-        expanded: { width: '280px' },
-        collapsed: { width: '80px' }
+    if (isLoading) {
+        return <PremiumLoader message="Booting Workspace..." fullScreen />;
+    }
+
+    const NavItem = ({ icon, label, id, isSub = false }) => {
+        const isActive = activeTab === id;
+        
+        return (
+            <li className={`group ${isSub ? 'mt-1' : 'mt-2'}`}>
+               <button 
+                 onClick={() => setActiveTab(id)}
+                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} 
+                             rounded-lg transition-all duration-200 relative
+                             ${isActive ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] font-semibold' : 'text-gray-600 hover:bg-gray-100 font-medium'}
+                 `}
+               >
+                   {isActive && !isSidebarCollapsed && (
+                       <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[var(--theme-primary)] rounded-r-md"></div>
+                   )}
+                   <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-[var(--theme-primary)]' : 'text-gray-500 group-hover:text-gray-700'} transition-colors`}>
+                       {icon}
+                   </div>
+                   {!isSidebarCollapsed && (
+                       <span className={`ml-3 text-[14px] ${isSub ? 'text-[13.5px] font-medium transition-all' : 'tracking-tight'} truncate`}>{label}</span>
+                   )}
+                   {!isSidebarCollapsed && !isSub && (label === 'Home' || label === 'Insights' || label === 'Collaboration') && (
+                       <FiChevronDown className="ml-auto opacity-50" size={14} />
+                   )}
+               </button>
+            </li>
+        );
     };
-    
-    const navItems = [
-        {icon: FiHome, label: 'Dashboard'},
-        {icon: FiUsers, label: 'Employees'},
-        {icon: FiBarChart2, label: 'Reports'},
-        {icon: FiSettings, label: 'Settings'}
-    ];
 
     return (
-        <div className="flex h-screen bg-gray-50" style={{ color: 'var(--theme-text)' }}>
-            <motion.div 
-                animate={isSidebarCollapsed ? "collapsed" : "expanded"}
-                variants={sidebarVariants}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="bg-white shadow-xl flex flex-col justify-between relative z-20"
-            >
-                <div>
-                    <div className="flex items-center px-4 h-20 border-b overflow-hidden">
-                        <div className={`flex items-center space-x-3 w-full ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-                            {company?.logo_small_url && (
-                                <img src={company.logo_small_url} alt={company.name} className="h-10 w-10 object-contain flex-shrink-0" />
-                            )}
-                            {!isSidebarCollapsed && (
-                                <span className="text-xl font-bold truncate transition-opacity duration-300" style={{color: 'var(--theme-primary)'}}>
-                                    {company?.name || "Dashboard"}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                    <nav className="mt-6 px-4">
-                        {navItems.map((item) => (
-                             <button 
-                                key={item.label} 
-                                onClick={() => setActiveNav(item.label)}
-                                className={`w-full text-left flex items-center px-4 py-3 my-2 rounded-lg transition-colors duration-200 
-                                    ${activeNav === item.label 
-                                        ? 'bg-[var(--theme-primary)] text-white shadow-md' 
-                                        : 'text-gray-600 hover:bg-[var(--theme-secondary)]'}`}>
-                                {React.createElement(item.icon, { size: 24, className:"flex-shrink-0" })}
-                                <AnimatePresence>
-                                {!isSidebarCollapsed && (
-                                    <motion.span 
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -10 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="ml-4 font-medium whitespace-nowrap"
-                                    >
-                                        {item.label}
-                                    </motion.span>
-                                )}
-                                </AnimatePresence>
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-                 <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="absolute -right-4 top-1/2 bg-white border shadow-md p-2 rounded-full focus:outline-none z-30 transition-transform hover:scale-110">
-                    {isSidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
-                </button>
-            </motion.div>
-
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="flex items-center justify-between p-6 h-20 bg-white border-b shadow-sm">
-                    <h1 className="text-2xl font-bold" style={{color: 'var(--theme-text)'}}>Welcome Admin</h1>
-                    <div className="flex items-center space-x-6">
-                        <div className="relative">
-                            <FiBell size={24} className="text-gray-500 cursor-pointer hover:text-[var(--theme-primary)] transition-colors"/>
-                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full">3</span>
-                        </div>
-                        <div className="flex items-center space-x-3 cursor-pointer group">
-                            <div className="w-10 h-10 rounded-full bg-[var(--theme-secondary)] flex items-center justify-center transition-transform group-hover:scale-105">
-                                <FiUser size={24} style={{color: 'var(--theme-primary)'}}/>
+        <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text)' }}>
+            
+            {/* SIDEBAR (Dribbble Layout) */}
+            <aside className={`${isSidebarCollapsed ? 'w-[84px]' : 'w-[260px]'} flex-shrink-0 bg-white m-4 rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.03)] transition-all duration-300 flex flex-col z-20`}>
+                {/* Logo Area */}
+                <div className="h-24 flex items-center px-6">
+                    <div className="flex items-center space-x-3 w-full">
+                        {company?.logo_original_url ? (
+                            <img src={company.logo_original_url} alt="Logo" className="w-8 h-8 object-contain rounded" />
+                        ) : (
+                            <div className="w-9 h-9 rounded-xl bg-[#0f172a] text-white flex items-center justify-center font-bold shadow-md">
+                                {company?.name ? company.name.charAt(0).toUpperCase() : 'C'}
                             </div>
-                            <span className="font-semibold hidden sm:block">Admin User</span>
+                        )}
+                        {!isSidebarCollapsed && (
+                            <h1 className="text-[16px] font-bold text-gray-800 tracking-tight truncate">
+                                {company?.name || 'Company Name'}
+                            </h1>
+                        )}
+                    </div>
+                </div>
+
+                {/* Navigation Sections */}
+                <div className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar">
+                    <ul>
+                        <NavItem icon={<FiHome/>} label="Home" id="Home" />
+                        
+                        {/* Sub-items block for Home */}
+                        {!isSidebarCollapsed && (
+                            <div className="ml-[22px] border-l border-gray-100 pl-2 mt-1 mb-3 space-y-0.5">
+                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-gray-400"></span>} label="Overview" id="Overview" />
+                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full bg-[var(--theme-primary)]"></span>} label="Live Network" id="Live Network" />
+                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-gray-400"></span>} label="To-Do's" id="To-Dos" />
+                            </div>
+                        )}
+
+                        <NavItem icon={<FiPieChart/>} label="Insights" id="Insights" />
+                        <NavItem icon={<FiGrid/>} label="Data Lake" id="Data Lake" />
+                        <NavItem icon={<FiMessageSquare/>} label="Collaboration" id="Collaboration" />
+                        <NavItem icon={<FiUsers/>} label="Employees" id="Employees" />
+                        <NavItem icon={<FiBarChart2/>} label="Reports" id="Reports" />
+                        
+                        {!isSidebarCollapsed && (
+                            <div className="mt-8 mb-3 px-3">
+                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Apps</span>
+                            </div>
+                        )}
+                        
+                        <NavItem icon={<FiMonitor/>} label="Demand Planning" id="Demand" />
+                        <NavItem icon={<FiBox/>} label="Add Module" id="Module" />
+                    </ul>
+                </div>
+
+                {/* Bottom Actions */}
+                <div className="p-4 border-t border-gray-50 space-y-0.5 pt-4">
+                     <NavItem icon={<FiSettings/>} label="Settings" id="Settings" />
+                     <NavItem icon={<FiInfo/>} label="Info" id="Info" />
+                     <motion.button 
+                        onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-gray-50 transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
+                     >
+                        <motion.div 
+                            className="text-lg group-hover:text-[var(--theme-primary)] transition-colors"
+                            animate={{ x: isSidebarCollapsed ? [0, 4, 0] : [0, -4, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                            {isSidebarCollapsed ? <FiArrowRight /> : <FiArrowLeft />}
+                        </motion.div>
+                        {!isSidebarCollapsed && <span className="ml-3 text-[14px] font-bold group-hover:text-gray-700 transition-colors truncate">Collapse</span>}
+                     </motion.button>
+                </div>
+            </aside>
+
+            {/* MAIN CONTENT AREA */}
+            <div className="flex-1 flex flex-col overflow-hidden pt-6 pr-8 pb-8 pl-[2px]">
+                
+                {/* TOP NAV (Pill Style) */}
+                <header className="h-[52px] flex justify-between items-center mb-8 pl-4">
+                    <div className="text-2xl font-bold tracking-tight text-gray-800">
+                        {activeTab === 'Live Network' ? 'Live Network (Admin)' : activeTab}
+                    </div>
+
+                    <div className="flex items-center space-x-1 bg-white px-1.5 py-1.5 rounded-full shadow-sm border border-gray-200/60 z-30 relative">
+                        {/* Notifications */}
+                        <div className="relative border-r border-gray-100 pr-2 pl-1" ref={notifRef}>
+                            <button 
+                                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                                className="relative p-2 text-gray-600 hover:bg-gray-50 rounded-full transition-colors flex items-center justify-center cursor-pointer"
+                            >
+                                <FiBell size={20} />
+                                <span className="absolute top-1.5 right-1.5 w-[15px] h-[15px] bg-red-500 border-2 border-white rounded-full text-[8px] font-bold text-white flex items-center justify-center leading-none">3</span>
+                            </button>
+                            
+                            {/* Notif Dropdown */}
+                            <AnimatePresence>
+                                {isNotifOpen && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                        className="absolute right-0 mt-4 w-80 bg-white rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100/80 z-50 overflow-hidden"
+                                    >
+                                        <div className="p-4 flex justify-between items-center border-b border-gray-50">
+                                            <h3 className="font-bold text-gray-800 text-sm">Notifications</h3>
+                                            <button className="text-[12px] text-[var(--theme-primary)] font-semibold hover:underline flex items-center gap-1">
+                                                <FiCheckCircle size={12}/> Mark all as read
+                                            </button>
+                                        </div>
+                                        <div className="bg-[var(--theme-secondary)] p-4 border-l-[3px] border-[var(--theme-primary)]">
+                                            <div className="flex space-x-3">
+                                                <div className="mt-0.5 p-1.5 bg-white rounded-full shadow-sm"><FiUser className="text-gray-500" size={14}/></div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-800 leading-snug">Requires admin approval: New User.</p>
+                                                    <p className="text-[11px] text-gray-400 mt-1.5 font-medium">Administration • 5m ago</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-3 bg-white border-t border-gray-50">
+                                            <button className="w-full py-2 bg-[var(--theme-primary)] text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity">
+                                                Show all
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Profile */}
+                        <div className="relative pl-1 pr-1" ref={profileRef}>
+                            <button 
+                                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                className="flex items-center space-x-2.5 p-1.5 pr-3 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+                            >
+                                <div className="w-[30px] h-[30px] rounded-full bg-[var(--theme-secondary)] border border-white flex items-center justify-center">
+                                    <FiUser size={16} className="text-[var(--theme-primary)]"/>
+                                </div>
+                                <span className="text-[13.5px] font-semibold text-gray-700 hidden md:block tracking-tight">Admin User</span>
+                                <FiChevronDown className="text-gray-400 ml-1" size={16} />
+                            </button>
+
+                            {/* Profile Dropdown */}
+                            <AnimatePresence>
+                                {isProfileOpen && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                        className="absolute right-0 mt-4 w-52 bg-white rounded-xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 z-50 p-2"
+                                    >
+                                            <div className="p-1 space-y-0.5">
+                                                <button onClick={() => { setActiveTab('My Organization'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                                    <FiBox className="mr-3 text-gray-400" size={16}/> My Organization
+                                                </button>
+                                                <button onClick={() => { setActiveTab('My Profile'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                                    <FiUsers className="mr-3 text-gray-400" size={16}/> My Profile
+                                                </button>
+                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                                <FiSettings className="mr-3 text-gray-400" size={16}/> Settings
+                                            </a>
+                                            <div className="border-t border-gray-100 my-1.5"></div>
+                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-red-600 hover:bg-red-50 rounded-lg font-medium cursor-pointer" onClick={() => localStorage.removeItem('token') || window.location.reload()}>
+                                                <FiLogOut className="mr-3 text-red-400" size={16}/> Log Out
+                                            </a>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </header>
-                
-                <main className="flex-1 overflow-y-auto p-8" style={{ backgroundColor: 'var(--theme-bg)' }}>
-                     <motion.div 
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-                            <StatCard icon={FiUsers} label="Total Employees" value="1,254" color="var(--theme-primary)" />
-                            <StatCard icon={FiBarChart2} label="Pending Approvals" value="12" color="var(--theme-accent)" />
-                            <StatCard icon={FiHome} label="Active Departments" value="8" color="#10B981" />
-                            <StatCard icon={FiSettings} label="Open Roles" value="4" color="#F59E0B" />
-                        </div>
 
-                        {/* Quick Actions */}
-                        <div className="mb-10">
-                            <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-                            <div className="flex flex-wrap gap-4">
-                                <button 
-                                    onClick={() => { setInvitationLink(''); setIsInviteModalOpen(true); }}
-                                    className="flex items-center px-6 py-3 rounded-xl text-white font-bold transition-all hover:shadow-lg active:scale-95"
-                                    style={{ backgroundColor: 'var(--theme-primary)' }}
-                                >
-                                    <FiPlus className="mr-2" size={20}/> Invite New User
-                                </button>
-                                <button className="flex items-center px-6 py-3 rounded-xl bg-white border border-gray-200 font-bold hover:bg-gray-50 transition-all shadow-sm">
-                                    <FiBarChart2 className="mr-2" size={20}/> Generate Report
-                                </button>
+                {/* MAIN ADMIN CONTENT PANELS */}
+                <main className="flex-1 overflow-y-auto scroll-smooth pl-4 pb-8">
+                    {activeTab === 'My Profile' ? (
+                        <UserProfile token={localStorage.getItem('token')} />
+                    ) : activeTab === 'My Organization' ? (
+                        <OrganizationProfile token={localStorage.getItem('token')} />
+                    ) : (
+                        <>
+                            {/* Metrics Overview */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <StatCard icon={FiUsers} label="Total Employees" value="1,254" color="var(--theme-primary)" />
+                                <StatCard icon={FiBarChart2} label="Pending Approvals" value="12" color="var(--theme-accent)" />
+                                <StatCard icon={FiHome} label="Active Departments" value="8" color="#10B981" />
+                                <StatCard icon={FiSettings} label="Open Roles" value="4" color="#F59E0B" />
                             </div>
-                        </div>
-
-                        {/* Placeholder for Data Table / Charts */}
-                        <div className="bg-white rounded-2xl shadow-md p-8 min-h-[300px] flex items-center justify-center border border-gray-100">
-                            <p className="text-gray-400 italic">Analytical overview and employee directory coming soon...</p>
-                        </div>
-                     </motion.div>
+        
+                            {/* Quick Actions preserving old Admin logic */}
+                            <div className="mb-8">
+                                <h2 className="text-xl font-bold mb-5 tracking-tight text-gray-800">Operational Actions</h2>
+                                <div className="flex flex-wrap gap-4">
+                                    <button 
+                                        onClick={() => { 
+                                            if (!company?.smtp_host) {
+                                                setIsMailConfigModalOpen(true);
+                                            } else {
+                                                setInvitationLink(''); 
+                                                setIsInviteModalOpen(true); 
+                                            }
+                                        }}
+                                        className="flex items-center px-6 py-3.5 rounded-xl text-white font-medium transition-all shadow-[0_4px_14px_rgba(43,182,203,0.3)] hover:shadow-[0_6px_20px_rgba(43,182,203,0.4)] active:scale-95"
+                                        style={{ backgroundColor: 'var(--theme-primary)' }}
+                                    >
+                                        <FiPlus className="mr-2" size={20}/> Invite New Employee
+                                    </button>
+                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                                        <FiBarChart2 className="mr-2 text-gray-400" size={20}/> Build Analytical Report
+                                    </button>
+                                </div>
+                            </div>
+        
+                            {/* Data Placeholder */}
+                            <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-8 min-h-[300px] flex items-center justify-center border border-gray-100">
+                                <p className="text-gray-400 italic font-medium">Analytical overview and employee directory infrastructure rendering here.</p>
+                            </div>
+                        </>
+                    )}
                 </main>
             </div>
 
-            {/* User Invitation Modal */}
+            {/* Mail Configuration Intercept Modal */}
+            <AnimatePresence>
+                {isMailConfigModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsMailConfigModalOpen(false)} className="absolute inset-0 bg-[#0f172a]/70 backdrop-blur-sm" />
+                        <motion.div 
+                            initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="bg-white rounded-[24px] shadow-2xl w-full max-w-lg p-8 relative z-10 border border-gray-100"
+                        >
+                            <button onClick={() => setIsMailConfigModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 rounded-full p-2 focus:outline-none"><FiX size={20}/></button>
+                            <div className="mb-6">
+                                <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4 border border-indigo-100">
+                                   <FiSettings className="text-[var(--theme-primary)]" size={24}/>
+                                </div>
+                                <h2 className="text-2xl font-bold tracking-tight text-gray-800">Mail Configuration Required</h2>
+                                <p className="text-gray-500 text-sm mt-1 leading-relaxed">Before circumventing invitations, your organization's SMTP communication parameters must be securely established.</p>
+                            </div>
+                            <form onSubmit={handleMailConfigSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-600 mb-1.5">SMTP Host Server</label>
+                                    <input required type="text" placeholder="smtp.gmail.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all text-[14px]" 
+                                        value={mailConfigData.smtp_host} onChange={e => setMailConfigData({...mailConfigData, smtp_host: e.target.value})} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">SMTP Port</label>
+                                        <input required type="number" placeholder="587" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all text-[14px]" 
+                                            value={mailConfigData.smtp_port} onChange={e => setMailConfigData({...mailConfigData, smtp_port: e.target.value})} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Sender Address</label>
+                                        <input required type="email" placeholder="hr@company.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all text-[14px]" 
+                                            value={mailConfigData.smtp_from_email} onChange={e => setMailConfigData({...mailConfigData, smtp_from_email: e.target.value})} />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Auth Username</label>
+                                        <input required type="text" placeholder="Access ID" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all text-[14px]" 
+                                            value={mailConfigData.smtp_username} onChange={e => setMailConfigData({...mailConfigData, smtp_username: e.target.value})} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">App Password</label>
+                                        <input required type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all text-[14px]" 
+                                            value={mailConfigData.smtp_password} onChange={e => setMailConfigData({...mailConfigData, smtp_password: e.target.value})} />
+                                    </div>
+                                </div>
+                                <button disabled={isSavingMailConfig} type="submit" className="w-full py-3.5 rounded-xl text-white font-bold transition-all shadow-[0_4px_14px_rgba(43,182,203,0.3)] hover:shadow-[0_6px_20px_rgba(43,182,203,0.4)] mt-6 disabled:opacity-50 flex items-center justify-center gap-2" style={{ backgroundColor: 'var(--theme-primary)' }}>
+                                    {isSavingMailConfig ? "Verifying Keys..." : "Provision Mail Server"} 
+                                </button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* User Invitation Modal (Maintained Backend Logic) */}
             <AnimatePresence>
                 {isInviteModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsInviteModalOpen(false)}
-                            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                            className="absolute inset-0 bg-[#0f172a]/40 backdrop-blur-[4px]"
                         />
                         <motion.div 
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0, y: 10 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative z-10"
+                            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-100"
                         >
-                            <button onClick={() => setIsInviteModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
-                                <FiX size={24}/>
+                            <button onClick={() => setIsInviteModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 rounded-full p-1.5 focus:outline-none">
+                                <FiX size={20}/>
                             </button>
                             
-                            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--theme-primary)' }}>Invite Team Member</h2>
+                            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">Add Team Member</h2>
 
                             {!invitationLink ? (
-                                <form onSubmit={handleInviteSubmit} className="space-y-4">
+                                <form onSubmit={handleInviteSubmit} className="space-y-5">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-600 mb-1">First Name</label>
-                                            <input required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--theme-primary)] outline-none" 
+                                            <label className="block text-sm font-semibold text-gray-600 mb-1.5">First Name</label>
+                                            <input required type="text" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] focus:border-transparent outline-none transition-all" 
                                                 onChange={e => setInviteData({...inviteData, first_name: e.target.value})} />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-600 mb-1">Last Name</label>
-                                            <input required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--theme-primary)] outline-none" 
+                                            <label className="block text-sm font-semibold text-gray-600 mb-1.5">Last Name</label>
+                                            <input required type="text" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] focus:border-transparent outline-none transition-all" 
                                                 onChange={e => setInviteData({...inviteData, last_name: e.target.value})} />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-600 mb-1">Email Address</label>
-                                        <input required type="email" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--theme-primary)] outline-none" 
+                                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Email Address</label>
+                                        <input required type="email" placeholder="colleague@domain.com" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] focus:border-transparent outline-none transition-all" 
                                             onChange={e => setInviteData({...inviteData, email: e.target.value})} />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-600 mb-1">Role</label>
-                                        <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--theme-primary)] outline-none appearance-none bg-white"
+                                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Organizational Role</label>
+                                        <select className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[var(--theme-primary)] focus:border-transparent outline-none appearance-none font-medium text-gray-700"
                                             onChange={e => setInviteData({...inviteData, role: e.target.value})}>
-                                            <option value="employee">Employee</option>
+                                            <option value="employee">Standard Employee</option>
                                             <option value="admin">Administrator</option>
                                         </select>
                                     </div>
                                     <button 
                                         disabled={isInviting}
                                         type="submit" 
-                                        className="w-full py-3 rounded-lg text-white font-bold transition-all shadow-md mt-4 disabled:opacity-50"
+                                        className="w-full py-3.5 rounded-xl text-white font-bold transition-all shadow-[0_4px_14px_rgba(43,182,203,0.3)] hover:shadow-[0_6px_20px_rgba(43,182,203,0.4)] mt-6 disabled:opacity-50"
                                         style={{ backgroundColor: 'var(--theme-primary)' }}
                                     >
-                                        {isInviting ? "Generating Link..." : "Generate Invitation Link"}
+                                        {isInviting ? "Authenticating Request..." : "Send Invitation Access"}
                                     </button>
                                 </form>
                             ) : (
                                 <div className="space-y-6 text-center">
-                                    <div className="p-4 bg-green-50 rounded-xl border border-green-100 flex flex-col items-center">
-                                        <FiCheck size={40} className="text-green-500 mb-2"/>
-                                        <p className="text-green-800 font-medium">Link Generated Successfully!</p>
+                                    <div className="p-5 bg-green-50 rounded-2xl border border-green-100 flex flex-col items-center">
+                                        <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                                            <FiCheck size={28} className="text-green-600"/>
+                                        </div>
+                                        <p className="text-green-800 font-bold text-lg">Secure Link Formulated</p>
                                     </div>
                                     <div className="relative">
-                                        <input readOnly value={invitationLink} className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-sm font-mono pr-12" />
-                                        <button onClick={copyToClipboard} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-[var(--theme-primary)] transition-colors">
+                                        <input readOnly value={invitationLink} className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-[13px] text-gray-600 font-mono pr-12 focus:outline-none" />
+                                        <button onClick={copyToClipboard} className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-white shadow-sm border border-gray-100 text-gray-500 hover:text-[var(--theme-primary)] rounded-lg transition-colors">
                                             {isCopied ? <FiCheck className="text-green-500"/> : <FiCopy/>}
                                         </button>
                                     </div>
-                                    <p className="text-xs text-gray-500 px-4 italic">Send this link to the user. They can use it to set their password and activate their account.</p>
-                                    <button onClick={() => setIsInviteModalOpen(false)} className="w-full py-3 border rounded-lg font-bold hover:bg-gray-50 transition-colors">Close</button>
+                                    <p className="text-[13px] text-gray-500 px-2">Distribute this secure access string to the recipient. They will use it to bypass standard registration and associate seamlessly with the organization profile.</p>
+                                    <button onClick={() => setIsInviteModalOpen(false)} className="w-full py-3.5 border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-colors">Finalize Process</button>
                                 </div>
                             )}
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* Global Styled Overrides */}
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: transparent;
+                    border-radius: 20px;
+                }
+                .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                    background-color: #cbd5e1;
+                }
+            `}</style>
         </div>
     );
 };

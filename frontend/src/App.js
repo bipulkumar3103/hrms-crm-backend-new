@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Login from './components/Login';
@@ -6,10 +6,22 @@ import Register from './components/Register';
 import CompleteProfile from './components/CompleteProfile';
 import AdminDashboard from './components/admin/Dashboard';
 import OnboardingGoogle from './components/onboarding/OnboardingGoogle';
+import PremiumLoader from './components/PremiumLoader';
+import AcceptInvitation from './components/AcceptInvitation';
+import { useAlert } from './context/AlertContext';
+import PremiumAlert from './components/PremiumAlert';
 
 function App() {
+  const { showAlert } = useAlert();
+  // Stable ref so the URL-error effect doesn't re-run when showAlert identity changes
+  const showAlertRef = useRef(showAlert);
+  useEffect(() => { showAlertRef.current = showAlert; }, [showAlert]);
+
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [view, setView] = useState('login');
+  // If user landed directly on /accept-invitation, lock into that view immediately
+  // and never let the token checkStatus override it.
+  const isAcceptInvite = window.location.pathname.startsWith('/accept-invitation');
+  const [view, setView] = useState(isAcceptInvite ? 'accept-invitation' : 'login');
   const [isLoading, setIsLoading] = useState(false);
 
   const api = useMemo(() => {
@@ -31,38 +43,41 @@ function App() {
   };
 
   useEffect(() => {
+    // Don't process OAuth tokens/errors when on the invitation page
+    if (isAcceptInvite) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const urlToken = urlParams.get('token');
     const urlError = urlParams.get('error');
 
-    console.log("DEBUG: Checking URL for token/error", { urlToken, urlError });
-
     if (urlToken) {
-      console.log('Token received from URL:', urlToken);
       saveToken(urlToken);
-      // Clean up the URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (urlError) {
-      console.error('Auth error from URL:', urlError);
-      alert(urlError === 'email_exists' ? 'An account with this email already exists. Please log in with your password.' : 'Authentication failed.');
+      showAlertRef.current(
+        urlError === 'email_exists'
+          ? 'An account with this email already exists. Please log in with your password.'
+          : 'Authentication failed.',
+        'error'
+      );
       window.history.replaceState({}, document.title, window.location.pathname);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    // Skip auth check entirely when the user is on the invitation acceptance page.
+    // A stored admin JWT must not redirect them to the dashboard.
+    if (isAcceptInvite) return;
+
     const checkStatus = async () => {
       if (token) {
         setIsLoading(true);
-        console.log("DEBUG: Current Token found, calling check-status API");
         try {
           const decoded = jwtDecode(token);
           console.log('Decoded Token:', decoded);
-
-          // Call the onboarding check-status endpoint to determine current state
           const response = await api.get('/onboarding/check-status');
-          console.log("DEBUG: Onboarding Status Response:", response.data);
           const { has_company, profile_complete } = response.data;
-
           if (!has_company) {
             setView('onboarding-google');
           } else if (!profile_complete) {
@@ -71,7 +86,6 @@ function App() {
             setView('dashboard');
           }
         } catch (e) {
-          console.error("DEBUG: checkStatus Error details:", e.response?.data || e.message);
           console.error('Session validation or status check failed', e);
           logout();
         } finally {
@@ -82,20 +96,18 @@ function App() {
         setIsLoading(false);
       }
     };
-
     checkStatus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, api]);
 
   const renderView = () => {
     if (isLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-      );
+      return <PremiumLoader message="Initializing Secure Environment..." fullScreen />;
     }
 
     switch (view) {
+      case 'accept-invitation':
+        return <AcceptInvitation />;
       case 'login':
         return <Login setToken={saveToken} setView={setView} />;
       case 'register':
@@ -111,7 +123,12 @@ function App() {
     }
   };
 
-  return <div className="App">{renderView()}</div>;
+  return (
+    <>
+      <PremiumAlert />
+      <div className="App">{renderView()}</div>
+    </>
+  );
 }
 
 export default App;

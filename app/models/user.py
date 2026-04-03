@@ -20,6 +20,23 @@ class User(db.Model):
     invitation_token = db.Column(db.String(64), unique=True, nullable=True)
     status = db.Column(db.String(20), default='invited', nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    
+    phone_number = db.Column(db.String(20), nullable=True)
+    job_title = db.Column(db.String(128), nullable=True)
+    department = db.Column(db.String(128), nullable=True)
+    location = db.Column(db.String(128), nullable=True)
+    
+    avatar_original_url = db.Column(db.String(255), nullable=True)
+    avatar_medium_url = db.Column(db.String(255), nullable=True)
+    avatar_small_url = db.Column(db.String(255), nullable=True)
+    
+    dob = db.Column(db.String(20), nullable=True)
+    address_temporary = db.Column(db.Text, nullable=True)
+    address_permanent = db.Column(db.Text, nullable=True)
+    
+    pan_number = db.Column(db.String(15), nullable=True)
+    aadhar_number = db.Column(db.String(20), nullable=True)
+    uan = db.Column(db.String(20), nullable=True)
 
     roles = db.relationship('Role', secondary=user_roles, lazy='subquery',
                             back_populates='users')

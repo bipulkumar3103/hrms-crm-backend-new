@@ -83,7 +83,7 @@ function Profile({ token }) {
       setUploadStatus('Uploading...');
       setUploadError('');
 
-      await axios.post('/api/v1/company/logo', formData, {
+      await axios.post('/api/v1/uploads/company-logo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -147,13 +147,14 @@ function Profile({ token }) {
                     type="file"
                     accept="image/png, image/jpeg, image/gif"
                     onChange={handleFileChange}
-                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border border-gray-200 file:bg-[var(--theme-secondary,#e0e7ff)] file:text-[var(--theme-primary,#3730A3)] hover:file:opacity-90 file:font-bold file:transition-all cursor-pointer"
                 />
             </div>
             <button
                 onClick={handleUpload}
                 disabled={!selectedFile || uploadStatus === 'Uploading...'}
-                className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
+                className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 border border-transparent font-bold rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.1)] text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400 transition-all font-sans"
+                style={{ backgroundColor: 'var(--theme-primary, #3730A3)' }}
             >
                 {uploadStatus.includes('Uploading') ? 'Uploading...' : 'Upload Logo'}
             </button>
