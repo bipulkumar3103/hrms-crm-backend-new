@@ -13,6 +13,10 @@ function OrganizationProfile({ token }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('');
 
+    // Details state
+    const [details, setDetails] = useState({ name: '', domain: '', phone: '', address: '', website: '' });
+    const [detailsStatus, setDetailsStatus] = useState('');
+
     // Theme and Mail state
     const [themeColors, setThemeColors] = useState({ primary: '', secondary: '', accent: '', bg: '', text: '' });
     const [mailConfig, setMailConfig] = useState({ host: '', port: '', user: '', pass: '', from: '' });
@@ -28,6 +32,13 @@ function OrganizationProfile({ token }) {
                     axios.get('/api/v1/users/me', { headers: { Authorization: `Bearer ${token}` } })
                 ]);
                 setCompanyInfo(companyRes.data);
+                setDetails({
+                    name: companyRes.data.name || '',
+                    domain: companyRes.data.domain || '',
+                    phone: companyRes.data.phone || '',
+                    address: companyRes.data.address || '',
+                    website: companyRes.data.website || ''
+                });
                 setUserRoles(userRes.data.roles || []);
                 setThemeColors({ 
                     primary: companyRes.data.theme_primary_color || '', 
@@ -58,21 +69,22 @@ function OrganizationProfile({ token }) {
 
     const isSuperAdmin = userRoles.includes('superadmin');
 
-    const handleUpload = async () => {
-        if (!selectedFile) return;
+    const handleUpload = async (file) => {
+        const fileToUpload = file || selectedFile;
+        if (!fileToUpload) return;
         
         const form = new FormData();
-        form.append('logo', selectedFile);
+        form.append('logo', fileToUpload);
         
         try {
-            setUploadStatus('Uploading...');
+            setUploadStatus('Synchronizing Identity...');
             await axios.post('/api/v1/uploads/company-logo', form, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
                 }
             });
-            setUploadStatus('Success!');
+            setUploadStatus('New Organization Logo Engaged!');
             setSelectedFile(null);
             
             // Reload company data to get the new logo
@@ -81,7 +93,20 @@ function OrganizationProfile({ token }) {
             setTimeout(() => setUploadStatus(''), 3000);
         } catch (err) {
             console.error(err);
-            setUploadStatus('Upload failed.');
+            setUploadStatus('Upload request dropped.');
+            setTimeout(() => setUploadStatus(''), 3000);
+        }
+    };
+
+    const handleDetailsUpdate = async () => {
+        try {
+            setDetailsStatus('Updating...');
+            await axios.put('/api/v1/company/me', details, { headers: { Authorization: `Bearer ${token}` } });
+            setDetailsStatus('Company Directory Updated!');
+            setCompanyInfo({...companyInfo, ...details});
+            setTimeout(() => setDetailsStatus(''), 3000);
+        } catch (err) {
+            setDetailsStatus('Update failed.');
         }
     };
 
@@ -119,294 +144,330 @@ function OrganizationProfile({ token }) {
         }
     };
 
-    if (loading) return <PremiumLoader message="Loading Organization..." />;
+    if (loading) return <PremiumLoader message="Fetching Organization Subsystems..." />;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
     return (
-        <div className="max-w-5xl mx-auto py-8 pl-2 pr-6">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-800">My Organization</h2>
-                    <p className="text-gray-500 mt-1">Enterprise parameters and branding.</p>
+        <div className="mx-auto w-full">
+            {uploadStatus && (
+                <div className={`mb-6 p-4 rounded-xl text-sm font-semibold flex items-center shadow-sm ${uploadStatus.includes('failed') || uploadStatus.includes('dropped') ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-[#e0e7ff] text-[#3730A3] border border-[#c7d2fe]'} z-50`}>
+                    {uploadStatus}
                 </div>
-                {!isSuperAdmin && (
-                    <div className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded-xl text-sm font-semibold border border-yellow-100 flex items-center">
-                        <FiSettings className="mr-2"/> Read Only Mode
-                    </div>
-                )}
-            </div>
+            )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Branding Card */}
-                <div className="lg:col-span-2 bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8">
-                    <div className="flex items-center mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-4">
-                            <FiImage className="text-[var(--theme-primary)]" size={20}/>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800">Visual Identity</h3>
-                    </div>
-
-                    <div className="flex items-center space-x-8 mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                        <div className="w-24 h-24 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {companyInfo?.logo_original_url ? (
-                                <img src={companyInfo.logo_original_url} alt="Logo" className="max-w-full max-h-full object-contain p-2"/>
-                            ) : (
-                                <span className="text-gray-400 font-bold uppercase">{companyInfo?.name?.[0]}</span>
-                            )}
-                        </div>
-                        <div>
-                            <p className="font-bold text-gray-800 text-lg">{companyInfo?.name}</p>
-                            <p className="text-gray-500 text-sm mt-1">{companyInfo?.domain}</p>
-                        </div>
-                    </div>
-
-                    {isSuperAdmin && (
-                        <div className="space-y-4 pt-6 border-t border-gray-100">
-                            <label className="block text-sm font-semibold text-gray-700">Update Organization Logo</label>
-                            <div className="flex items-center space-x-3">
-                                <input 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={e => setSelectedFile(e.target.files[0])}
-                                    className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-[var(--theme-primary)] hover:file:bg-indigo-100 file:font-semibold cursor-pointer transition-colors"
-                                />
-                                <button 
-                                    onClick={handleUpload}
-                                    disabled={!selectedFile || uploadStatus === 'Uploading...'}
-                                    className="px-6 py-2.5 rounded-xl text-white font-bold disabled:opacity-50 transition-all shadow-sm"
-                                    style={{ backgroundColor: 'var(--theme-primary)' }}
-                                >
-                                    Upload
-                                </button>
-                            </div>
-                            {uploadStatus && (
-                                <p className={`text-sm font-medium ${uploadStatus.includes('failed') ? 'text-red-500' : 'text-green-600'}`}>
-                                    {uploadStatus}
-                                </p>
-                            )}
+            <div className="bg-white rounded-[24px] shadow-[0_4px_34px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden relative">
+                
+                {/* Enterprise Header Area */}
+                <div className="h-40 bg-gradient-to-r from-[var(--theme-primary,#3730A3)] to-indigo-800 relative overflow-hidden">
+                    {!isSuperAdmin && (
+                        <div className="absolute top-5 right-5 bg-yellow-500/80 backdrop-blur-md border border-yellow-400 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center shadow-md z-20">
+                            <FiSettings className="mr-2"/> Protected View (Read Only)
                         </div>
                     )}
-                </div>
-
-                {/* Configuration Card */}
-                <div className="bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-[var(--theme-secondary)] flex items-center justify-center mb-6 border border-gray-50">
-                        <FiAperture className="text-[var(--theme-primary)]" size={30}/>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Theme Integration</h3>
-                    <p className="text-gray-500 text-sm mb-8">Primary branding colors synchronizing with your dashboard.</p>
                     
-                    <div className="w-full space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-600">Primary Color</span>
-                            <div className="flex items-center">
-                                {isSuperAdmin ? (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{themeColors.primary}</span>
-                                        <input 
-                                            type="color" 
-                                            value={themeColors.primary}
-                                            onChange={(e) => setThemeColors({...themeColors, primary: e.target.value})}
-                                            className="w-8 h-8 rounded border-0 shadow-sm cursor-pointer"
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{companyInfo?.theme_primary_color}</span>
-                                        <div className="w-6 h-6 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: companyInfo?.theme_primary_color }}></div>
-                                    </>
+                    {/* Background decorations */}
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dimension.png')] bg-repeat"></div>
+                    <div className="absolute right-0 bottom-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+                </div>
+                
+                {/* Main Profile Body */}
+                <div className="px-8 pb-10">
+                    <div className="flex flex-col lg:flex-row gap-10 relative z-10 w-full">
+                        
+                        {/* Interactive Logo Column */}
+                        <div className="lg:w-1/4 -mt-20 flex flex-col items-center">
+                            <div className="relative group">
+                                <div className="w-40 h-40 rounded-[32px] bg-white p-2 shadow-xl mb-6 transform group-hover:scale-105 transition-all duration-300">
+                                    <div className="w-full h-full bg-gray-50 rounded-[24px] flex items-center justify-center text-[54px] text-[var(--theme-primary)] font-bold tracking-tighter border border-gray-100 overflow-hidden relative">
+                                        {companyInfo?.logo_original_url ? (
+                                            <img src={companyInfo.logo_original_url} alt="Enterprise Logo" className="w-full h-full object-contain p-2 bg-white"/>
+                                        ) : (
+                                            <>{companyInfo?.name?.[0] || 'O'}</>
+                                        )}
+                                        
+                                        {isSuperAdmin && (
+                                            <div 
+                                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white flex-col cursor-pointer"
+                                                onClick={() => document.getElementById('companyLogoUpload').click()}
+                                            >
+                                                <FiImage size={28} className="mb-2"/>
+                                                <span className="text-[11px] uppercase font-bold tracking-widest text-center px-1">Update Insignia</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                {isSuperAdmin && (
+                                    <input 
+                                        type="file" 
+                                        id="companyLogoUpload"
+                                        className="hidden" 
+                                        accept="image/*" 
+                                        onChange={(e) => {
+                                            if(e.target.files[0]) {
+                                                handleUpload(e.target.files[0]);
+                                            }
+                                        }} 
+                                    />
                                 )}
                             </div>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-600">Secondary Color</span>
-                            <div className="flex items-center">
-                                {isSuperAdmin ? (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{themeColors.secondary}</span>
-                                        <input 
-                                            type="color" 
-                                            value={themeColors.secondary}
-                                            onChange={(e) => setThemeColors({...themeColors, secondary: e.target.value})}
-                                            className="w-8 h-8 rounded border-0 shadow-sm cursor-pointer"
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{companyInfo?.theme_secondary_color}</span>
-                                        <div className="w-6 h-6 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: companyInfo?.theme_secondary_color }}></div>
-                                    </>
-                                )}
+                            
+                            <div className="w-full bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-4">
+                                <div className="w-full bg-green-50 text-green-700 px-4 py-2 rounded-xl text-[12px] font-extrabold flex items-center justify-center">
+                                    Network Active
+                                </div>
+                                <div className="w-full pt-2">
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-center">Root Domain Space</p>
+                                    <div className="bg-gray-50 border border-gray-200 text-gray-700 px-3 py-2.5 rounded-lg text-[13px] font-bold text-center truncate">
+                                        {companyInfo?.domain || 'N/A'}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-600">Accent Color</span>
-                            <div className="flex items-center">
-                                {isSuperAdmin ? (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{themeColors.accent}</span>
-                                        <input 
-                                            type="color" 
-                                            value={themeColors.accent}
-                                            onChange={(e) => setThemeColors({...themeColors, accent: e.target.value})}
-                                            className="w-8 h-8 rounded border-0 shadow-sm cursor-pointer"
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{companyInfo?.theme_accent_color}</span>
-                                        <div className="w-6 h-6 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: companyInfo?.theme_accent_color }}></div>
-                                    </>
-                                )}
+
+                        {/* Configuration Grid Column */}
+                        <div className="lg:w-3/4 pt-6 lg:pt-2 w-full">
+                            
+                            {/* Summary Header */}
+                            <div className="mb-10 pb-6 border-b border-gray-100">
+                                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-3">
+                                    {companyInfo?.name || 'Enterprise Matrix'}
+                                </h1>
+                                <p className="text-[18px] font-semibold text-[var(--theme-primary)] flex items-center">
+                                    Enterprise parameters and active framework identity
+                                </p>
                             </div>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-600">Background Color</span>
-                            <div className="flex items-center">
-                                {isSuperAdmin ? (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{themeColors.bg}</span>
-                                        <input 
-                                            type="color" 
-                                            value={themeColors.bg}
-                                            onChange={(e) => setThemeColors({...themeColors, bg: e.target.value})}
-                                            className="w-8 h-8 rounded border-0 shadow-sm cursor-pointer"
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{companyInfo?.theme_bg_color}</span>
-                                        <div className="w-6 h-6 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: companyInfo?.theme_bg_color }}></div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-600">Text Color</span>
-                            <div className="flex items-center">
-                                {isSuperAdmin ? (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{themeColors.text}</span>
-                                        <input 
-                                            type="color" 
-                                            value={themeColors.text}
-                                            onChange={(e) => setThemeColors({...themeColors, text: e.target.value})}
-                                            className="w-8 h-8 rounded border-0 shadow-sm cursor-pointer"
-                                        />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="font-mono text-xs text-gray-400 mr-2">{companyInfo?.theme_text_color}</span>
-                                        <div className="w-6 h-6 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: companyInfo?.theme_text_color }}></div>
-                                    </>
+
+                            <div className="space-y-8">
+                                
+                                {/* Enterprise Directory Data */}
+                                <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-inner relative overflow-hidden">
+                                    <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider">
+                                        <FiBriefcase className="mr-2 text-[var(--theme-primary)]"/> Global Directory Profile
+                                    </h3>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Registered Entity Name</label>
+                                            {isSuperAdmin ? (
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    value={details.name}
+                                                    onChange={e => setDetails({...details, name: e.target.value})}
+                                                />
+                                            ) : (
+                                                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 text-[14px] shadow-sm">{companyInfo?.name || 'N/A'}</div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Primary Namespace Domain</label>
+                                            {isSuperAdmin ? (
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    value={details.domain}
+                                                    onChange={e => setDetails({...details, domain: e.target.value})}
+                                                />
+                                            ) : (
+                                                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 text-[14px] shadow-sm">{companyInfo?.domain || 'N/A'}</div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Support Terminal (Phone)</label>
+                                            {isSuperAdmin ? (
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    value={details.phone}
+                                                    onChange={e => setDetails({...details, phone: e.target.value})}
+                                                    placeholder="+1 (555) 000-0000"
+                                                />
+                                            ) : (
+                                                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 text-[14px] shadow-sm">{companyInfo?.phone || 'N/A'}</div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Corporate Web Portal</label>
+                                            {isSuperAdmin ? (
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    value={details.website}
+                                                    onChange={e => setDetails({...details, website: e.target.value})}
+                                                    placeholder="https://www.example.com"
+                                                />
+                                            ) : (
+                                                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 text-[14px] shadow-sm">{companyInfo?.website || 'N/A'}</div>
+                                            )}
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Physical HQ Protocol (Address)</label>
+                                            {isSuperAdmin ? (
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    value={details.address}
+                                                    onChange={e => setDetails({...details, address: e.target.value})}
+                                                    placeholder="123 Enterprise Drive, Cloud City"
+                                                />
+                                            ) : (
+                                                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-semibold text-gray-800 text-[14px] shadow-sm">{companyInfo?.address || 'N/A'}</div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {isSuperAdmin && (
+                                        <div className="mt-8 flex justify-end relative z-10 border-t border-gray-200 pt-5">
+                                            {detailsStatus && (
+                                                <p className={`text-sm font-bold absolute left-0 top-8 ${detailsStatus.includes('failed') ? 'text-red-500' : 'text-green-600'}`}>{detailsStatus}</p>
+                                            )}
+                                            <button 
+                                                onClick={handleDetailsUpdate}
+                                                disabled={detailsStatus === 'Updating...'}
+                                                className="px-8 py-3.5 rounded-xl text-white font-extrabold transition-all shadow-[0_8px_30px_rgb(55,48,163,0.3)] hover:scale-105 active:scale-95 text-[14px]"
+                                                style={{ backgroundColor: 'var(--theme-primary)' }}
+                                            >
+                                                Synchronize Directory
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Aesthetic Identity Configurator */}
+                                <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-inner overflow-hidden relative">
+                                    <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider">
+                                        <FiAperture className="mr-2 text-[var(--theme-primary)]"/> Interface Token Design
+                                    </h3>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 relative z-10">
+                                        {[
+                                            { label: 'Primary Core', key: 'primary', val: themeColors.primary },
+                                            { label: 'Secondary Tone', key: 'secondary', val: themeColors.secondary },
+                                            { label: 'Action Accent', key: 'accent', val: themeColors.accent },
+                                            { label: 'Base Canvas', key: 'bg', val: themeColors.bg },
+                                            { label: 'Typography', key: 'text', val: themeColors.text }
+                                        ].map(item => (
+                                            <div key={item.key} className="flex flex-col items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                                <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-3 text-center h-8 flex items-center">{item.label}</span>
+                                                {isSuperAdmin ? (
+                                                    <input 
+                                                        type="color" 
+                                                        value={item.val || '#ffffff'}
+                                                        onChange={(e) => setThemeColors({...themeColors, [item.key]: e.target.value})}
+                                                        className="w-12 h-12 rounded-[14px] cursor-pointer shadow-sm p-0 border-0 overflow-hidden mb-3"
+                                                        style={{ WebkitAppearance: 'none' }}
+                                                    />
+                                                ) : (
+                                                    <div className="w-12 h-12 rounded-[14px] shadow-sm mb-3 border border-gray-100" style={{ backgroundColor: item.val }}></div>
+                                                )}
+                                                <span className="font-mono text-[11px] text-gray-600 font-bold uppercase bg-gray-50 px-2 py-1 rounded w-full text-center truncate">{item.val || '#----'}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {isSuperAdmin && (
+                                        <div className="mt-8 flex justify-end relative z-10 border-t border-gray-200 pt-5">
+                                            {themeStatus && (
+                                                <p className={`text-sm font-bold absolute left-0 top-8 ${themeStatus.includes('failed') ? 'text-red-500' : 'text-green-600'}`}>{themeStatus}</p>
+                                            )}
+                                            <button 
+                                                onClick={() => setThemeColors({ primary: '#3730A3', secondary: '#d3d1ff', accent: '#818CF8', bg: '#F9FAFB', text: '#1F2937' })}
+                                                className="px-6 py-3.5 rounded-xl text-gray-600 font-extrabold transition-all hover:bg-white border border-transparent hover:border-gray-200 hover:shadow-sm text-[14px] mr-3"
+                                            >
+                                                Reset Defaults
+                                            </button>
+                                            <button 
+                                                onClick={handleThemeUpdate}
+                                                disabled={themeStatus === 'Updating...'}
+                                                className="px-8 py-3.5 rounded-xl text-white font-extrabold transition-all shadow-[0_8px_30px_rgb(55,48,163,0.3)] hover:scale-105 active:scale-95 text-[14px]"
+                                                style={{ backgroundColor: 'var(--theme-primary)' }}
+                                            >
+                                                Deploy Theme Topology
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* SMTP Networking Module */}
+                                {isSuperAdmin && (
+                                    <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-inner">
+                                        <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider">
+                                            <FiMail className="mr-2 text-[var(--theme-primary)]"/> Encrypted Mail Node Setup
+                                        </h3>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                            <div>
+                                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">SMTP Relay Host</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    placeholder="smtp.example.com"
+                                                    value={mailConfig.host}
+                                                    onChange={e => setMailConfig({...mailConfig, host: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Node Port</label>
+                                                <input 
+                                                    type="number" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    placeholder="587"
+                                                    value={mailConfig.port}
+                                                    onChange={e => setMailConfig({...mailConfig, port: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Remote Access Key (User)</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    placeholder="proxy_user@domain"
+                                                    value={mailConfig.user}
+                                                    onChange={e => setMailConfig({...mailConfig, user: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Security Token (Pass)</label>
+                                                <input 
+                                                    type="password" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    placeholder="••••••••••"
+                                                    value={mailConfig.pass}
+                                                    onChange={e => setMailConfig({...mailConfig, pass: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2 mt-2">
+                                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Alias Broadcaster Address</label>
+                                                <input 
+                                                    type="email" 
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    placeholder="operations@system.ai"
+                                                    value={mailConfig.from}
+                                                    onChange={e => setMailConfig({...mailConfig, from: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8 flex justify-end relative z-10 border-t border-gray-200 pt-5">
+                                            {mailStatus && (
+                                                <p className={`text-sm font-bold absolute left-0 top-8 ${mailStatus.includes('failed') ? 'text-red-500' : 'text-green-600'}`}>{mailStatus}</p>
+                                            )}
+                                            <button 
+                                                onClick={handleMailUpdate}
+                                                disabled={mailStatus === 'Updating...'}
+                                                className="px-8 py-3.5 rounded-xl text-white font-extrabold disabled:opacity-50 transition-all shadow-[0_8px_30px_rgb(55,48,163,0.3)] hover:scale-105 active:scale-95 text-[14px]"
+                                                style={{ backgroundColor: 'var(--theme-primary)' }}
+                                            >
+                                                Lock Gateway Settings
+                                            </button>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
 
-                        {isSuperAdmin && (
-                            <div className="pt-4 mt-4 border-t border-gray-100">
-                                <button 
-                                    onClick={handleThemeUpdate}
-                                    disabled={themeStatus === 'Updating...'}
-                                    className="w-full px-6 py-2.5 rounded-xl text-white font-bold disabled:opacity-50 transition-all shadow-sm"
-                                    style={{ backgroundColor: 'var(--theme-primary)' }}
-                                >
-                                    Update Theme
-                                </button>
-                                {themeStatus && (
-                                    <p className={`text-sm font-medium mt-2 ${themeStatus.includes('failed') ? 'text-red-500' : 'text-green-600'}`}>
-                                        {themeStatus}
-                                    </p>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
-
-                {/* Mail Configuration Card (Superadmin only) */}
-                {isSuperAdmin && (
-                    <div className="lg:col-span-3 bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 mt-4">
-                        <div className="flex items-center mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-4">
-                                <FiMail className="text-[var(--theme-primary)]" size={20}/>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-800">Mail Setup</h3>
-                                <p className="text-gray-500 text-sm mt-1">Configure SMTP settings for outgoing system emails.</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">SMTP Host</label>
-                                <input 
-                                    type="text" 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] focus:ring-opacity-20 outline-none transition-all placeholder:text-gray-400 bg-white"
-                                    placeholder="smtp.example.com"
-                                    value={mailConfig.host}
-                                    onChange={e => setMailConfig({...mailConfig, host: e.target.value})}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">SMTP Port</label>
-                                <input 
-                                    type="number" 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] focus:ring-opacity-20 outline-none transition-all placeholder:text-gray-400 bg-white"
-                                    placeholder="587"
-                                    value={mailConfig.port}
-                                    onChange={e => setMailConfig({...mailConfig, port: e.target.value})}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">SMTP Username</label>
-                                <input 
-                                    type="text" 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] focus:ring-opacity-20 outline-none transition-all placeholder:text-gray-400 bg-white"
-                                    placeholder="user@example.com"
-                                    value={mailConfig.user}
-                                    onChange={e => setMailConfig({...mailConfig, user: e.target.value})}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">SMTP Password</label>
-                                <input 
-                                    type="password" 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] focus:ring-opacity-20 outline-none transition-all placeholder:text-gray-400 bg-white"
-                                    placeholder="Leave blank to keep existing password"
-                                    value={mailConfig.pass}
-                                    onChange={e => setMailConfig({...mailConfig, pass: e.target.value})}
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">From Email</label>
-                                <input 
-                                    type="email" 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] focus:ring-opacity-20 outline-none transition-all placeholder:text-gray-400 bg-white"
-                                    placeholder="noreply@example.com"
-                                    value={mailConfig.from}
-                                    onChange={e => setMailConfig({...mailConfig, from: e.target.value})}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                            <button 
-                                onClick={handleMailUpdate}
-                                disabled={mailStatus === 'Updating...'}
-                                className="px-8 py-3 rounded-xl text-white font-bold disabled:opacity-50 transition-all shadow-sm flex items-center"
-                                style={{ backgroundColor: 'var(--theme-primary)' }}
-                            >
-                                <FiSettings className="mr-2"/> Save Mail Configuration
-                            </button>
-                        </div>
-                        {mailStatus && (
-                            <p className={`text-sm font-medium mt-3 text-right ${mailStatus.includes('failed') ? 'text-red-500' : 'text-green-600'}`}>
-                                {mailStatus}
-                            </p>
-                        )}
-                    </div>
-                )}
-
             </div>
         </div>
     );

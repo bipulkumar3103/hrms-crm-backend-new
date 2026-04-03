@@ -45,6 +45,30 @@ def get_my_company():
     
     return jsonify(company_data), 200
 
+@company_blueprint.route('/me', methods=['PUT'])
+@jwt_required()
+def update_my_company():
+    """Updates the company details associated with the current logged-in user."""
+    current_user = get_current_user()
+    company = current_user.company
+
+    if not company:
+        return jsonify({"message": "User is not associated with any company."}), 404
+
+    # Ensure only superadmin can update details
+    if not current_user.has_role('superadmin'):
+        return jsonify({"message": "Unauthorized."}), 403
+
+    data = request.get_json()
+    
+    expected_fields = ['name', 'domain', 'address', 'phone', 'website']
+    for field in expected_fields:
+        if field in data:
+            setattr(company, field, data[field])
+            
+    db.session.commit()
+    
+    return jsonify({"message": "Company details updated successfully."}), 200
 @company_blueprint.route('/theme', methods=['POST'])
 @jwt_required()
 def update_theme():

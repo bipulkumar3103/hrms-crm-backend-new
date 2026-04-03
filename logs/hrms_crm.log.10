@@ -1,4 +1,4 @@
-2026-04-03 14:55:44,994 INFO: Headers: Accept-Language: en-US,en;q=0.9
+2026-04-03 17:08:29,560 INFO: Headers: Accept-Language: en-US,en;q=0.9
 Accept-Encoding: gzip, deflate, br, zstd
 Referer: http://localhost:3000/
 Sec-Fetch-Dest: empty
@@ -8,16 +8,16 @@ Sec-Ch-Ua-Mobile: ?0
 Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
 Accept: application/json, text/plain, */*
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
 Sec-Ch-Ua-Platform: "Windows"
 Connection: close
 Host: localhost:5000
 
  [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 14:55:47,077 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 14:55:47,081 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 14:55:47,083 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
-2026-04-03 14:55:47,086 INFO: Headers: Accept-Language: en-US,en;q=0.9
+2026-04-03 17:08:39,661 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:08:39,662 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:08:39,663 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:08:39,664 INFO: Headers: Accept-Language: en-US,en;q=0.9
 Accept-Encoding: gzip, deflate, br, zstd
 Referer: http://localhost:3000/
 Sec-Fetch-Dest: empty
@@ -27,16 +27,16 @@ Sec-Ch-Ua-Mobile: ?0
 Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
 Accept: application/json, text/plain, */*
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
 Sec-Ch-Ua-Platform: "Windows"
 Connection: close
 Host: localhost:5000
 
  [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 14:55:47,400 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 14:55:47,400 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 14:55:47,400 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
-2026-04-03 14:55:47,400 INFO: Headers: Accept-Language: en-US,en;q=0.9
+2026-04-03 17:08:39,985 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:08:39,985 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:08:39,986 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:08:39,987 INFO: Headers: Accept-Language: en-US,en;q=0.9
 Accept-Encoding: gzip, deflate, br, zstd
 Referer: http://localhost:3000/
 Sec-Fetch-Dest: empty
@@ -46,38 +46,16 @@ Sec-Ch-Ua-Mobile: ?0
 Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
 Accept: application/json, text/plain, */*
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
 Sec-Ch-Ua-Platform: "Windows"
 Connection: close
 Host: localhost:5000
 
  [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 14:55:54,142 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 14:55:54,144 INFO: Method: POST [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 14:55:54,146 INFO: Path: /api/v1/uploads/user-avatar [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
-2026-04-03 14:55:54,148 INFO: Headers: Accept-Language: en-US,en;q=0.9
-Accept-Encoding: gzip, deflate, br, zstd
-Referer: http://localhost:3000/
-Sec-Fetch-Dest: empty
-Sec-Fetch-Mode: cors
-Sec-Fetch-Site: same-origin
-Origin: http://localhost:5000/
-Sec-Ch-Ua-Mobile: ?0
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryWEHuCzZGI1c2DR9I
-Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
-Accept: application/json, text/plain, */*
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
-Sec-Ch-Ua-Platform: "Windows"
-Content-Length: 32445
-Connection: close
-Host: localhost:5000
-
- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 14:55:55,277 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 14:55:55,277 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 14:55:55,282 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
-2026-04-03 14:55:55,283 INFO: Headers: Accept-Language: en-US,en;q=0.9
+2026-04-03 17:09:16,587 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:09:16,588 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:09:16,590 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:09:16,590 INFO: Headers: Accept-Language: en-US,en;q=0.9
 Accept-Encoding: gzip, deflate, br, zstd
 Referer: http://localhost:3000/
 Sec-Fetch-Dest: empty
@@ -87,19 +65,16 @@ Sec-Ch-Ua-Mobile: ?0
 Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
 Accept: application/json, text/plain, */*
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
 Sec-Ch-Ua-Platform: "Windows"
 Connection: close
 Host: localhost:5000
 
  [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 15:03:52,018 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 15:03:52,020 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 15:03:52,021 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 15:03:52,021 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 15:03:52,023 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
-2026-04-03 15:03:52,023 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
-2026-04-03 15:03:52,025 INFO: Headers: Accept-Language: en-US,en;q=0.9
+2026-04-03 17:09:16,911 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:09:16,917 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:09:16,923 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:09:16,928 INFO: Headers: Accept-Language: en-US,en;q=0.9
 Accept-Encoding: gzip, deflate, br, zstd
 Referer: http://localhost:3000/
 Sec-Fetch-Dest: empty
@@ -109,13 +84,16 @@ Sec-Ch-Ua-Mobile: ?0
 Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
 Accept: application/json, text/plain, */*
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
 Sec-Ch-Ua-Platform: "Windows"
 Connection: close
 Host: localhost:5000
 
  [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 15:03:52,025 INFO: Headers: Accept-Language: en-US,en;q=0.9
+2026-04-03 17:09:16,930 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:09:16,944 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:09:16,956 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:09:16,960 INFO: Headers: Accept-Language: en-US,en;q=0.9
 Accept-Encoding: gzip, deflate, br, zstd
 Referer: http://localhost:3000/
 Sec-Fetch-Dest: empty
@@ -125,12 +103,34 @@ Sec-Ch-Ua-Mobile: ?0
 Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
 Accept: application/json, text/plain, */*
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwNzk2MCwianRpIjoiMTQ2NjRmOWUtNTRhNC00ODE2LWI5ZjktMDczMmY3MjczNDI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMDc5NjAsImNzcmYiOiJlOGRiMGU2Yi01NGRjLTRiNjEtOWU5Yy0zM2YzZDg1ZjVlNTkiLCJleHAiOjE3NzUyMDg4NjAsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._1S8nNvdb3uNH9mTh5tzYsUhN9wGhxWoPo6kSAQQTvQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
 Sec-Ch-Ua-Platform: "Windows"
 Connection: close
 Host: localhost:5000
 
  [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
-2026-04-03 15:03:52,256 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
-2026-04-03 15:03:52,256 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
-2026-04-03 15:03:52,256 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:09:17,285 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:09:17,285 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:09:17,285 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:09:17,285 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIxNTU5MSwianRpIjoiNDJiY2YyYTctOWZlYi00NzE4LWJmYWItMTkwOWM3YmZhYTk3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzUyMTU1OTEsImNzcmYiOiJlYmFlODQ0Yy04NmJjLTRmOWUtOTU0My02MGI2NDYzYTcxMDIiLCJleHAiOjE3NzUyMTY0OTEsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0.emDOVJX5SkH1EIZHbkQfWk_qT-MtCC87_-srxiM4XAg
+Sec-Ch-Ua-Platform: "Windows"
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 17:10:05,684 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:10:05,685 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 17:10:05,686 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:10:05,686 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 17:10:05,686 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 17:10:05,686 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]

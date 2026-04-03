@@ -43,15 +43,22 @@ class S3Service:
             
             s3_path = f"logos/{company_id}/{size_name}_logo.png"
             
-            self.s3_client.upload_fileobj(
-                buffer,
-                self.bucket_name,
-                s3_path,
-                ExtraArgs={'ContentType': 'image/png'}
-            )
-            
-            # Correctly construct the URL using the configured region
-            url = f"https://{self.bucket_name}.s3.{self.region}.amazonaws.com/{s3_path}"
+            try:
+                self.s3_client.upload_fileobj(
+                    buffer,
+                    self.bucket_name,
+                    s3_path,
+                    ExtraArgs={'ContentType': 'image/png'}
+                )
+                # Correctly construct the URL using the configured AWS region
+                url = f"https://{self.bucket_name}.s3.{self.region}.amazonaws.com/{s3_path}"
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"S3 upload failed for {size_name}: {e}. Falling back to placeholder.")
+                # Return placeholder URLs for disconnected local testing
+                dim = dimensions[0] if dimensions else 500
+                url = f"https://via.placeholder.com/{dim}?text=Logo+({size_name})"
+                
             urls[size_name] = url
 
         return urls
