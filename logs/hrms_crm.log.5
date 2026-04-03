@@ -1,108 +1,139 @@
-2026-03-31 08:37:44,910 INFO: DEBUG: Google user info: {'iss': 'https://accounts.google.com', 'azp': '500899802424-fcr92t50ro45h30638ld37po11iqa60l.apps.googleusercontent.com', 'aud': '500899802424-fcr92t50ro45h30638ld37po11iqa60l.apps.googleusercontent.com', 'sub': '110000610113987970837', 'email': 'bipulkumar3103@gmail.com', 'email_verified': True, 'at_hash': 'NYV7QosgaIl4Yqv1Q02Rgg', 'nonce': 'QfYQXg9YTisS2ZfuYPBNYxoEJKcs79', 'name': 'Bipul Kumar', 'picture': 'https://lh3.googleusercontent.com/a/ACg8ocJyjVZvJzMv98y8JGrcgwQsvK3WDtw_dnmN7abZE8sFTEejHg=s96-c', 'given_name': 'Bipul', 'family_name': 'Kumar', 'iat': 1774946264, 'exp': 1774949864} [in /home/user/hrms-crm-backend-new/app/auth/google.py:67]
-2026-03-31 08:37:44,932 INFO: Existing user signing in: bipulkumar3103@gmail.com [in /home/user/hrms-crm-backend-new/app/auth/google.py:81]
-2026-03-31 08:37:44,946 INFO: DEBUG: Redirecting to frontend: https://3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NDk0NjI2NCwianRpIjoiYTIzYWE1NmEtZWYzMS00OTUwLTk4N2UtYjk4YjBmNWE0ZGMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NzQ5NDYyNjQsImNzcmYiOiJiMTQyMjNmMS0xMzJmLTQ4MmMtODUwNC1hNjMxNzNkOWVlNmQiLCJleHAiOjE3NzQ5NDcxNjQsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._wtio3X26a9WWxBnRcU8MATFN__04Xw1CW8TSJBMrbo [in /home/user/hrms-crm-backend-new/app/auth/google.py:186]
-2026-03-31 08:37:45,641 INFO: Incoming Request: [in /home/user/hrms-crm-backend-new/app/__init__.py:52]
-2026-03-31 08:37:45,643 INFO: Method: GET [in /home/user/hrms-crm-backend-new/app/__init__.py:53]
-2026-03-31 08:37:45,643 INFO: Path: /api/v1/onboarding/check-status [in /home/user/hrms-crm-backend-new/app/__init__.py:54]
-2026-03-31 08:37:45,647 INFO: Headers: X-Forwarded-Proto: http
-X-Forwarded-Port: 3000
-X-Forwarded-For: 127.0.0.1
-X-Goog-Workstations-Endpoint: workstations-3ade512d-0ae6-4951-848d-d4ecaa666c8a.asia-east1-c.c.monospace-10.internal.:980
-X-Forwarded-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-Sec-User-Ip: 106.219.162.157
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
-Sec-Ch-Ua-Platform: "Windows"
-Sec-Ch-Ua-Mobile: ?0
-Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
-Referer: https://3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev/
-Connection: close
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NDk0NjI2NCwianRpIjoiYTIzYWE1NmEtZWYzMS00OTUwLTk4N2UtYjk4YjBmNWE0ZGMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NzQ5NDYyNjQsImNzcmYiOiJiMTQyMjNmMS0xMzJmLTQ4MmMtODUwNC1hNjMxNzNkOWVlNmQiLCJleHAiOjE3NzQ5NDcxNjQsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._wtio3X26a9WWxBnRcU8MATFN__04Xw1CW8TSJBMrbo
-Accept-Language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7
-Accept-Encoding: gzip, deflate, br, zstd
-Accept: application/json, text/plain, */*
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-
- [in /home/user/hrms-crm-backend-new/app/__init__.py:55]
-2026-03-31 08:37:45,843 INFO: Incoming Request: [in /home/user/hrms-crm-backend-new/app/__init__.py:52]
-2026-03-31 08:37:45,848 INFO: Method: GET [in /home/user/hrms-crm-backend-new/app/__init__.py:53]
-2026-03-31 08:37:45,849 INFO: Path: /api/v1/company/me [in /home/user/hrms-crm-backend-new/app/__init__.py:54]
-2026-03-31 08:37:45,850 INFO: Headers: X-Forwarded-Proto: http
-X-Forwarded-Port: 3000
-X-Forwarded-For: 127.0.0.1
-X-Goog-Workstations-Endpoint: workstations-3ade512d-0ae6-4951-848d-d4ecaa666c8a.asia-east1-c.c.monospace-10.internal.:980
-X-Forwarded-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-Sec-User-Ip: 106.219.162.157
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
-Sec-Ch-Ua-Platform: "Windows"
-Sec-Ch-Ua-Mobile: ?0
-Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
-Referer: https://3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev/
-Connection: close
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NDk0NjI2NCwianRpIjoiYTIzYWE1NmEtZWYzMS00OTUwLTk4N2UtYjk4YjBmNWE0ZGMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NzQ5NDYyNjQsImNzcmYiOiJiMTQyMjNmMS0xMzJmLTQ4MmMtODUwNC1hNjMxNzNkOWVlNmQiLCJleHAiOjE3NzQ5NDcxNjQsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._wtio3X26a9WWxBnRcU8MATFN__04Xw1CW8TSJBMrbo
-Accept-Language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7
-Accept-Encoding: gzip, deflate, br, zstd
-Accept: application/json, text/plain, */*
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-
- [in /home/user/hrms-crm-backend-new/app/__init__.py:55]
-2026-03-31 08:37:46,017 INFO: Incoming Request: [in /home/user/hrms-crm-backend-new/app/__init__.py:52]
-2026-03-31 08:37:46,020 INFO: Method: GET [in /home/user/hrms-crm-backend-new/app/__init__.py:53]
-2026-03-31 08:37:46,021 INFO: Path: /api/v1/company/me [in /home/user/hrms-crm-backend-new/app/__init__.py:54]
-2026-03-31 08:37:46,021 INFO: Headers: X-Forwarded-Proto: http
-X-Forwarded-Port: 3000
-X-Forwarded-For: 127.0.0.1
-X-Goog-Workstations-Endpoint: workstations-3ade512d-0ae6-4951-848d-d4ecaa666c8a.asia-east1-c.c.monospace-10.internal.:980
-X-Forwarded-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-Sec-User-Ip: 106.219.162.157
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
-Sec-Ch-Ua-Platform: "Windows"
-Sec-Ch-Ua-Mobile: ?0
-Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
-Referer: https://3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev/
-Connection: close
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NDk0NjI2NCwianRpIjoiYTIzYWE1NmEtZWYzMS00OTUwLTk4N2UtYjk4YjBmNWE0ZGMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NzQ5NDYyNjQsImNzcmYiOiJiMTQyMjNmMS0xMzJmLTQ4MmMtODUwNC1hNjMxNzNkOWVlNmQiLCJleHAiOjE3NzQ5NDcxNjQsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._wtio3X26a9WWxBnRcU8MATFN__04Xw1CW8TSJBMrbo
-Accept-Language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7
-Accept-Encoding: gzip, deflate, br, zstd
-Accept: application/json, text/plain, */*
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-
- [in /home/user/hrms-crm-backend-new/app/__init__.py:55]
-2026-03-31 08:41:43,369 INFO: HRMS-CRM startup [in /home/user/hrms-crm-backend-new/app/__init__.py:48]
-2026-03-31 08:41:55,746 INFO: HRMS-CRM startup [in /home/user/hrms-crm-backend-new/app/__init__.py:48]
-2026-03-31 08:41:58,377 INFO: Incoming Request: [in /home/user/hrms-crm-backend-new/app/__init__.py:52]
-2026-03-31 08:41:58,378 INFO: Method: GET [in /home/user/hrms-crm-backend-new/app/__init__.py:53]
-2026-03-31 08:41:58,379 INFO: Path: /api/v1/onboarding/check-status [in /home/user/hrms-crm-backend-new/app/__init__.py:54]
-2026-03-31 08:41:58,382 INFO: Headers: X-Forwarded-Proto: http
-X-Forwarded-Port: 3000
-X-Forwarded-For: 127.0.0.1
-X-Goog-Workstations-Endpoint: workstations-3ade512d-0ae6-4951-848d-d4ecaa666c8a.asia-east1-c.c.monospace-10.internal.:980
-X-Forwarded-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-Sec-User-Ip: 106.219.162.157
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
-Sec-Ch-Ua-Platform: "Windows"
-Sec-Ch-Ua-Mobile: ?0
-Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
-Referer: https://3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev/
-Connection: close
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NDk0NjI2NCwianRpIjoiYTIzYWE1NmEtZWYzMS00OTUwLTk4N2UtYjk4YjBmNWE0ZGMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NzQ5NDYyNjQsImNzcmYiOiJiMTQyMjNmMS0xMzJmLTQ4MmMtODUwNC1hNjMxNzNkOWVlNmQiLCJleHAiOjE3NzQ5NDcxNjQsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6dHJ1ZX0._wtio3X26a9WWxBnRcU8MATFN__04Xw1CW8TSJBMrbo
-Accept-Language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7
-Accept-Encoding: gzip, deflate, br, zstd
-Accept: application/json, text/plain, */*
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
-Host: 3000-firebase-hrms-newgit-1774940071778.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev
-
- [in /home/user/hrms-crm-backend-new/app/__init__.py:55]
-2026-03-31 08:41:58,592 INFO: Incoming Request: [in /home/user/hrms-crm-backend-new/app/__init__.py:52]
-2026-03-31 08:41:58,593 INFO: Method: GET [in /home/user/hrms-crm-backend-new/app/__init__.py:53]
-2026-03-31 08:41:58,593 INFO: Path: /api/v1/onboarding/check-status [in /home/user/hrms-crm-backend-new/app/__init__.py:54]
+2026-04-03 15:16:04,048 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Origin: http://localhost:5000/
+Sec-Ch-Ua-Mobile: ?0
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryFUAwoiKBCe1BliUT
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTIwOTU0NiwianRpIjoiMDFlMTQzYzMtMjJiOC00MzE4LWI2Y2EtM2UxYWJiODE5OGRjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NzUyMDk1NDYsImNzcmYiOiI0NjRiNjA5NC1hOWNmLTRiNmQtODAzYi1lMTRkNjNhYTUyMDAiLCJleHAiOjE3NzUyMTA0NDYsInJvbGVzIjpbInN1cGVyYWRtaW4iXSwicHJvZmlsZV9jb21wbGV0ZSI6ZmFsc2V9.iKksf2MqLEEZEUQBQ1_ClNXKAOXNRPEgxOnkETGjsA8
+Sec-Ch-Ua-Platform: "Windows"
+Content-Length: 8778
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:06,417 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:06,418 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:06,419 INFO: Path: /api/v1/onboarding/check-status [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 15:16:06,420 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc1MjA5NTY2LCJqdGkiOiJlNmFlOWRhOS1lMTU5LTRlMDctYmFkOS0zNWRiMjRlMThmYzQiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NTIwOTU2NiwiY3NyZiI6IjlkNGM4OTVlLTZkNWMtNGE4Ni1hODdmLTMyMzc3MzJlODdiNyIsImV4cCI6MTc3NTIxMDQ2Niwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.jRU_pn1uvVGQzPYTpv1pJ1fMysowaa7tx04gujzrFlc
+Sec-Ch-Ua-Platform: "Windows"
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:06,673 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:06,674 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:06,674 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 15:16:06,675 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc1MjA5NTY2LCJqdGkiOiJlNmFlOWRhOS1lMTU5LTRlMDctYmFkOS0zNWRiMjRlMThmYzQiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NTIwOTU2NiwiY3NyZiI6IjlkNGM4OTVlLTZkNWMtNGE4Ni1hODdmLTMyMzc3MzJlODdiNyIsImV4cCI6MTc3NTIxMDQ2Niwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.jRU_pn1uvVGQzPYTpv1pJ1fMysowaa7tx04gujzrFlc
+Sec-Ch-Ua-Platform: "Windows"
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:06,750 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:06,752 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:06,752 INFO: Path: /api/v1/company/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 15:16:06,754 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc1MjA5NTY2LCJqdGkiOiJlNmFlOWRhOS1lMTU5LTRlMDctYmFkOS0zNWRiMjRlMThmYzQiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NTIwOTU2NiwiY3NyZiI6IjlkNGM4OTVlLTZkNWMtNGE4Ni1hODdmLTMyMzc3MzJlODdiNyIsImV4cCI6MTc3NTIxMDQ2Niwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.jRU_pn1uvVGQzPYTpv1pJ1fMysowaa7tx04gujzrFlc
+Sec-Ch-Ua-Platform: "Windows"
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:10,570 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:10,571 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:10,572 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 15:16:10,573 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc1MjA5NTY2LCJqdGkiOiJlNmFlOWRhOS1lMTU5LTRlMDctYmFkOS0zNWRiMjRlMThmYzQiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NTIwOTU2NiwiY3NyZiI6IjlkNGM4OTVlLTZkNWMtNGE4Ni1hODdmLTMyMzc3MzJlODdiNyIsImV4cCI6MTc3NTIxMDQ2Niwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.jRU_pn1uvVGQzPYTpv1pJ1fMysowaa7tx04gujzrFlc
+Sec-Ch-Ua-Platform: "Windows"
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:10,910 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:10,910 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:10,911 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 15:16:10,913 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc1MjA5NTY2LCJqdGkiOiJlNmFlOWRhOS1lMTU5LTRlMDctYmFkOS0zNWRiMjRlMThmYzQiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NTIwOTU2NiwiY3NyZiI6IjlkNGM4OTVlLTZkNWMtNGE4Ni1hODdmLTMyMzc3MzJlODdiNyIsImV4cCI6MTc3NTIxMDQ2Niwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.jRU_pn1uvVGQzPYTpv1pJ1fMysowaa7tx04gujzrFlc
+Sec-Ch-Ua-Platform: "Windows"
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:19,163 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:19,164 INFO: Method: POST [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:19,165 INFO: Path: /api/v1/uploads/user-avatar [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]
+2026-04-03 15:16:19,166 INFO: Headers: Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Referer: http://localhost:3000/
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Origin: http://localhost:5000/
+Sec-Ch-Ua-Mobile: ?0
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryiLF4h2QJN8AzpgLv
+Sec-Ch-Ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzc1MjA5NTY2LCJqdGkiOiJlNmFlOWRhOS1lMTU5LTRlMDctYmFkOS0zNWRiMjRlMThmYzQiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiMiIsIm5iZiI6MTc3NTIwOTU2NiwiY3NyZiI6IjlkNGM4OTVlLTZkNWMtNGE4Ni1hODdmLTMyMzc3MzJlODdiNyIsImV4cCI6MTc3NTIxMDQ2Niwicm9sZXMiOlsic3VwZXJhZG1pbiJdLCJwcm9maWxlX2NvbXBsZXRlIjp0cnVlfQ.jRU_pn1uvVGQzPYTpv1pJ1fMysowaa7tx04gujzrFlc
+Sec-Ch-Ua-Platform: "Windows"
+Content-Length: 32445
+Connection: close
+Host: localhost:5000
+
+ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:55]
+2026-04-03 15:16:20,498 INFO: Incoming Request: [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:52]
+2026-04-03 15:16:20,498 INFO: Method: GET [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:53]
+2026-04-03 15:16:20,499 INFO: Path: /api/v1/users/me [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:54]

@@ -52,7 +52,7 @@ const LogoUpload = ({ value, token }) => {
         formData.append('logo', selectedFile);
 
         try {
-            const res = await axios.post('/api/v1/company/logo', formData, {
+            const res = await axios.post('/api/v1/uploads/company-logo', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,

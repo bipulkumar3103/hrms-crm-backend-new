@@ -1,7 +1,8 @@
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_current_user
 from app.models.user import User
+from app import db
 
 company_blueprint = Blueprint('company', __name__, url_prefix='/company')
 
@@ -33,8 +34,70 @@ def get_my_company():
         "theme_bg_color": company.theme_bg_color,
         "theme_text_color": company.theme_text_color
     }
+
+    if current_user.has_role('superadmin'):
+        company_data.update({
+            "smtp_host": company.smtp_host,
+            "smtp_port": company.smtp_port,
+            "smtp_username": company.smtp_username,
+            "smtp_from_email": company.smtp_from_email
+        })
     
     return jsonify(company_data), 200
+
+@company_blueprint.route('/theme', methods=['POST'])
+@jwt_required()
+def update_theme():
+    """Updates the theme colors for the company."""
+    current_user = get_current_user()
+    company = current_user.company
+
+    if not company:
+        return jsonify({"message": "User is not associated with any company."}), 404
+
+    # Ensure only superadmin can update theme
+    if not current_user.has_role('superadmin'):
+        return jsonify({"message": "Unauthorized."}), 403
+
+    data = request.get_json()
+    
+    if 'theme_primary_color' in data:
+        company.theme_primary_color = data['theme_primary_color']
+    if 'theme_secondary_color' in data:
+        company.theme_secondary_color = data['theme_secondary_color']
+    if 'theme_accent_color' in data:
+        company.theme_accent_color = data['theme_accent_color']
+    if 'theme_bg_color' in data:
+        company.theme_bg_color = data['theme_bg_color']
+    if 'theme_text_color' in data:
+        company.theme_text_color = data['theme_text_color']
+        
+    db.session.commit()
+    
+    return jsonify({"message": "Theme configuration saved successfully."}), 200
+
+@company_blueprint.route('/mail-config', methods=['POST'])
+@jwt_required()
+def configure_mail():
+    """Configures the SMTP parameters for the company."""
+    current_user = get_current_user()
+    company = current_user.company
+
+    if not company:
+        return jsonify({"message": "User is not associated with any company."}), 404
+
+    data = request.get_json()
+    
+    # Store settings
+    company.smtp_host = data.get('smtp_host', company.smtp_host)
+    company.smtp_port = data.get('smtp_port', company.smtp_port)
+    company.smtp_username = data.get('smtp_username', company.smtp_username)
+    company.smtp_password = data.get('smtp_password', company.smtp_password)
+    company.smtp_from_email = data.get('smtp_from_email', company.smtp_from_email)
+
+    db.session.commit()
+    
+    return jsonify({"message": "Mail configuration saved successfully.", "smtp_host": company.smtp_host}), 200
 
 @company_blueprint.route('/branding/<invitation_token>', methods=['GET'])
 def get_company_branding(invitation_token):

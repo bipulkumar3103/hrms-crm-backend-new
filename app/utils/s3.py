@@ -19,7 +19,7 @@ def upload_file(file, bucket_name, object_name=None):
             file,
             bucket_name,
             object_name,
-            ExtraArgs={'ACL': 'public-read', 'ContentType': file.content_type}
+            ExtraArgs={'ContentType': file.content_type}
         )
         url = f"https://{bucket_name}.s3.amazonaws.com/{object_name}"
         return url

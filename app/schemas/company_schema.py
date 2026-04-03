@@ -12,5 +12,6 @@ class CompanySchema(SQLAlchemyAutoSchema):
             "id", "name", "domain", "address", "logo_original_url", 
             "logo_medium_url", "logo_small_url", "phone", "website", 
             "profile_complete", "theme_primary_color", "theme_secondary_color",
-            "theme_accent_color", "theme_bg_color", "theme_text_color"
+            "theme_accent_color", "theme_bg_color", "theme_text_color",
+            "smtp_host", "smtp_port", "smtp_username", "smtp_from_email"
         )

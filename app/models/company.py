@@ -21,4 +21,11 @@ class Company(db.Model):
     theme_bg_color = db.Column(db.String(10), nullable=True)
     theme_text_color = db.Column(db.String(10), nullable=True)
 
+    # Mail Configuration Fields
+    smtp_host = db.Column(db.String(255), nullable=True)
+    smtp_port = db.Column(db.Integer, nullable=True)
+    smtp_username = db.Column(db.String(255), nullable=True)
+    smtp_password = db.Column(db.String(255), nullable=True)
+    smtp_from_email = db.Column(db.String(255), nullable=True)
+
     users = db.relationship('User', back_populates='company', lazy=True)

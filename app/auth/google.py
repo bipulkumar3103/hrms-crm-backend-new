@@ -6,6 +6,7 @@ from authlib.common.security import generate_token
 from flask_jwt_extended import create_access_token
 from app.models.user import User
 from app.models.company import Company
+from app.config import Config
 from app.models.role import Role
 from app import db
 
@@ -30,7 +31,8 @@ def init_app(app):
 @google_blueprint.route('/login/google')
 def login():
     print("\n--- PRINT DEBUG: [1/8] /login/google route hit ---")
-    redirect_uri = url_for('google.authorize', _external=True, _scheme='https')
+    # redirect_uri = url_for('google.authorize', _external=True, _scheme='https')
+    redirect_uri = url_for('google.authorize', _external=True, _scheme=Config.PREFERRED_URL_SCHEME)
     print(f"--- PRINT DEBUG: [2/8] Generated Redirect URI for Google: {redirect_uri} ---")
     current_app.logger.info(f"!!!! IMPORTANT !!!! Generated Redirect URI for Google: {redirect_uri}")
     print(f"TERMINAL LOG: Generated Redirect URI for Google: {redirect_uri}")
