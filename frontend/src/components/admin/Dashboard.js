@@ -5,7 +5,8 @@ import {
   FiBox, FiUsers, FiSettings, FiHome, FiBarChart2, 
   FiBell, FiChevronDown, FiLogOut, FiInfo, FiGrid, 
   FiMessageSquare, FiPieChart, FiMonitor, FiCheckCircle,
-  FiArrowRight, FiArrowLeft, FiUser, FiPlus, FiX, FiCopy, FiCheck
+  FiArrowRight, FiArrowLeft, FiUser, FiPlus, FiX, FiCopy, FiCheck,
+  FiClock, FiFileText, FiAward
 } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
 import { useAlert } from '../../context/AlertContext';
@@ -32,7 +33,9 @@ const Dashboard = () => {
     const { showAlert } = useAlert();
     // --- Data State ---
     const [company, setCompany] = useState(null);
+    const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [viewAsEmployee, setViewAsEmployee] = useState(false);
 
     // --- UI State (Dribbble Layout) ---
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -62,26 +65,34 @@ const Dashboard = () => {
     });
 
     useEffect(() => {
-        const fetchCompanyData = async () => {
+        const fetchData = async () => {
             try {
-                const response = await api.get('/company/me');
-                setCompany(response.data);
+                const [companyRes, userRes] = await Promise.all([
+                    api.get('/company/me'),
+                    api.get('/users/me')
+                ]);
+                
+                setCompany(companyRes.data);
+                setUser(userRes.data);
                 
                 const root = document.documentElement;
-                root.style.setProperty('--theme-primary', response.data.theme_primary_color || '#2bb6cb');
-                root.style.setProperty('--theme-secondary', response.data.theme_secondary_color || '#e4f5f8');
-                root.style.setProperty('--theme-accent', response.data.theme_accent_color || '#1e293b');
-                root.style.setProperty('--theme-bg', response.data.theme_bg_color || '#f0f4f8');
-                root.style.setProperty('--theme-text', response.data.theme_text_color || '#0f172a');
+                root.style.setProperty('--theme-primary', companyRes.data.theme_primary_color || '#2bb6cb');
+                root.style.setProperty('--theme-secondary', companyRes.data.theme_secondary_color || '#e4f5f8');
+                root.style.setProperty('--theme-accent', companyRes.data.theme_accent_color || '#1e293b');
+                root.style.setProperty('--theme-bg', companyRes.data.theme_bg_color || '#f0f4f8');
+                root.style.setProperty('--theme-text', companyRes.data.theme_text_color || '#0f172a');
             } catch (error) {
-                console.error("Failed to fetch company data", error);
+                console.error("Failed to fetch initial data", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchCompanyData();
+        fetchData();
     }, []);
+
+    const actualIsAdminOrSuper = user?.roles?.includes('superadmin') || user?.roles?.includes('admin');
+    const isAdminOrSuper = actualIsAdminOrSuper && !viewAsEmployee;
 
     // Close dropdowns when clicking outside
     useEffect(() => {
@@ -205,20 +216,30 @@ const Dashboard = () => {
                             </div>
                         )}
 
-                        <NavItem icon={<FiPieChart/>} label="Insights" id="Insights" />
-                        <NavItem icon={<FiGrid/>} label="Data Lake" id="Data Lake" />
-                        <NavItem icon={<FiMessageSquare/>} label="Collaboration" id="Collaboration" />
-                        <NavItem icon={<FiUsers/>} label="Employees" id="Employees" />
-                        <NavItem icon={<FiBarChart2/>} label="Reports" id="Reports" />
-                        
-                        {!isSidebarCollapsed && (
-                            <div className="mt-8 mb-3 px-3">
-                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Apps</span>
-                            </div>
+                        {isAdminOrSuper ? (
+                            <>
+                                <NavItem icon={<FiPieChart/>} label="Insights" id="Insights" />
+                                <NavItem icon={<FiGrid/>} label="Data Lake" id="Data Lake" />
+                                <NavItem icon={<FiMessageSquare/>} label="Collaboration" id="Collaboration" />
+                                <NavItem icon={<FiUsers/>} label="Employees" id="Employees" />
+                                <NavItem icon={<FiBarChart2/>} label="Reports" id="Reports" />
+                                
+                                {!isSidebarCollapsed && (
+                                    <div className="mt-8 mb-3 px-3">
+                                        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Apps</span>
+                                    </div>
+                                )}
+                                
+                                <NavItem icon={<FiMonitor/>} label="Demand Planning" id="Demand" />
+                                <NavItem icon={<FiBox/>} label="Add Module" id="Module" />
+                            </>
+                        ) : (
+                            <>
+                                <NavItem icon={<FiCheckCircle/>} label="My Tasks" id="My Tasks" />
+                                <NavItem icon={<FiMessageSquare/>} label="Messages" id="Messages" />
+                                <NavItem icon={<FiInfo/>} label="Directory" id="Directory" />
+                            </>
                         )}
-                        
-                        <NavItem icon={<FiMonitor/>} label="Demand Planning" id="Demand" />
-                        <NavItem icon={<FiBox/>} label="Add Module" id="Module" />
                     </ul>
                 </div>
 
@@ -308,7 +329,7 @@ const Dashboard = () => {
                                 <div className="w-[30px] h-[30px] rounded-full bg-[var(--theme-secondary)] border border-white flex items-center justify-center">
                                     <FiUser size={16} className="text-[var(--theme-primary)]"/>
                                 </div>
-                                <span className="text-[13.5px] font-semibold text-gray-700 hidden md:block tracking-tight">Admin User</span>
+                                <span className="text-[13.5px] font-semibold text-gray-700 hidden md:block tracking-tight">{user?.first_name || 'Active User'}</span>
                                 <FiChevronDown className="text-gray-400 ml-1" size={16} />
                             </button>
 
@@ -329,9 +350,14 @@ const Dashboard = () => {
                                                 <button onClick={() => { setActiveTab('My Profile'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
                                                     <FiUsers className="mr-3 text-gray-400" size={16}/> My Profile
                                                 </button>
-                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                            <button onClick={() => { setActiveTab('My Profile'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
                                                 <FiSettings className="mr-3 text-gray-400" size={16}/> Settings
-                                            </a>
+                                            </button>
+                                            {actualIsAdminOrSuper && (
+                                                <button onClick={() => { setViewAsEmployee(!viewAsEmployee); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-[var(--theme-primary)] hover:bg-indigo-50 rounded-lg font-medium cursor-pointer">
+                                                    <FiMonitor className="mr-3 text-[var(--theme-primary)]" size={16}/> {viewAsEmployee ? 'Revert to Admin View' : 'Preview Employee View'}
+                                                </button>
+                                            )}
                                             <div className="border-t border-gray-100 my-1.5"></div>
                                             <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-red-600 hover:bg-red-50 rounded-lg font-medium cursor-pointer" onClick={() => localStorage.removeItem('token') || window.location.reload()}>
                                                 <FiLogOut className="mr-3 text-red-400" size={16}/> Log Out
@@ -350,9 +376,9 @@ const Dashboard = () => {
                         <UserProfile token={localStorage.getItem('token')} />
                     ) : activeTab === 'My Organization' ? (
                         <OrganizationProfile token={localStorage.getItem('token')} />
-                    ) : (
+                    ) : isAdminOrSuper ? (
                         <>
-                            {/* Metrics Overview */}
+                            {/* Admin Metrics Overview */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                 <StatCard icon={FiUsers} label="Total Employees" value="1,254" color="var(--theme-primary)" />
                                 <StatCard icon={FiBarChart2} label="Pending Approvals" value="12" color="var(--theme-accent)" />
@@ -387,6 +413,107 @@ const Dashboard = () => {
                             {/* Data Placeholder */}
                             <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-8 min-h-[300px] flex items-center justify-center border border-gray-100">
                                 <p className="text-gray-400 italic font-medium">Analytical overview and employee directory infrastructure rendering here.</p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* Employee Metrics Overview */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <StatCard icon={FiCheckCircle} label="Available Leave (Days)" value="14" color="var(--theme-primary)" />
+                                <StatCard icon={FiBell} label="Next Holiday" value="May 25" color="var(--theme-accent)" />
+                                <StatCard icon={FiBox} label="Pending Tasks" value="3" color="#10B981" />
+                                <StatCard icon={FiMessageSquare} label="Unread Messages" value="2" color="#F59E0B" />
+                            </div>
+
+                            {/* Employee Quick Actions */}
+                            <div className="mb-8">
+                                <h2 className="text-xl font-bold mb-5 tracking-tight text-gray-800">My Actions</h2>
+                                <div className="flex flex-wrap gap-4">
+                                    <button 
+                                        className="flex items-center px-6 py-3.5 rounded-xl text-white font-medium transition-all shadow-[0_4px_14px_rgba(43,182,203,0.3)] hover:shadow-[0_6px_20px_rgba(43,182,203,0.4)] active:scale-95"
+                                        style={{ backgroundColor: 'var(--theme-primary)' }}
+                                    >
+                                        <FiPlus className="mr-2" size={20}/> Request Time Off
+                                    </button>
+                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                                        <FiMessageSquare className="mr-2 text-gray-400" size={20}/> Send Message
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Detailed Employee Widgets */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Today's Schedule */}
+                                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center tracking-tight">
+                                        <FiClock className="mr-2 text-[var(--theme-primary)]"/> Today's Schedule
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div className="flex items-start">
+                                            <div className="w-12 h-12 bg-[#e4f5f8] rounded-xl flex items-center justify-center text-[var(--theme-primary)] font-bold text-sm shrink-0 shadow-sm border border-[#2bb6cb]/20">9 AM</div>
+                                            <div className="ml-4">
+                                                <p className="font-semibold text-gray-800 text-[14px]">Morning Standup</p>
+                                                <p className="text-gray-500 text-[12px] mt-0.5">Conference Room A</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 font-bold text-sm shrink-0 shadow-sm border border-amber-100">1 PM</div>
+                                            <div className="ml-4">
+                                                <p className="font-semibold text-gray-800 text-[14px]">Project Sync Review</p>
+                                                <p className="text-gray-500 text-[12px] mt-0.5">Virtual Teams Meeting</p>
+                                            </div>
+                                        </div>
+                                        <button className="w-full py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold rounded-xl text-[13px] transition-colors mt-2 shadow-sm">View Full Calendar</button>
+                                    </div>
+                                </div>
+
+                                {/* Recent Payslips & Docs */}
+                                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center tracking-tight">
+                                        <FiFileText className="mr-2 text-[var(--theme-primary)]"/> Recent Documents
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {[
+                                            { name: 'April 2026 Payslip', date: 'Apr 01', icon: FiAward, color: 'text-green-600', bg: 'bg-green-50' },
+                                            { name: 'Q1 Performance Review', date: 'Mar 28', icon: FiFileText, color: 'text-blue-600', bg: 'bg-blue-50' },
+                                            { name: 'Updated Health Benefits', date: 'Mar 15', icon: FiBox, color: 'text-purple-600', bg: 'bg-purple-50' }
+                                        ].map((doc, idx) => (
+                                            <div key={idx} className="flex items-center justify-between p-3 border border-gray-100 bg-gray-50/50 rounded-xl hover:bg-white hover:shadow-sm transition-all cursor-pointer">
+                                                <div className="flex items-center">
+                                                    <div className={`p-2 rounded-lg ${doc.bg} ${doc.color} mr-3 shadow-sm`}>
+                                                        <doc.icon size={16}/>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-gray-800 text-[13px]">{doc.name}</p>
+                                                        <p className="text-gray-400 text-[11px] font-medium">{doc.date}</p>
+                                                    </div>
+                                                </div>
+                                                <FiArrowRight className="text-gray-300" size={14}/>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Company Announcements */}
+                                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center tracking-tight">
+                                        <FiInfo className="mr-2 text-[var(--theme-primary)]"/> Announcements
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div className="border-l-2 border-[var(--theme-primary)] pl-4 py-1 bg-gradient-to-r from-gray-50 to-transparent pr-2 rounded-r-xl">
+                                            <p className="text-[10px] font-bold text-[var(--theme-primary)] uppercase tracking-wider mb-1">Company Wide</p>
+                                            <p className="font-medium text-gray-800 text-[13.5px] leading-snug">Annual Company Retreat scheduled for August.</p>
+                                        </div>
+                                        <div className="border-l-2 border-amber-400 pl-4 py-1 bg-gradient-to-r from-amber-50/50 to-transparent pr-2 rounded-r-xl">
+                                            <p className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">Engineering Dept</p>
+                                            <p className="font-medium text-gray-800 text-[13.5px] leading-snug">Server maintenance scheduled for this weekend.</p>
+                                        </div>
+                                        <div className="border-l-2 border-gray-300 pl-4 py-1">
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">HR Update</p>
+                                            <p className="font-medium text-gray-800 text-[13.5px] leading-snug">New standardized templates available.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </>
                     )}
