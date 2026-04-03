@@ -25,6 +25,12 @@ if os.path.exists(db_path):
         except Exception as e:
             print(f"Column {column} likely already exists or error: {e}")
 
+    try:
+        cursor.execute("ALTER TABLE company ADD COLUMN employee_dashboard_schema TEXT")
+        print("Added employee_dashboard_schema to company.")
+    except Exception as e:
+        print(f"Column employee_dashboard_schema likely already exists or error: {e}")
+
     conn.commit()
     conn.close()
     print("Database columns added successfully.")

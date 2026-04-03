@@ -28,4 +28,7 @@ class Company(db.Model):
     smtp_password = db.Column(db.String(255), nullable=True)
     smtp_from_email = db.Column(db.String(255), nullable=True)
 
+    # CMS Dashboard Config
+    employee_dashboard_schema = db.Column(db.Text, nullable=True) 
+
     users = db.relationship('User', back_populates='company', lazy=True)

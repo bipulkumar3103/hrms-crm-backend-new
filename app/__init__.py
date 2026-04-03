@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from app.config import config
 import logging
 from logging.handlers import RotatingFileHandler
@@ -18,6 +19,9 @@ jwt = JWTManager()
 def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+    # Broaden CORS for all API v1 routes with explicit credentials support
+    CORS(app, resources={r"/api/v1/.*": {"origins": "*"}}, supports_credentials=True, 
+         allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
     # Apply the ProxyFix middleware to handle X-Forwarded- headers
     app.wsgi_app = ProxyFix(
@@ -49,12 +53,22 @@ def create_app(config_name='default'):
 
     @app.before_request
     def log_request_info():
-        app.logger.info('Incoming Request:')
-        app.logger.info(f'Method: {request.method}')
-        app.logger.info(f'Path: {request.path}')
-        app.logger.info(f'Headers: {request.headers}')
+        # Specifically check for Authorization to debug 401s
+        auth_header = request.headers.get('Authorization')
+        auth_status = f"PRESENT (Starts with: {auth_header[:15]}...)" if auth_header else "MISSING"
+        
+        app.logger.info(f'--- Incoming Request: {request.method} {request.path} ---')
+        app.logger.info(f'Auth Header: {auth_status}')
+        app.logger.info(f'Origin: {request.headers.get("Origin")}')
+        
+        # Log all headers for full context if needed
+        # app.logger.info(f'Full Headers: {request.headers}')
+        
         if request.is_json:
-            app.logger.info(f'Body: {request.get_json()}')
+            try:
+                app.logger.info(f'Body: {request.get_json()}')
+            except:
+                pass
 
     # Import models to ensure they are registered with SQLAlchemy metadata
     from app.models.user import User
@@ -63,6 +77,7 @@ def create_app(config_name='default'):
     from app.models.employee import Employee
     from app.models.ui_page import UIPage
     from app.models.page_permission import PagePermission
+    from app.models.form_submission import FormSubmission
 
 
     from app.api.auth import auth_blueprint
@@ -73,6 +88,7 @@ def create_app(config_name='default'):
     from app.api.employees import employees_blueprint
     from app.api.users import users_blueprint
     from app.api.ui import ui_blueprint
+    from app.api.forms import forms_blueprint
 
 
     @jwt.user_lookup_loader
@@ -90,6 +106,8 @@ def create_app(config_name='default'):
     app.register_blueprint(google_blueprint, url_prefix='/api/v1/auth')
     app.register_blueprint(employees_blueprint, url_prefix='/api/v1/employees')
     app.register_blueprint(users_blueprint, url_prefix='/api/v1/users')
+    app.register_blueprint(ui_blueprint, url_prefix='/api/v1/ui')
+    app.register_blueprint(forms_blueprint, url_prefix='/api/v1/forms')
 
     with app.app_context():
         db.create_all()

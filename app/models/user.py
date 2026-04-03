@@ -50,3 +50,8 @@ class User(db.Model):
 
     def has_role(self, role_name):
         return any(role.name == role_name for role in self.roles)
+
+    @property
+    def is_admin_or_super(self):
+        """Returns True if the user has either the 'admin' or 'superadmin' role."""
+        return any(role.name in ['admin', 'superadmin'] for role in self.roles)

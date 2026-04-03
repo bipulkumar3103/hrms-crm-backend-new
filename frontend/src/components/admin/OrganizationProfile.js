@@ -171,13 +171,13 @@ function OrganizationProfile({ token }) {
                 </div>
                 
                 {/* Main Profile Body */}
-                <div className="px-8 pb-10">
-                    <div className="flex flex-col lg:flex-row gap-10 relative z-10 w-full">
+                <div className="px-4 md:px-8 pb-10">
+                    <div className="flex flex-col lg:flex-row gap-6 md:gap-10 relative z-10 w-full">
                         
                         {/* Interactive Logo Column */}
-                        <div className="lg:w-1/4 -mt-20 flex flex-col items-center">
+                        <div className="lg:w-1/4 -mt-12 lg:-mt-20 flex flex-col items-center">
                             <div className="relative group">
-                                <div className="w-40 h-40 rounded-[32px] bg-white p-2 shadow-xl mb-6 transform group-hover:scale-105 transition-all duration-300">
+                                <div className="w-32 h-32 md:w-40 md:h-40 rounded-[28px] md:rounded-[32px] bg-white p-2 shadow-xl mb-6 transform group-hover:scale-105 transition-all duration-300">
                                     <div className="w-full h-full bg-gray-50 rounded-[24px] flex items-center justify-center text-[54px] text-[var(--theme-primary)] font-bold tracking-tighter border border-gray-100 overflow-hidden relative">
                                         {companyInfo?.logo_original_url ? (
                                             <img src={companyInfo.logo_original_url} alt="Enterprise Logo" className="w-full h-full object-contain p-2 bg-white"/>
@@ -228,11 +228,11 @@ function OrganizationProfile({ token }) {
                         <div className="lg:w-3/4 pt-6 lg:pt-2 w-full">
                             
                             {/* Summary Header */}
-                            <div className="mb-10 pb-6 border-b border-gray-100">
-                                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-3">
+                            <div className="mb-6 md:mb-10 pb-6 border-b border-gray-100 text-center lg:text-left">
+                                <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-3">
                                     {companyInfo?.name || 'Enterprise Matrix'}
                                 </h1>
-                                <p className="text-[18px] font-semibold text-[var(--theme-primary)] flex items-center">
+                                <p className="text-sm md:text-[18px] font-semibold text-[var(--theme-primary)] flex items-center justify-center lg:justify-start">
                                     Enterprise parameters and active framework identity
                                 </p>
                             </div>
@@ -339,7 +339,7 @@ function OrganizationProfile({ token }) {
                                         <FiAperture className="mr-2 text-[var(--theme-primary)]"/> Interface Token Design
                                     </h3>
                                     
-                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 relative z-10">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 relative z-10">
                                         {[
                                             { label: 'Primary Core', key: 'primary', val: themeColors.primary },
                                             { label: 'Secondary Tone', key: 'secondary', val: themeColors.secondary },

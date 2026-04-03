@@ -31,15 +31,20 @@ const PremiumAlert = () => {
                             initial={{ opacity: 0, x: 20, scale: 0.98 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                            className={`pointer-events-auto flex items-start gap-3.5 p-4 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border backdrop-blur-md ${style.bg} ${style.border}`}
+                            className={`pointer-events-auto flex items-start gap-4 p-4 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] border backdrop-blur-xl ${style.bg} ${style.border}`}
                         >
-                            <div className="flex-shrink-0 mt-0.5">{style.icon}</div>
-                            <div className={`flex-1 text-[13.5px] font-semibold tracking-tight leading-snug ${style.text}`}>
-                                {alert.message}
+                            <div className="flex-shrink-0 mt-1">{style.icon}</div>
+                            <div className="flex-1 space-y-1">
+                                <div className={`text-[13px] font-black uppercase tracking-widest ${style.text}`}>
+                                    {alert.title}
+                                </div>
+                                <div className={`text-[12.5px] font-medium leading-relaxed opacity-80 ${style.text}`}>
+                                    {alert.message}
+                                </div>
                             </div>
                             <button 
                                 onClick={() => removeAlert(alert.id)} 
-                                className={`flex-shrink-0 ${style.text} opacity-60 hover:opacity-100 transition-opacity p-0.5`}
+                                className={`flex-shrink-0 ${style.text} opacity-30 hover:opacity-100 transition-opacity p-1`}
                             >
                                 <FiX size={16} />
                             </button>

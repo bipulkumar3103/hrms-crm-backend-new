@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import ColorChip from './ColorChip';
+import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
 
 const getBorderStyle = (style, theme) => {
     if (!style?.border_color_variant) return {};
@@ -107,12 +108,22 @@ function Card({ config, theme, token }) {
           {title}
       </h2>
       <div className="space-y-3">
-        {elements.map((el, index) => (
+        {elements && elements.map((el, index) => (
           <div key={index} className="flex justify-between items-center">
-            <p style={{color: theme.theme_text_color, opacity: 0.9}} className="font-semibold">{el.label}</p>
-            {renderElement(el, theme, token)}
+            <p style={{color: theme?.theme_text_color || '#333', opacity: 0.9}} className="font-semibold">{el.label}</p>
+            {renderElement(el, theme || {}, token)}
           </div>
         ))}
+        {/* Support Nested Layout Array for Advanced CMS Capabilities */}
+        {config.children && config.children.length > 0 && (
+          <div className="mt-4 border-t pt-4 border-dashed border-gray-200">
+             <SchemaEngine 
+                  schemaOverride={{ components: config.children }}
+                  token={token}
+                  onNavigate={config.onNavigate}
+              />
+          </div>
+        )}
       </div>
     </div>
   );

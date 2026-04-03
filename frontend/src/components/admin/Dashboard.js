@@ -6,12 +6,14 @@ import {
   FiBell, FiChevronDown, FiLogOut, FiInfo, FiGrid, 
   FiMessageSquare, FiPieChart, FiMonitor, FiCheckCircle,
   FiArrowRight, FiArrowLeft, FiUser, FiPlus, FiX, FiCopy, FiCheck,
-  FiClock, FiFileText, FiAward
+  FiClock, FiFileText, FiAward, FiMenu
 } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
 import { useAlert } from '../../context/AlertContext';
 import UserProfile from './UserProfile';
 import OrganizationProfile from './OrganizationProfile';
+import UIBuilder from './UIBuilder';
+import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
 
 const StatCard = ({ icon, label, value, color }) => (
     <motion.div 
@@ -29,7 +31,7 @@ const StatCard = ({ icon, label, value, color }) => (
     </motion.div>
 );
 
-const Dashboard = () => {
+const Dashboard = ({ api, token, logout }) => {
     const { showAlert } = useAlert();
     // --- Data State ---
     const [company, setCompany] = useState(null);
@@ -38,7 +40,8 @@ const Dashboard = () => {
     const [viewAsEmployee, setViewAsEmployee] = useState(false);
 
     // --- UI State (Dribbble Layout) ---
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(window.innerWidth < 1024);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('Overview');
@@ -182,8 +185,27 @@ const Dashboard = () => {
     return (
         <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text)' }}>
             
+            {/* MOBILE OVERLAY */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[40] lg:hidden"
+                    />
+                )}
+            </AnimatePresence>
+
             {/* SIDEBAR (Dribbble Layout) */}
-            <aside className={`${isSidebarCollapsed ? 'w-[84px]' : 'w-[260px]'} flex-shrink-0 bg-white m-4 rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.03)] transition-all duration-300 flex flex-col z-20`}>
+            <aside className={`
+                fixed lg:relative top-0 bottom-0 left-0 z-[50]
+                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                ${isSidebarCollapsed ? 'w-[84px]' : 'w-[260px]'} 
+                flex-shrink-0 bg-white m-0 lg:m-4 lg:rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.03)] 
+                transition-all duration-300 flex flex-col
+            `}>
                 {/* Logo Area */}
                 <div className="h-24 flex items-center px-6">
                     <div className="flex items-center space-x-3 w-full">
@@ -232,6 +254,7 @@ const Dashboard = () => {
                                 
                                 <NavItem icon={<FiMonitor/>} label="Demand Planning" id="Demand" />
                                 <NavItem icon={<FiBox/>} label="Add Module" id="Module" />
+                                <NavItem icon={<FiSettings/>} label="UI Builder (CMS)" id="UI CMS" />
                             </>
                         ) : (
                             <>
@@ -266,12 +289,20 @@ const Dashboard = () => {
             </aside>
 
             {/* MAIN CONTENT AREA */}
-            <div className="flex-1 flex flex-col overflow-hidden pt-6 pr-8 pb-8 pl-[2px]">
+            <div className="flex-1 flex flex-col overflow-hidden pt-6 px-4 lg:pr-8 pb-8 lg:pl-[2px]">
                 
                 {/* TOP NAV (Pill Style) */}
-                <header className="h-[52px] flex justify-between items-center mb-8 pl-4">
-                    <div className="text-2xl font-bold tracking-tight text-gray-800">
-                        {activeTab === 'Live Network' ? 'Live Network (Admin)' : activeTab}
+                <header className="h-[52px] flex justify-between items-center mb-8 px-4 lg:pl-4">
+                    <div className="flex items-center space-x-4">
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-600"
+                        >
+                            <FiMenu size={20} />
+                        </button>
+                        <div className="text-xl lg:text-2xl font-bold tracking-tight text-gray-800 truncate">
+                            {activeTab === 'Live Network' ? 'Live Network (Admin)' : activeTab}
+                        </div>
                     </div>
 
                     <div className="flex items-center space-x-1 bg-white px-1.5 py-1.5 rounded-full shadow-sm border border-gray-200/60 z-30 relative">
@@ -376,6 +407,8 @@ const Dashboard = () => {
                         <UserProfile token={localStorage.getItem('token')} />
                     ) : activeTab === 'My Organization' ? (
                         <OrganizationProfile token={localStorage.getItem('token')} />
+                    ) : activeTab === 'UI CMS' ? (
+                        <UIBuilder token={token} />
                     ) : isAdminOrSuper ? (
                         <>
                             {/* Admin Metrics Overview */}
@@ -416,106 +449,14 @@ const Dashboard = () => {
                             </div>
                         </>
                     ) : (
-                        <>
-                            {/* Employee Metrics Overview */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                                <StatCard icon={FiCheckCircle} label="Available Leave (Days)" value="14" color="var(--theme-primary)" />
-                                <StatCard icon={FiBell} label="Next Holiday" value="May 25" color="var(--theme-accent)" />
-                                <StatCard icon={FiBox} label="Pending Tasks" value="3" color="#10B981" />
-                                <StatCard icon={FiMessageSquare} label="Unread Messages" value="2" color="#F59E0B" />
-                            </div>
-
-                            {/* Employee Quick Actions */}
-                            <div className="mb-8">
-                                <h2 className="text-xl font-bold mb-5 tracking-tight text-gray-800">My Actions</h2>
-                                <div className="flex flex-wrap gap-4">
-                                    <button 
-                                        className="flex items-center px-6 py-3.5 rounded-xl text-white font-medium transition-all shadow-[0_4px_14px_rgba(43,182,203,0.3)] hover:shadow-[0_6px_20px_rgba(43,182,203,0.4)] active:scale-95"
-                                        style={{ backgroundColor: 'var(--theme-primary)' }}
-                                    >
-                                        <FiPlus className="mr-2" size={20}/> Request Time Off
-                                    </button>
-                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-95">
-                                        <FiMessageSquare className="mr-2 text-gray-400" size={20}/> Send Message
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Detailed Employee Widgets */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                {/* Today's Schedule */}
-                                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center tracking-tight">
-                                        <FiClock className="mr-2 text-[var(--theme-primary)]"/> Today's Schedule
-                                    </h3>
-                                    <div className="space-y-4">
-                                        <div className="flex items-start">
-                                            <div className="w-12 h-12 bg-[#e4f5f8] rounded-xl flex items-center justify-center text-[var(--theme-primary)] font-bold text-sm shrink-0 shadow-sm border border-[#2bb6cb]/20">9 AM</div>
-                                            <div className="ml-4">
-                                                <p className="font-semibold text-gray-800 text-[14px]">Morning Standup</p>
-                                                <p className="text-gray-500 text-[12px] mt-0.5">Conference Room A</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 font-bold text-sm shrink-0 shadow-sm border border-amber-100">1 PM</div>
-                                            <div className="ml-4">
-                                                <p className="font-semibold text-gray-800 text-[14px]">Project Sync Review</p>
-                                                <p className="text-gray-500 text-[12px] mt-0.5">Virtual Teams Meeting</p>
-                                            </div>
-                                        </div>
-                                        <button className="w-full py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold rounded-xl text-[13px] transition-colors mt-2 shadow-sm">View Full Calendar</button>
-                                    </div>
-                                </div>
-
-                                {/* Recent Payslips & Docs */}
-                                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center tracking-tight">
-                                        <FiFileText className="mr-2 text-[var(--theme-primary)]"/> Recent Documents
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {[
-                                            { name: 'April 2026 Payslip', date: 'Apr 01', icon: FiAward, color: 'text-green-600', bg: 'bg-green-50' },
-                                            { name: 'Q1 Performance Review', date: 'Mar 28', icon: FiFileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-                                            { name: 'Updated Health Benefits', date: 'Mar 15', icon: FiBox, color: 'text-purple-600', bg: 'bg-purple-50' }
-                                        ].map((doc, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-3 border border-gray-100 bg-gray-50/50 rounded-xl hover:bg-white hover:shadow-sm transition-all cursor-pointer">
-                                                <div className="flex items-center">
-                                                    <div className={`p-2 rounded-lg ${doc.bg} ${doc.color} mr-3 shadow-sm`}>
-                                                        <doc.icon size={16}/>
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-semibold text-gray-800 text-[13px]">{doc.name}</p>
-                                                        <p className="text-gray-400 text-[11px] font-medium">{doc.date}</p>
-                                                    </div>
-                                                </div>
-                                                <FiArrowRight className="text-gray-300" size={14}/>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Company Announcements */}
-                                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center tracking-tight">
-                                        <FiInfo className="mr-2 text-[var(--theme-primary)]"/> Announcements
-                                    </h3>
-                                    <div className="space-y-4">
-                                        <div className="border-l-2 border-[var(--theme-primary)] pl-4 py-1 bg-gradient-to-r from-gray-50 to-transparent pr-2 rounded-r-xl">
-                                            <p className="text-[10px] font-bold text-[var(--theme-primary)] uppercase tracking-wider mb-1">Company Wide</p>
-                                            <p className="font-medium text-gray-800 text-[13.5px] leading-snug">Annual Company Retreat scheduled for August.</p>
-                                        </div>
-                                        <div className="border-l-2 border-amber-400 pl-4 py-1 bg-gradient-to-r from-amber-50/50 to-transparent pr-2 rounded-r-xl">
-                                            <p className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">Engineering Dept</p>
-                                            <p className="font-medium text-gray-800 text-[13.5px] leading-snug">Server maintenance scheduled for this weekend.</p>
-                                        </div>
-                                        <div className="border-l-2 border-gray-300 pl-4 py-1">
-                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">HR Update</p>
-                                            <p className="font-medium text-gray-800 text-[13.5px] leading-snug">New standardized templates available.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
+                        <div className="w-full">
+                            <SchemaEngine 
+                                route={(activeTab === 'Overview' || activeTab === 'Home') ? '/employee/dashboard' : activeTab} 
+                                dataSource="/api/v1/company/me" 
+                                token={token} 
+                                onNavigate={(targetRoute) => setActiveTab(targetRoute)}
+                            />
+                        </div>
                     )}
                 </main>
             </div>
