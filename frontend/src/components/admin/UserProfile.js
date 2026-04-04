@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import { FiUser, FiMail, FiShield, FiCheckCircle, FiEdit2, FiSave, FiX, FiPhone, FiBriefcase, FiMapPin, FiGrid, FiCalendar, FiHome, FiFileText, FiCamera } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
 
@@ -44,9 +44,7 @@ function UserProfile({ token }) {
 
     const fetchUserData = async () => {
         try {
-            const res = await axios.get('/api/v1/users/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get('/users/me');
             setUserData(res.data);
             setEditForm({ 
                 first_name: res.data.first_name || '', 
@@ -77,9 +75,7 @@ function UserProfile({ token }) {
     const handleSave = async () => {
         try {
             setSaveStatus('Saving changes...');
-            await axios.put('/api/v1/users/me', editForm, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await api.put('/users/me', editForm);
             await fetchUserData(); // Ensure data matches backend perfectly
             setIsEditing(false);
             setSaveStatus('Profile synchronized successfully');
@@ -99,9 +95,8 @@ function UserProfile({ token }) {
 
         try {
             setAvatarUploadStatus('Uploading...');
-            await axios.post('/api/v1/uploads/user-avatar', formData, {
+            await api.post('/uploads/user-avatar', formData, {
                 headers: { 
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });

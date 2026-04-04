@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useCallback } from 'react';
+import { api } from '../../utils/api';
 import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
 import { useAlert } from '../../context/AlertContext';
 import { useConfirmation } from '../../context/ConfirmationContext';
@@ -61,9 +61,9 @@ function UIBuilder({ token }) {
     setSubmissionsLoading(true);
     try {
       const url = filter
-        ? `/api/v1/forms/submissions?form_name=${encodeURIComponent(filter)}`
-        : '/api/v1/forms/submissions';
-      const res = await axios.get(url, { headers: { Authorization: `Bearer ${token?.trim()}` } });
+        ? `/forms/submissions?form_name=${encodeURIComponent(filter)}`
+        : '/forms/submissions';
+      const res = await api.get(url);
       setSubmissions(res.data.submissions || []);
     } catch (err) {
       console.error('Failed to load submissions', err);
@@ -84,9 +84,7 @@ function UIBuilder({ token }) {
     });
     if (!isConfirmed) return;
     try {
-      await axios.delete(`/api/v1/forms/submissions/${id}`, {
-        headers: { Authorization: `Bearer ${token?.trim()}` }
-      });
+      await api.delete(`/forms/submissions/${id}`);
       setSubmissions(prev => prev.filter(s => s.id !== id));
     } catch {
       showAlert({ 
@@ -97,36 +95,40 @@ function UIBuilder({ token }) {
     }
   };
 
-  useEffect(() => {
-    const fetchRoutes = async () => {
-      try {
-        const res = await axios.get('/api/v1/ui/builder/layouts', {
-          headers: { Authorization: `Bearer ${token?.trim()}` }
-        });
-        const fetchedRoutes = res.data.routes || [];
-        setRoutes(fetchedRoutes);
-        // Default to /employee/dashboard if available, otherwise first route
-        const defaultRoute = fetchedRoutes.includes('/employee/dashboard')
-          ? '/employee/dashboard'
-          : fetchedRoutes[0] || '/employee/dashboard';
-        setSelectedRoute(defaultRoute);
-      } catch (err) {
-        console.error("Failed to load routes", err);
-        // Even on error, provide the default routes
-        setSelectedRoute('/employee/dashboard');
+  const fetchRoutes = useCallback(async () => {
+    try {
+      const res = await api.get('/ui/builder/layouts');
+      const fetchedRoutes = res.data.routes || [];
+      setRoutes(fetchedRoutes);
+      
+      // Auto-set selected route if not set
+      if (!selectedRoute && fetchedRoutes.length > 0) {
+        const dashboardExists = fetchedRoutes.find(r => (typeof r === 'object' ? r.path : r) === '/employee/dashboard');
+        setSelectedRoute(dashboardExists ? '/employee/dashboard' : (typeof fetchedRoutes[0] === 'object' ? fetchedRoutes[0].path : fetchedRoutes[0]));
       }
-    };
+    } catch (err) {
+      console.error("Failed to load routes", err);
+      // Fallback suggestions for a functional UI even on backend failure
+      const fallbackRoutes = [
+        { path: '/employee/dashboard', is_custom: false, has_global: true },
+        { path: '/employee/profile', is_custom: false, has_global: false },
+        { path: '/employee/reports', is_custom: false, has_global: false }
+      ];
+      setRoutes(fallbackRoutes);
+      if (!selectedRoute) setSelectedRoute('/employee/dashboard');
+    }
+  }, [token, selectedRoute]);
+
+  useEffect(() => {
     if (token) fetchRoutes();
-  }, [token]);
+  }, [token, fetchRoutes]);
 
   useEffect(() => {
     const fetchLayout = async () => {
       if (!selectedRoute) return;
       setLoading(true);
       try {
-        const res = await axios.get(`/api/v1/ui/layout?route=${selectedRoute}`, {
-          headers: { Authorization: `Bearer ${token?.trim()}` }
-        });
+        const res = await api.get(`/ui/layout?route=${selectedRoute}`);
         setSchema(res.data.schema);
         setSchemaText(JSON.stringify(res.data.schema, null, 2));
       } catch (err) {
@@ -146,24 +148,37 @@ function UIBuilder({ token }) {
     try {
       setSaving(true);
       setMessage({ text: '', type: '' });
-      let payloadSchema = schema;
+      let payloadSchema = schema || { components: [] };
       if (editMode) {
-        payloadSchema = JSON.parse(schemaText);
-        setSchema(payloadSchema);
+        try {
+          payloadSchema = JSON.parse(schemaText);
+          setSchema(payloadSchema);
+        } catch (e) {
+          showAlert({ title: 'Syntax Error', message: 'Invalid JSON architecture detected. Please check your schema formatting.', type: 'error' });
+          return;
+        }
       }
 
-      await axios.post('/api/v1/ui/builder/layout', {
+      await api.post('/ui/builder/layout', {
         route: selectedRoute,
         schema: payloadSchema
-      }, {
-        headers: { Authorization: `Bearer ${token?.trim()}` }
       });
       setMessage({ text: 'Layout saved effectively! Employees can now see this configuration.', type: 'success' });
       
-      // Update routes list if it was a new route
-      if (!routes.includes(selectedRoute)) {
-          setRoutes([...routes, selectedRoute]);
+      // Update local routes state to reflect 'custom' status immediately
+      const routeIdx = routes.findIndex(r => (typeof r === 'object' ? r.path : r) === selectedRoute);
+      if (routeIdx === -1) {
+          setRoutes(prev => [...prev, { path: selectedRoute, is_custom: true, has_global: false }]);
+      } else {
+          setRoutes(prev => prev.map((r, i) => 
+              i === routeIdx 
+              ? { ...(typeof r === 'object' ? r : { path: r }), is_custom: true }
+              : r
+          ));
       }
+
+      // Re-fetch in background to keep all metadata (global vs custom) in sync with DB
+      fetchRoutes();
     } catch (err) {
       setMessage({ text: 'Failed to save layout. ' + (err.response?.data?.message || err.message), type: 'error' });
     } finally {
@@ -172,16 +187,22 @@ function UIBuilder({ token }) {
   };
 
   const handleDelete = async () => {
+    if (!selectedRoute) return;
+    
+    const routeMeta = routes.find(r => r.path === selectedRoute) || {};
+    const hasGlobal = routeMeta.has_global;
+
     const isConfirmed = await confirm({
-        title: 'Deconstruct Protocol Layout',
-        message: `Confirming this request will destroy the custom administrative interface for "${selectedRoute}". All regional workforce interactions on this route will revert to global system defaults.`
+        title: hasGlobal ? 'Reset to Architecture' : 'Deconstruct Protocol Layout',
+        message: hasGlobal 
+            ? `Confirming this request will dismantle your custom overwrite for "${selectedRoute}" and instantly restore the Enterprise Elite Default configuration.`
+            : `Confirming this request will destroy the custom administrative interface for "${selectedRoute}". All regional workforce interactions on this route will revert to global system defaults.`
     });
+
     if (!isConfirmed) return;
     try {
       setLoading(true);
-      await axios.delete(`/api/v1/ui/builder/layout?route=${selectedRoute}`, {
-        headers: { Authorization: `Bearer ${token?.trim()}` }
-      });
+      await api.delete(`/ui/builder/layout?route=${selectedRoute}`);
       setMessage({ text: 'Layout deleted successfully! Employees will now see the default interface.', type: 'success' });
       
       // Remove from routes dropdown if missing
@@ -244,7 +265,18 @@ function UIBuilder({ token }) {
           setConfigTableColumns([{ header: "Name", bind: "name" }, { header: "Department", bind: "department" }]);
           setAvailablePaths([]);
       }
-      else if (type === 'header') setConfigFormData({ title: 'Dashboard Header', subtitle: 'Manage your tasks' });
+      else if (type === 'header') {
+          setConfigFormData({ 
+              title: 'Dashboard Header', 
+              subtitle: 'Manage your tasks',
+              dataSource: '',
+              alignment: 'left',
+              backgroundType: 'solid',
+              padding: '2.5rem',
+              shadow: 'none'
+          });
+          setAvailablePaths([]);
+      }
       else if (type === 'card') setConfigFormData({ title: 'Data Container' });
       else if (type === 'form') {
           setConfigFormData({ title: 'Submit Request', submitEndpoint: '/api/v1/forms/submit', submitLabel: 'Submit Data' });
@@ -262,16 +294,17 @@ function UIBuilder({ token }) {
     try {
       // Endpoint Normalization: Prepend /api/v1 if not present
       let endpoint = configFormData.dataSource.trim();
-      if (!endpoint.startsWith('http') && !endpoint.startsWith('/api/v1')) {
-          endpoint = `/api/v1${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+      // Only prefix if it's a relative path and doesn't already have the base
+      if (!endpoint.startsWith('http') && !endpoint.startsWith('/api/v1') && !endpoint.startsWith('api/v1')) {
+          endpoint = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+      } else {
+          // If it already has /api/v1, strip it so the 'api' utility (which has /api/v1 baseURL) doesn't double it
+          endpoint = endpoint.replace(/^\/?api\/v1/, '');
+          if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
       }
 
-      // 1. Fetch raw data using axios directly (as requested)
-      const res = await axios.get(endpoint, {
-        headers: { 
-          Authorization: `Bearer ${token?.trim()}`
-        }
-      });
+      // 1. Fetch raw data using the centralized api utility
+      const res = await api.get(endpoint);
       
       // 2. Intelligent Data Discovery
       let sampleObject = null;
@@ -341,7 +374,7 @@ function UIBuilder({ token }) {
   };
 
   const UIBlockTemplates = {
-    header: { id: "new-header", type: "header", config: { title: "New Header", subtitle: "Subtitle" } },
+    header: { id: "new-header", type: "header", config: { title: "New Header", subtitle: "Subtitle", dataSource: "", alignment: "left", backgroundType: "solid" } },
     card: { id: "new-card", type: "card", config: { title: "New Card", elements: [], children: [] } },
     table: { id: "new-table", type: "table", config: { title: "New Table", dataSource: "/api/v1/employees", columns: [{header: "Name", bind: "name"}, {header: "Department", bind: "department"}] } },
     button: { id: "new-button", type: "button", config: { label: "Navigate", targetRoute: "/"} },
@@ -392,6 +425,12 @@ function UIBuilder({ token }) {
       } else if (configType === 'header') {
           block.config.title = configFormData.title;
           block.config.subtitle = configFormData.subtitle;
+          block.config.dataSource = configFormData.dataSource;
+          block.config.alignment = configFormData.alignment;
+          block.config.backgroundType = configFormData.backgroundType;
+          block.config.shadow = configFormData.shadow;
+          block.config.backgroundColor = configFormData.backgroundColor;
+          block.config.padding = configFormData.padding;
       } else if (configType === 'card') {
           block.config.title = configFormData.title;
       } else if (configType === 'form') {
@@ -434,51 +473,85 @@ function UIBuilder({ token }) {
 
       {activeView === 'builder' ? (
         <>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 gap-6">
-        <div>
-            <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Enterprise Layout Builder</h1>
-            <p className="text-gray-500 text-xs md:text-sm mt-1 font-medium">Design and deploy custom interfaces for your workforce.</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="relative flex-1 md:flex-none">
-            <select 
-                value={selectedRoute} 
-                onChange={e => setSelectedRoute(e.target.value)}
-                className="w-full appearance-none font-semibold text-gray-700 bg-gray-50 border border-gray-200 px-4 py-2.5 pr-10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all shadow-sm text-sm"
-            >
-                {routes.map(r => <option key={r} value={r}>{r}</option>)}
-                {selectedRoute && !routes.includes(selectedRoute) && <option value={selectedRoute}>{selectedRoute} (Unsaved)</option>}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                 <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+          <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 gap-6">
+            <div className="flex-shrink-0">
+                <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                  <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-100">
+                    <FiLayout size={20} />
+                  </div>
+                  Enterprise Layout Builder
+                </h1>
+                <p className="text-gray-500 text-sm mt-1.5 font-medium ml-1">Design and deploy custom interfaces for your workforce.</p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
+              {/* Route Management Group */}
+              <div className="flex items-center gap-1 bg-gray-50 p-1.5 rounded-[1.25rem] border border-gray-100 flex-1 md:flex-none">
+                <div className="relative flex-1 md:w-64 group">
+                  <select 
+                      value={selectedRoute} 
+                      onChange={e => setSelectedRoute(e.target.value)}
+                      className="w-full appearance-none font-bold text-gray-700 bg-transparent px-4 py-2 pr-10 focus:outline-none transition-all text-sm cursor-pointer"
+                  >
+                      {Array.isArray(routes) && routes.map(r => {
+                        const path = typeof r === 'object' ? r.path : r;
+                        const isCustom = typeof r === 'object' ? r.is_custom : false;
+                        const hasGlobal = typeof r === 'object' ? r.has_global || r.is_global : false;
+                        
+                        let label = path;
+                        if (isCustom) label += " (Custom)";
+                        else if (hasGlobal) label += " (Elite Default)";
+
+                        return <option key={path} value={path}>{label}</option>;
+                      })}
+                      {selectedRoute && Array.isArray(routes) && !routes.find(r => (typeof r === 'object' ? r.path : r) === selectedRoute) && (
+                          <option value={selectedRoute}>{selectedRoute} (Unsaved)</option>
+                      )}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 group-hover:text-indigo-500 transition-colors">
+                       <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
+                
+                <div className="h-6 w-[1px] bg-gray-200 mx-1"></div>
+
+                <button 
+                  onClick={() => setIsNewRouteModalOpen(true)}
+                  title="Create New Route"
+                  className="p-2.5 text-indigo-600 hover:bg-white hover:shadow-sm rounded-xl transition-all active:scale-90"
+                >
+                  <FiPlusCircle size={22} />
+                </button>
+                
+                <button 
+                  onClick={handleDelete}
+                  title="Delete Layout"
+                  className="p-2.5 text-rose-500 hover:bg-white hover:shadow-sm rounded-xl transition-all active:scale-90"
+                >
+                  <FiTrash2 size={22} />
+                </button>
+              </div>
+
+              {/* Publish Action */}
+              <button 
+                onClick={handleSave} 
+                disabled={saving}
+                className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 px-10 rounded-[1.25rem] shadow-[0_10px_20px_-5px_rgba(79,70,229,0.4)] hover:shadow-[0_15px_25px_-5px_rgba(79,70,229,0.5)] disabled:opacity-50 transition-all border-b-4 border-indigo-800 text-sm flex items-center justify-center gap-3 active:border-b-0 active:translate-y-1"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span className="tracking-wide">SYNCHRONIZING...</span>
+                  </>
+                ) : (
+                  <>
+                    <FiZap size={18} className="text-amber-300 fill-amber-300" />
+                    <span className="tracking-wide">PUBLISH LAYOUT</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
-          
-          <button 
-            onClick={() => setIsNewRouteModalOpen(true)}
-            className="flex-shrink-0 text-indigo-600 font-bold px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all border border-indigo-100 text-sm flex items-center justify-center gap-1.5"
-          >
-            <FiPlusCircle size={18} />
-            <span className="hidden sm:inline">Create</span>
-          </button>
- 
-          <button 
-            onClick={handleDelete}
-            className="flex-shrink-0 text-red-600 font-bold px-4 py-2.5 bg-red-50 hover:bg-red-100 rounded-xl transition-all border border-red-100 text-sm flex items-center justify-center gap-1.5"
-          >
-            <FiTrash2 size={18} />
-            <span className="hidden sm:inline">Delete</span>
-          </button>
- 
-          <button 
-            onClick={handleSave} 
-            disabled={saving}
-            className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.3)] disabled:opacity-50 transition-all border border-indigo-700 text-sm"
-          >
-            {saving ? 'Synchronizing...' : 'Publish Layout'}
-          </button>
-        </div>
-      </div>
 
       {message.text && (
         <div className={`mb-6 p-4 rounded-xl font-medium border ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
@@ -589,7 +662,7 @@ function UIBuilder({ token }) {
                     <div className="pointer-events-none border border-dashed border-indigo-200 p-2 rounded-xl bg-white shadow-sm min-h-full">
                         <SchemaEngine 
                             route={selectedRoute} 
-                            dataSource="/api/v1/company/me" 
+                            dataSource="/api/v1/ui/context" 
                             token={token} 
                             schemaOverride={schema}
                             onNavigate={() => {}} // Disabled in preview
@@ -860,17 +933,104 @@ function UIBuilder({ token }) {
                           )}
 
                           {configType === 'header' && (
-                              <div className="space-y-4">
-                                  <div>
-                                      <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1.5">Main Title</label>
-                                      <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all" 
-                                          value={configFormData.title || ''} onChange={e => setConfigFormData({...configFormData, title: e.target.value})} />
+                              <div className="space-y-5">
+                                  {/* Tab Navigation for Header */}
+                                  <div className="flex border-b border-gray-100 mb-4 sticky top-0 bg-white z-20 -mx-4 px-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                                      {[
+                                          { id: 'data', label: 'Data', icon: <FiSearch /> },
+                                          { id: 'content', label: 'Content', icon: <FiLayout /> },
+                                          { id: 'style', label: 'Styles', icon: <FiSettings /> }
+                                      ].map(tab => (
+                                          <button 
+                                              key={tab.id}
+                                              type="button"
+                                              onClick={() => setModalTab(tab.id)}
+                                              className={`flex items-center gap-2 px-4 py-3 text-xs font-black transition-all border-b-2 ${modalTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                          >
+                                              {tab.icon}
+                                              {tab.label}
+                                          </button>
+                                      ))}
                                   </div>
-                                  <div>
-                                      <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1.5">Subtitle</label>
-                                      <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all" 
-                                          value={configFormData.subtitle || ''} onChange={e => setConfigFormData({...configFormData, subtitle: e.target.value})} />
-                                  </div>
+
+                                  {modalTab === 'data' && (
+                                      <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                          <div>
+                                              <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">API Data Linkage</label>
+                                              <div className="flex gap-2">
+                                                  <input type="text" placeholder="/api/v1/..." className="flex-1 font-mono text-sm px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" 
+                                                      value={configFormData.dataSource || ''} onChange={e => setConfigFormData({...configFormData, dataSource: e.target.value})} />
+                                                  <button type="button" onClick={discoverTableSchema} disabled={isFetchingSchema} className="px-5 py-2 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 disabled:opacity-50 flex items-center transition-all">
+                                                      {isFetchingSchema ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div> : <FiSearch className="mr-2" />}
+                                                      Scan
+                                                  </button>
+                                              </div>
+                                              <p className="mt-2 text-[10px] text-gray-400 italic">Scan to discover dynamic paths like {"{{name}}"} for your titles.</p>
+                                          </div>
+                                          {availablePaths.length > 0 && (
+                                              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3">
+                                                  <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"><FiCheck /></div>
+                                                  <div className="text-xs text-emerald-800 font-bold uppercase tracking-tight">Handshake Successful: {availablePaths.length} Dynamic Paths Map Ready</div>
+                                              </div>
+                                          )}
+                                      </div>
+                                  )}
+
+                                  {modalTab === 'content' && (
+                                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                          <div>
+                                              <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1.5">Main Title</label>
+                                              <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all font-bold" 
+                                                  placeholder="e.g. Welcome, {{first_name}}"
+                                                  value={configFormData.title || ''} onChange={e => setConfigFormData({...configFormData, title: e.target.value})} />
+                                          </div>
+                                          <div>
+                                              <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1.5">Subtitle</label>
+                                              <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all" 
+                                                  placeholder="e.g. Manage your {{department}} portal"
+                                                  value={configFormData.subtitle || ''} onChange={e => setConfigFormData({...configFormData, subtitle: e.target.value})} />
+                                          </div>
+                                      </div>
+                                  )}
+
+                                  {modalTab === 'style' && (
+                                      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                          <div className="grid grid-cols-2 gap-4">
+                                               <div className="col-span-2">
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3">Alignment</label>
+                                                   <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
+                                                       {['left', 'center', 'right'].map(align => (
+                                                           <button 
+                                                               key={align}
+                                                               type="button"
+                                                               onClick={() => setConfigFormData({...configFormData, alignment: align})}
+                                                               className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${configFormData.alignment === align ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                                           >
+                                                               {align}
+                                                           </button>
+                                                       ))}
+                                                   </div>
+                                               </div>
+                                               <div>
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Background</label>
+                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none" value={configFormData.backgroundType || 'solid'} onChange={e => setConfigFormData({...configFormData, backgroundType: e.target.value})}>
+                                                       <option value="solid">Solid Color</option>
+                                                       <option value="gradient">Indigo Gradient</option>
+                                                       <option value="glass">Glassmorphism</option>
+                                                   </select>
+                                               </div>
+                                               <div>
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Shadow</label>
+                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none" value={configFormData.shadow || 'none'} onChange={e => setConfigFormData({...configFormData, shadow: e.target.value})}>
+                                                       <option value="none">Flat</option>
+                                                       <option value="sm">Soft</option>
+                                                       <option value="md">Std</option>
+                                                       <option value="lg">High</option>
+                                                   </select>
+                                               </div>
+                                          </div>
+                                      </div>
+                                  )}
                               </div>
                           )}
 

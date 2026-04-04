@@ -119,9 +119,8 @@ function Table({ config, token, providedData }) {
     // 1. Strip domain if present
     url = url.replace(/^https?:\/\/[^\/]+/, ''); 
     
-    // 2. Aggressively remove /api/v1 or api/v1 prefix
-    if (url.startsWith('/api/v1')) url = url.replace('/api/v1', '');
-    else if (url.startsWith('api/v1')) url = url.replace('api/v1', '');
+    // 2. Aggressively remove /api/v1 or api/v1 prefix to avoid doubling with baseURL
+    url = url.replace(/^\/?api\/v1/, '');
     
     // 3. Ensure single leading slash
     if (!url.startsWith('/')) url = '/' + url;
@@ -185,7 +184,7 @@ function Table({ config, token, providedData }) {
     };
 
     fetchData();
-  }, [normalizedUrl, providedData, token, config.title]);
+  }, [normalizedUrl, providedData, config.title]);
 
   // Loading Skeleton State
   if (loading) {

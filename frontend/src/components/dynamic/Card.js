@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import ColorChip from './ColorChip';
 import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
 
@@ -53,10 +53,9 @@ const LogoUpload = ({ value, token }) => {
         formData.append('logo', selectedFile);
 
         try {
-            const res = await axios.post('/api/v1/uploads/company-logo', formData, {
+            const res = await api.post('/uploads/company-logo', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`,
                 }
             });
             setLogo(res.data.data.logo_url);

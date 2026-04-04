@@ -87,23 +87,69 @@ def list_builder_layouts():
     if not user.is_admin_or_super:
         return jsonify({"message": "Admin access required"}), 403
 
-    # Only this company's saved layouts
-    company_layouts = UIMetadata.query.filter_by(
-        company_id=user.company_id,
+    # 1. Fetch custom layouts for THIS company
+    company_routes = { r.page_route for r in UIMetadata.query.filter_by(
+        company_id=user.company_id, 
         is_global=False
-    ).all()
-    company_routes = set(layout.page_route for layout in company_layouts)
+    ).all() }
 
-    # Global platform-default templates (shared across all companies, read-only)
-    global_layouts = UIMetadata.query.filter_by(is_global=True).all()
-    global_routes = set(layout.page_route for layout in global_layouts)
+    # 2. Fetch global defaults from platform templates
+    global_routes = { r.page_route for r in UIMetadata.query.filter_by(
+        is_global=True
+    ).all() }
 
-    # Always include core employee routes as suggestions so admins can start immediately
-    built_in_routes = {'/employee/dashboard', '/employee/directory', '/employee/announcements'}
+    # 3. Standard suggested routes for easy discovery
+    suggested_routes = {'/employee/dashboard', '/employee/profile', '/employee/reports'}
 
-    all_routes = sorted(company_routes | global_routes | built_in_routes)
-    logger.info(f"Admin {user.id} (company {user.company_id}) listing {len(all_routes)} routes")
-    return jsonify({"routes": all_routes}), 200
+    # Combine and sort all unique routes
+    all_paths = sorted(list(company_routes | global_routes | suggested_routes))
+
+    route_details = []
+    for path in all_paths:
+        route_details.append({
+            "path": path,
+            "is_custom": path in company_routes,
+            "has_global": path in global_routes
+        })
+
+    logger.info(f"Admin {user.id} (company {user.company_id}) listing {len(route_details)} routes")
+    return jsonify({"routes": route_details}), 200
+
+
+@ui_blueprint.route('/context', methods=['GET'])
+@jwt_required()
+def get_ui_context():
+    """Returns a unified data object containing both user profile and company theme details."""
+    user, err = _get_verified_user(require_company=True)
+    if err:
+        return err
+
+    company = user.company
+    
+    # Merge user data and company theme/branding data
+    context = {
+        # User details - Used for Dynamic String Resolution ({{first_name}})
+        'id': user.id,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'full_name': f"{user.first_name} {user.last_name}",
+        'email': user.email,
+        'job_title': user.job_title,
+        'department': user.department,
+        'avatar_url': user.avatar_medium_url,
+        
+        # Company theme & branding - Used for Component Styling (theme_primary_color)
+        'company_name': company.name,
+        'theme_primary_color': company.theme_primary_color,
+        'theme_secondary_color': company.theme_secondary_color,
+        'theme_accent_color': company.theme_accent_color,
+        'theme_bg_color': company.theme_bg_color,
+        'theme_text_color': company.theme_text_color,
+        'logo_url': company.logo_medium_url
+    }
+    
+    logger.info(f"Serving unified UI context for user {user.id}")
+    return jsonify(context), 200
 
 
 @ui_blueprint.route('/builder/layout', methods=['POST'])

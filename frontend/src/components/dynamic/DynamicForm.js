@@ -11,21 +11,19 @@ function DynamicForm({ config, token, currentRoute }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let endpoint = config.submitEndpoint || '/api/v1/forms/submit';
+    let endpoint = config.submitEndpoint || '/forms/submit';
     
-    // Normalize: strip backend domain and /api/v1 prefix
+    // Normalize: strip backend domain and /api/v1 prefix to avoid doubling with baseURL
     endpoint = endpoint.replace(/^https?:\/\/[^\/]+/, '');
-    if (endpoint.startsWith('/api/v1')) {
-      endpoint = endpoint.replace('/api/v1', '');
-    }
+    endpoint = endpoint.replace(/^\/?api\/v1/, '');
+    if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
 
     try {
       setStatus({ loading: true, message: '', type: '' });
       
       // Normalize the source route: Prefer the passed route prop, fallback to window location
       let srcRoute = currentRoute || window.location.pathname;
-      if (srcRoute.startsWith('/api/v1')) srcRoute = srcRoute.replace('/api/v1', '');
-      else if (srcRoute.startsWith('api/v1')) srcRoute = srcRoute.replace('api/v1', '');
+      srcRoute = srcRoute.replace(/^\/?api\/v1/, '');
 
       // Build the submission payload with metadata so the backend can identify the form
       const payload = {

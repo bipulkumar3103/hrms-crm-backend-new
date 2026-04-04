@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../../utils/api';
 import { FiImage, FiSettings, FiBriefcase, FiAperture, FiMail } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
 
@@ -28,8 +28,8 @@ function OrganizationProfile({ token }) {
             try {
                 // Fetch company data and user data concurrently
                 const [companyRes, userRes] = await Promise.all([
-                    axios.get('/api/v1/company/me', { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get('/api/v1/users/me', { headers: { Authorization: `Bearer ${token}` } })
+                    api.get('/company/me'),
+                    api.get('/users/me')
                 ]);
                 setCompanyInfo(companyRes.data);
                 setDetails({
@@ -78,17 +78,16 @@ function OrganizationProfile({ token }) {
         
         try {
             setUploadStatus('Synchronizing Identity...');
-            await axios.post('/api/v1/uploads/company-logo', form, {
+            await api.post('/uploads/company-logo', form, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`
                 }
             });
             setUploadStatus('New Organization Logo Engaged!');
             setSelectedFile(null);
             
             // Reload company data to get the new logo
-            const res = await axios.get('/api/v1/company/me', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await api.get('/company/me');
             setCompanyInfo(res.data);
             setTimeout(() => setUploadStatus(''), 3000);
         } catch (err) {
@@ -101,7 +100,7 @@ function OrganizationProfile({ token }) {
     const handleDetailsUpdate = async () => {
         try {
             setDetailsStatus('Updating...');
-            await axios.put('/api/v1/company/me', details, { headers: { Authorization: `Bearer ${token}` } });
+            await api.put('/company/me', details);
             setDetailsStatus('Company Directory Updated!');
             setCompanyInfo({...companyInfo, ...details});
             setTimeout(() => setDetailsStatus(''), 3000);
@@ -113,13 +112,13 @@ function OrganizationProfile({ token }) {
     const handleThemeUpdate = async () => {
         try {
             setThemeStatus('Updating...');
-            await axios.post('/api/v1/company/theme', {
+            await api.post('/company/theme', {
                 theme_primary_color: themeColors.primary,
                 theme_secondary_color: themeColors.secondary,
                 theme_accent_color: themeColors.accent,
                 theme_bg_color: themeColors.bg,
                 theme_text_color: themeColors.text
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             setThemeStatus('Success!');
             setTimeout(() => setThemeStatus(''), 3000);
         } catch (err) {
@@ -130,13 +129,13 @@ function OrganizationProfile({ token }) {
     const handleMailUpdate = async () => {
         try {
             setMailStatus('Updating...');
-            await axios.post('/api/v1/company/mail-config', {
+            await api.post('/company/mail-config', {
                 smtp_host: mailConfig.host,
                 smtp_port: mailConfig.port,
                 smtp_username: mailConfig.user,
                 smtp_password: mailConfig.pass,
                 smtp_from_email: mailConfig.from
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             setMailStatus('Success!');
             setTimeout(() => setMailStatus(''), 3000);
         } catch (err) {

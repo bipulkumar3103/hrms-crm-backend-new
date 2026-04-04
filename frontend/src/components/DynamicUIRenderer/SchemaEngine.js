@@ -51,8 +51,7 @@ const bindData = (ui, data) => {
 
 // <SchemaEngine route="/employee/dashboard" dataSource="/api/v1/company/me" token={token} schemaOverride={null} />
 function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, onNavigate }) {
-  const [uiStructure, setUiStructure] = useState(null);
-  const [pageData, setPageData] = useState(null);
+  const [renderState, setRenderState] = useState({ ui: null, data: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -73,9 +72,7 @@ function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, on
         }
         
         let uiUrl = `/ui/layout?route=${route}`;
-        const uiRes = await api.get(uiUrl, {
-          headers: { Authorization: `Bearer ${token?.trim()}` }
-        });
+        const uiRes = await api.get(uiUrl);
         schema = uiRes.data.schema;
       }
 
@@ -86,30 +83,40 @@ function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, on
         // 1. Strip domain if present
         cleanDataUrl = cleanDataUrl.replace(/^https?:\/\/[^\/]+/, ''); 
         
-        // 2. Aggressively remove /api/v1 or api/v1 prefix
-        if (cleanDataUrl.startsWith('/api/v1')) cleanDataUrl = cleanDataUrl.replace('/api/v1', '');
-        else if (cleanDataUrl.startsWith('api/v1')) cleanDataUrl = cleanDataUrl.replace('api/v1', '');
+        // 2. Aggressively remove /api/v1 or api/v1 prefix to avoid doubling with baseURL
+        cleanDataUrl = cleanDataUrl.replace(/^\/?api\/v1/, '');
         
         // 3. Ensure single leading slash
         if (!cleanDataUrl.startsWith('/')) cleanDataUrl = '/' + cleanDataUrl;
         
-        const dataRes = await api.get(cleanDataUrl, {
-          headers: { Authorization: `Bearer ${token?.trim()}` }
-        });
+        const dataRes = await api.get(cleanDataUrl);
         providedData = dataRes.data;
+        console.log(`[SchemaEngine] Context Data Fetched (${cleanDataUrl}):`, providedData);
         if (dataMapper) {
           providedData = dataMapper(providedData);
+          console.log(`[SchemaEngine] Data Transformation Applied:`, providedData);
         }
       }
 
       const boundUI = providedData ? bindData(schema, providedData) : schema;
-      console.log(`[SchemaEngine] Final Bound UI:`, boundUI);
-      setUiStructure(boundUI);
-      setPageData(providedData || {});
+      console.log(`[SchemaEngine] Final Data-Bound UI Structure:`, boundUI);
+      
+      setRenderState({
+        ui: boundUI,
+        data: providedData || {}
+      });
     } catch (err) {
-      const errMsg = err.response?.data?.message || err.message || 'Unknown error';
-      setError('Failed to load page: ' + errMsg);
-      console.error('[SchemaEngine Error]', err);
+      console.error('[SchemaEngine Error Detail]', {
+        url: err.config?.url,
+        status: err.response?.status,
+        data: err.response?.data,
+        msg: err.message
+      });
+      const errMsg = err.response?.data?.message || err.response?.data?.error || err.message || 'Unknown protocol error';
+      setError(err.response?.status === 401 
+        ? 'Session Authorization Required: ' + errMsg 
+        : 'Failed to load page architecture: ' + errMsg
+      );
     } finally {
       setLoading(false);
     }
@@ -117,51 +124,77 @@ function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, on
 
   useEffect(() => {
     fetchUiAndData();
-  }, [fetchUiAndData, token]);
+  }, [fetchUiAndData]);
 
   // Apply theme background if present in data
   useEffect(() => {
-    if (pageData?.theme_bg_color) {
-      document.body.style.backgroundColor = pageData.theme_bg_color;
+    const themeBg = renderState.data?.theme_bg_color;
+    if (themeBg) {
+      document.body.style.backgroundColor = themeBg;
     } else {
       document.body.style.backgroundColor = '#f3f4f6'; // default
     }
     return () => {
       document.body.style.backgroundColor = '';
     }
-  }, [pageData]);
+  }, [renderState.data]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="flex flex-col justify-center items-center h-full min-h-[300px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
+        <p className="text-indigo-400 font-bold text-xs uppercase tracking-widest animate-pulse">Syncing Remote Metadata...</p>
       </div>
     );
   }
 
   if (error) {
-    return <div className="flex justify-center items-center px-4 py-8"><p className="text-red-500 font-semibold">{error}</p></div>;
+    return (
+      <div className="flex flex-col justify-center items-center h-full min-h-[300px] px-8 text-center bg-rose-50/30 rounded-2xl border border-rose-100/50 m-4">
+        <div className="w-12 h-12 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <p className="text-rose-600 font-bold mb-2 text-sm uppercase tracking-tight">{error}</p>
+        <button 
+          onClick={fetchUiAndData}
+          className="mt-2 text-xs font-black text-indigo-500 hover:text-indigo-700 uppercase tracking-widest underline decoration-2 underline-offset-4"
+        >
+          Attempt Force Re-sync
+        </button>
+      </div>
+    );
   }
 
-  if (!uiStructure || !uiStructure.components) {
+  const { ui, data } = renderState;
+
+  if (!ui || !ui.components) {
+    if (loading) return null; // Wait for loader
     return <div className="flex justify-center items-center px-4 py-8 text-gray-400">No layout configured for this page.</div>;
   }
 
   return (
     <div className="w-full space-y-4">
-      {uiStructure.components.map((component, index) => {
+      {ui.components.map((component, index) => {
           const Component = componentMap[component.type];
           if (!Component) {
               console.warn(`Unknown component type: ${component.type}`);
               return <div key={index} className="text-red-500 p-4 border border-red-500 my-2 rounded">Unknown component type: {component.type}</div>;
           }
           const blockStyle = component.config?.style || {};
+          const isComponentSelfData = !!(component.config?.dataSource && component.config.dataSource !== '');
+          
+          console.log(`[SchemaEngine] Rendering ${component.type}:`, {
+            hasSelfData: isComponentSelfData,
+            dataSource: component.config?.dataSource,
+            passingData: isComponentSelfData ? 'LOCAL_ONLY' : 'GLOBAL_CONTEXT'
+          });
+
           return (
               <div key={component.id || index} style={blockStyle}>
-                                   <Component 
+                  <Component 
                     config={component.config} 
-                    theme={pageData} 
-                    providedData={component.config?.dataSource ? null : pageData}
+                    theme={data} 
+                    providedData={data} // Always provide global context as baseline
                     token={token} 
                     onNavigate={onNavigate} 
                     currentRoute={route}

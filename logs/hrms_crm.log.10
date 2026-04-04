@@ -1,79 +1,96 @@
-2026-04-04 02:52:05,690 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:05,849 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:05,849 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:05,849 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:06,043 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:06,044 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:06,048 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:06,588 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:06,591 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:06,595 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:06,600 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:06,608 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:06,616 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:07,958 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:07,961 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:07,965 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:08,221 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:08,227 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:08,242 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:16,209 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:16,211 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:16,215 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:16,519 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:16,521 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:16,524 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:16,880 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:16,880 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:16,884 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:17,138 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:17,140 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:17,140 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:17,297 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:17,303 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:17,305 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:17,613 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:17,615 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:17,617 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:17,955 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:17,956 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:17,957 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:18,196 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:18,196 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:18,203 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:28,581 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:28,585 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:28,585 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:28,894 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:28,900 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:28,902 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:29,235 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:29,237 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:29,238 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:29,304 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:29,305 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:29,308 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:30,235 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:30,237 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:30,241 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:30,243 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:30,245 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:30,249 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:30,726 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:30,728 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:30,728 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:52:30,904 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:52:30,905 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:52:30,907 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:56:53,335 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:56:53,337 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:56:53,339 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:56:53,340 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:56:53,341 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:56:53,342 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-04 02:56:53,343 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:56:53,344 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:56:53,345 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-04 02:56:53,381 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:56:53,440 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-04 02:56:53,453 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:20,325 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:20,348 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:20,350 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:20,351 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:20,356 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
+2026-04-04 06:03:20,677 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:20,677 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:20,677 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:20,677 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:20,677 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:20,677 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:20,687 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
+2026-04-04 06:03:20,927 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:20,934 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:20,935 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:34,643 INFO: --- Incoming Request: POST /api/v1/ui/builder/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:34,643 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:34,643 INFO: Origin: http://localhost:5000/ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:34,647 INFO: Body: {'route': '/employee/dashboard', 'schema': {'components': [{'id': 'header-1775262625277', 'type': 'header', 'config': {'title': 'Welcome, {{first_name}} ', 'subtitle': 'Manage your tasks', 'dataSource': '/api/v1/users/me', 'alignment': 'left', 'backgroundType': 'solid', 'shadow': 'none', 'padding': '', 'style': {}}}]}} [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:69]
+2026-04-04 06:03:34,653 INFO: Updated layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:130]
+2026-04-04 06:03:39,659 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:39,659 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:39,661 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:39,671 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
+2026-04-04 06:03:39,982 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:39,984 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:39,984 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:39,989 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
+2026-04-04 06:03:39,999 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:40,000 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:40,000 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:40,241 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:40,243 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:40,245 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:51,815 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:51,816 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:51,817 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:51,821 ERROR: Exception on /api/v1/ui/builder/layouts [GET] [in D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py:838]
+Traceback (most recent call last):
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask_jwt_extended\view_decorators.py", line 170, in decorator
+    return current_app.ensure_sync(fn)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py", line 92, in list_builder_layouts
+    for route in all_routes:
+                 ^^^^^^^^^^
+NameError: name 'all_routes' is not defined
+2026-04-04 06:03:52,134 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:52,134 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:52,134 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:52,147 ERROR: Exception on /api/v1/ui/builder/layouts [GET] [in D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py:838]
+Traceback (most recent call last):
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask_jwt_extended\view_decorators.py", line 170, in decorator
+    return current_app.ensure_sync(fn)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py", line 92, in list_builder_layouts
+    for route in all_routes:
+                 ^^^^^^^^^^
+NameError: name 'all_routes' is not defined
+2026-04-04 06:03:52,148 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:52,152 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:52,154 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:52,161 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
+2026-04-04 06:03:52,396 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-04 06:03:52,396 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-04 06:03:52,399 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-04 06:03:52,480 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]

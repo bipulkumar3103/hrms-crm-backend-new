@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { api } from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCheck, FiX, FiMail, FiGlobe } from 'react-icons/fi';
 import { useAlert } from '../context/AlertContext';
@@ -139,7 +139,7 @@ function Register({ setView }) {
     }
     setValidation(prev => ({ ...prev, [field]: { status: 'checking', message: '' } }));
     try {
-      const { data } = await axios.post('/api/v1/auth/check-availability', { field, value });
+      const { data } = await api.post('/auth/check-availability', { field, value });
       if (data.available) {
         setValidation(prev => ({ ...prev, [field]: { status: 'valid', message: '' } }));
       } else {
@@ -172,7 +172,7 @@ function Register({ setView }) {
     }
     setIsLoading(true); setFormError('');
     try {
-      await axios.post('/api/v1/auth/register', formData);
+      await api.post('/auth/register', formData);
       showAlert('Registration successful! Please log in to continue.', 'success');
       if(setView) setView('login');
     } catch (err) {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../utils/api';
 import { motion } from 'framer-motion';
 import { FiLock, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
 
-const api = axios.create({ baseURL: '/api/v1' });
+
 
 const AcceptInvitation = () => {
     // Read token directly from URL — no React Router needed

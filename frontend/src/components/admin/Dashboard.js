@@ -31,7 +31,7 @@ const StatCard = ({ icon, label, value, color }) => (
     </motion.div>
 );
 
-const Dashboard = ({ api, token, logout }) => {
+const Dashboard = ({ token, logout }) => {
     const { showAlert } = useAlert();
     // --- Data State ---
     const [company, setCompany] = useState(null);
@@ -452,7 +452,7 @@ const Dashboard = ({ api, token, logout }) => {
                         <div className="w-full">
                             <SchemaEngine 
                                 route={(activeTab === 'Overview' || activeTab === 'Home') ? '/employee/dashboard' : activeTab} 
-                                dataSource="/api/v1/company/me" 
+                                dataSource="/api/v1/ui/context" 
                                 token={token} 
                                 onNavigate={(targetRoute) => setActiveTab(targetRoute)}
                             />

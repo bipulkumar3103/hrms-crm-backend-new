@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { api } from '../utils/api';
 import Header from './dynamic/Header';
 import Card from './dynamic/Card';
 
@@ -45,8 +45,8 @@ function Profile({ token }) {
     try {
       setLoading(true);
       const [uiRes, dataRes] = await Promise.all([
-        axios.get('/api/v1/ui/profile', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/v1/company/me', { headers: { Authorization: `Bearer ${token}` } }),
+        api.get('/ui/profile'),
+        api.get('/company/me'),
       ]);
 
       const boundUI = bindData(uiRes.data, dataRes.data);
@@ -83,10 +83,9 @@ function Profile({ token }) {
       setUploadStatus('Uploading...');
       setUploadError('');
 
-      await axios.post('/api/v1/uploads/company-logo', formData, {
+      await api.post('/uploads/company-logo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
         },
       });
 

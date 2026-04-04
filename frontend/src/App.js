@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Login from './components/Login';
 import Register from './components/Register';
