@@ -7,6 +7,7 @@ import { CraftCard } from './user/CraftCard';
 import { CraftTable } from './user/CraftTable';
 import { CraftForm } from './user/CraftForm';
 import { CraftButton } from './user/CraftButton';
+import { CraftContainer } from './user/CraftContainer';
 import { EliteSubmissions } from './EliteSubmissions';
 import {
   FiSave, FiEye, FiZap, FiChevronRight, FiPlus,
@@ -16,33 +17,48 @@ import {
 import { api } from '../../../utils/api';
 import { useAlert } from '../../../context/AlertContext';
 
-/* Elite Serializer: Converts Craft Node Tree to Standard UI Schema */
+/* Elite Serializer: Converts Craft Node Tree to Standard UI Schema (Recursive) */
 const serializeToStandardSchema = (nodes) => {
-  const rootNode = nodes['ROOT'];
-  if (!rootNode) return { components: [] };
-
-  const components = rootNode.data.nodes.map(nodeId => {
+  const serializeNode = (nodeId) => {
     const node = nodes[nodeId];
-    let type = 'header';
+    if (!node) return null;
+
     const componentName = node.data.type?.name || node.data.displayName || node.data.type?.resolvedName;
+    let type = 'header';
 
     if (componentName?.includes('Header')) type = 'header';
     else if (componentName?.includes('Card')) type = 'card';
     else if (componentName?.includes('Table')) type = 'table';
     else if (componentName?.includes('Form')) type = 'form';
     else if (componentName?.includes('Button')) type = 'button';
+    else if (componentName?.includes('Container')) type = 'container';
 
-    return {
+    const serialized = {
       id: nodeId,
       type: type,
       config: { ...node.data.props }
     };
-  });
+
+    if (node.data.nodes && node.data.nodes.length > 0) {
+      serialized.components = node.data.nodes
+        .map(childId => serializeNode(childId))
+        .filter(Boolean);
+    }
+
+    return serialized;
+  };
+
+  const rootNode = nodes['ROOT'];
+  if (!rootNode) return { components: [] };
+
+  const components = rootNode.data.nodes
+    .map(nodeId => serializeNode(nodeId))
+    .filter(Boolean);
 
   return { components };
 };
 
-/* Elite Deserializer: Converts Standard UI Schema to Craft Node Tree */
+/* Elite Deserializer: Converts Standard UI Schema to Craft Node Tree (Recursive) */
 const deserializeFromStandardSchema = (schema) => {
   const nodes = {
     ROOT: {
@@ -58,28 +74,42 @@ const deserializeFromStandardSchema = (schema) => {
     }
   };
 
+  const deserializeComponent = (comp, parentId) => {
+    const nodeId = comp.id || `node-${Math.random().toString(36).substr(2, 9)}`;
+    
+    let resolvedName = 'CraftHeader';
+    if (comp.type === 'card') resolvedName = 'CraftCard';
+    else if (comp.type === 'table') resolvedName = 'CraftTable';
+    else if (comp.type === 'form') resolvedName = 'CraftForm';
+    else if (comp.type === 'button') resolvedName = 'CraftButton';
+    else if (comp.type === 'container') resolvedName = 'CraftContainer';
+
+    nodes[nodeId] = {
+      type: { resolvedName },
+      isCanvas: ['CraftCard', 'CraftContainer'].includes(resolvedName),
+      props: comp.config || {},
+      displayName: resolvedName,
+      custom: {},
+      parent: parentId,
+      hidden: false,
+      nodes: [],
+      linkedNodes: {}
+    };
+
+    if (comp.components && Array.isArray(comp.components)) {
+      comp.components.forEach(childComp => {
+        const childId = deserializeComponent(childComp, nodeId);
+        nodes[nodeId].nodes.push(childId);
+      });
+    }
+
+    return nodeId;
+  };
+
   if (schema && Array.isArray(schema.components)) {
-    schema.components.forEach((comp, idx) => {
-      const nodeId = comp.id || `node-${idx}`;
+    schema.components.forEach(comp => {
+      const nodeId = deserializeComponent(comp, 'ROOT');
       nodes.ROOT.nodes.push(nodeId);
-
-      let resolvedName = 'CraftHeader';
-      if (comp.type === 'card') resolvedName = 'CraftCard';
-      else if (comp.type === 'table') resolvedName = 'CraftTable';
-      else if (comp.type === 'form') resolvedName = 'CraftForm';
-      else if (comp.type === 'button') resolvedName = 'CraftButton';
-
-      nodes[nodeId] = {
-        type: { resolvedName },
-        isCanvas: resolvedName === 'CraftCard', // Cards can be containers
-        props: comp.config || {},
-        displayName: resolvedName,
-        custom: {},
-        parent: 'ROOT',
-        hidden: false,
-        nodes: [],
-        linkedNodes: {}
-      };
     });
   }
 
@@ -394,7 +424,8 @@ const CraftBuilder = (props) => {
         CraftCard,
         CraftTable,
         CraftForm,
-        CraftButton
+        CraftButton,
+        CraftContainer
       }}
     >
       <CraftBuilderInternal {...props} />

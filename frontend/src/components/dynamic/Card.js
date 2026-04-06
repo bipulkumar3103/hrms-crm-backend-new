@@ -76,7 +76,7 @@ const UniversalField = ({ label, value, path, theme, alignment }) => {
  * Enterprise Elite Card
  * A premium, data-aware layout block.
  */
-function Card({ config, theme, providedData }) {
+function Card({ config, theme, providedData, children }) {
   const { 
     title = '', 
     subtitle = '', 
@@ -233,6 +233,9 @@ function Card({ config, theme, providedData }) {
               />
             ))
           )}
+
+          {/* Manual Nesting Slot (Recursive) */}
+          {children}
         </div>
       </div>
 

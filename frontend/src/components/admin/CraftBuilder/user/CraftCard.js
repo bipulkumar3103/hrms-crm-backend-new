@@ -3,7 +3,7 @@ import { useNode } from '@craftjs/core';
 import { api } from '../../../../utils/api';
 import { resolveDynamicString } from '../../../DynamicUIRenderer/SchemaEngine';
 
-export const CraftCard = ({ title, subtitle, padding = '1.5rem', background = 'white', dataSource, ...props }) => {
+export const CraftCard = ({ title, subtitle, padding = '1.5rem', background = 'white', dataSource, children, ...props }) => {
   const [data, setData] = useState(null);
   const { connectors: { connect, drag }, selected } = useNode((state) => ({
     selected: state.events.selected,
@@ -45,11 +45,16 @@ export const CraftCard = ({ title, subtitle, padding = '1.5rem', background = 'w
           <p className="text-sm text-gray-400 mt-1 font-medium">{resolvedSubtitle || "Manage data fields here."}</p>
         </div>
       </div>
-      <div 
-        className="min-h-[100px] border-2 border-dashed rounded-2xl flex items-center justify-center text-gray-300 text-xs font-bold uppercase tracking-widest"
-        style={{ borderColor: 'var(--theme-secondary)', opacity: 0.3 }}
-      >
-        Empty Slot
+      {/* Recursive children slot */}
+      <div className="min-h-[60px]">
+        {children || (
+          <div 
+            className="min-h-[100px] border-2 border-dashed rounded-2xl flex items-center justify-center text-gray-300 text-xs font-bold uppercase tracking-widest bg-gray-50/50"
+            style={{ borderColor: 'var(--theme-secondary)', opacity: 0.3 }}
+          >
+            Data Nest Ready
+          </div>
+        )}
       </div>
     </div>
   );
@@ -61,8 +66,11 @@ CraftCard.craft = {
     subtitle: 'Real-time monitoring and reporting.',
     padding: '1.5rem',
     dataSource: '',
+    fields: [],
   },
   rules: {
     canDrag: () => true,
+    canMoveIn: () => true,
+    canMoveOut: () => true,
   },
 };

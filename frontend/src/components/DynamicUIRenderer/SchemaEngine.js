@@ -5,7 +5,7 @@ import Card from '../dynamic/Card';
 import Table from '../dynamic/Table';
 import Button from '../dynamic/Button';
 import DynamicForm from '../dynamic/DynamicForm';
-// Add more components here as needed
+import Container from '../dynamic/Container';
 
 const componentMap = {
   header: Header,
@@ -13,6 +13,7 @@ const componentMap = {
   table: Table,
   button: Button,
   form: DynamicForm,
+  container: Container,
 };
 
 export const getValue = (obj, path) => {
@@ -176,43 +177,108 @@ function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, on
     );
   }
 
+  const DataScopedWrapper = ({ component, contextData, token, onNavigate, route, children }) => {
+    const [localData, setLocalData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const dataSource = component.config?.dataSource;
+
+    useEffect(() => {
+      if (dataSource && dataSource.trim() !== '') {
+        const fetchData = async () => {
+          try {
+            setLoading(true);
+            let cleanUrl = dataSource.trim().replace(/^https?:\/\/[^\/]+/, '').replace(/^\/?api\/v1/, '');
+            if (!cleanUrl.startsWith('/')) cleanUrl = '/' + cleanUrl;
+            
+            const res = await api.get(cleanUrl);
+            setLocalData(res.data);
+          } catch (err) {
+            console.warn(`[DataScopedWrapper] Failed to fetch data for ${component.type}:`, err);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchData();
+      }
+    }, [dataSource]);
+
+    const activeData = localData || contextData;
+    const Component = componentMap[component.type];
+
+    if (!Component) return null;
+
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center p-8 opacity-50">
+           <div className="w-4 h-4 border-2 border-slate-200 border-t-slate-500 rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
+    return (
+      <Component 
+        config={component.config} 
+        theme={activeData} 
+        providedData={activeData} 
+        token={token} 
+        onNavigate={onNavigate} 
+        currentRoute={route}
+      >
+        {children(activeData)}
+      </Component>
+    );
+  };
+
+  const RenderComponents = ({ components, contextData, token, onNavigate, route }) => {
+    if (!components || !Array.isArray(components)) return null;
+
+    return (
+      <>
+        {components.map((component, index) => {
+          const blockStyle = component.config?.style || {};
+          
+          return (
+            <div key={component.id || index} style={blockStyle}>
+              <DataScopedWrapper 
+                component={component}
+                contextData={contextData}
+                token={token}
+                onNavigate={onNavigate}
+                route={route}
+              >
+                {(scopedData) => (
+                  <RenderComponents 
+                    components={component.components} 
+                    contextData={scopedData} 
+                    token={token}
+                    onNavigate={onNavigate}
+                    route={route}
+                  />
+                )}
+              </DataScopedWrapper>
+            </div>
+          );
+        })}
+      </>
+    );
+  };
+
   const { ui, data } = renderState;
 
   if (!ui || !ui.components) {
-    if (loading) return null; // Wait for loader
+    if (loading) return null;
     return <div className="flex justify-center items-center px-4 py-8 text-gray-400">No layout configured for this page.</div>;
   }
 
   return (
     <div className="w-full space-y-4">
-      {ui.components.map((component, index) => {
-          const Component = componentMap[component.type];
-          if (!Component) {
-              console.warn(`Unknown component type: ${component.type}`);
-              return <div key={index} className="text-red-500 p-4 border border-red-500 my-2 rounded">Unknown component type: {component.type}</div>;
-          }
-          const blockStyle = component.config?.style || {};
-          const isComponentSelfData = !!(component.config?.dataSource && component.config.dataSource !== '');
-          
-          console.log(`[SchemaEngine] Rendering ${component.type}:`, {
-            hasSelfData: isComponentSelfData,
-            dataSource: component.config?.dataSource,
-            passingData: isComponentSelfData ? 'LOCAL_ONLY' : 'GLOBAL_CONTEXT'
-          });
-
-          return (
-              <div key={component.id || index} style={blockStyle}>
-                  <Component 
-                    config={component.config} 
-                    theme={data} 
-                    providedData={data} // Always provide global context as baseline
-                    token={token} 
-                    onNavigate={onNavigate} 
-                    currentRoute={route}
-                  />
-              </div>
-          );
-      })}
+      <RenderComponents 
+        components={ui.components} 
+        contextData={data} 
+        token={token} 
+        onNavigate={onNavigate} 
+        route={route} 
+      />
     </div>
   );
 }

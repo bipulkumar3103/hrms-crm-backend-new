@@ -140,17 +140,18 @@ const EliteSearchSelect = ({ value, onChange, placeholder = "Select a data path.
 export const SettingsPanel = () => {
   const { actions, selected, isEnabled } = useEditor((state) => {
     const [currentNodeId] = state.events.selected;
+    const node = currentNodeId ? state.nodes[currentNodeId] : null;
     let selectedProps = {};
-
-    if (currentNodeId) {
-      selectedProps = state.nodes[currentNodeId].data.props;
+    
+    if (node) {
+      selectedProps = node.data.props;
     }
 
     return {
       isEnabled: state.options.enabled,
-      selected: currentNodeId ? {
+      selected: (currentNodeId && node) ? {
         id: currentNodeId,
-        name: state.nodes[currentNodeId].data.displayName || state.nodes[currentNodeId].data.type.name,
+        name: node.data.displayName || node.data.type?.name || node.data.type?.resolvedName || 'Unknown Block',
         props: selectedProps,
       } : null,
     };
@@ -398,7 +399,7 @@ export const SettingsPanel = () => {
   };
 
   return isEnabled && selected ? (
-    <div className="w-full bg-white border-l border-gray-100 flex flex-col h-full shadow-sm animate-in fade-in slide-in-from-right-4 duration-300 overflow-hidden">
+    <div className="w-[380px] bg-white border-l border-gray-100 flex flex-col h-full shadow-sm animate-in fade-in slide-in-from-right-4 duration-300 overflow-hidden">
       <div className="p-8 border-b border-gray-50" style={{ backgroundColor: 'var(--theme-secondary)', opacity: 0.2 }}>
         <h2 className="text-sm font-black uppercase tracking-widest flex items-center gap-2" style={{ color: 'var(--theme-primary)' }}>
           <FiSettings className="w-4 h-4" />
@@ -414,16 +415,125 @@ export const SettingsPanel = () => {
           
           {Object.keys(selected.props).map((prop) => {
             if (prop === 'columns') return renderArrayEditor('columns', 'Table Columns', [{key: 'header', label: 'Header', default: 'New Col'}, {key: 'bind', label: 'Data Path', default: 'path'}]);
-            if (prop === 'fields') return renderArrayEditor('fields', 'Form Fields', [{key: 'label', label: 'Label', default: 'New Field'}, {key: 'name', label: 'ID Key', default: 'field_name'}, {key: 'type', label: 'Type', default: 'text'}]);
+            if (prop === 'fields') {
+              const isCard = selected.name === 'CraftCard';
+              return renderArrayEditor(
+                'fields', 
+                isCard ? 'Card Data Mapping' : 'Form Fields', 
+                isCard 
+                  ? [{key: 'label', label: 'Label', default: 'New Field'}, {key: 'bind', label: 'Data Path', default: 'path'}]
+                  : [{key: 'label', label: 'Label', default: 'New Field'}, {key: 'name', label: 'ID Key', default: 'field_name'}, {key: 'type', label: 'Type', default: 'text'}]
+              );
+            }
+            // Skip styling props here, they go in the specialized sections
+            if (['width', 'height', 'padding', 'margin', 'backgroundColor', 'borderRadius', 'borderWidth', 'borderStyle', 'borderColor', 'flexDirection', 'alignItems', 'justifyContent', 'gap'].includes(prop)) return null;
             if (Array.isArray(selected.props[prop])) return null;
             return renderSimpleInput(prop);
           })}
         </div>
+
+        {/* Specialized Box Model for Containers */}
+        {selected.name === 'CraftContainer' && (
+          <div className="space-y-6 pt-6 border-t border-gray-100">
+             <div className="space-y-4">
+                <label className="block text-[10px] font-black text-slate-900 uppercase tracking-widest">Dimensions & Geometry</label>
+                <div className="grid grid-cols-2 gap-4">
+                   {renderSimpleInput('width', 'Width')}
+                   {renderSimpleInput('height', 'Height')}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   {renderSimpleInput('borderRadius', 'Radius')}
+                   {renderSimpleInput('backgroundColor', 'BG Color')}
+                </div>
+             </div>
+
+             <div className="space-y-4">
+                <label className="block text-[10px] font-black text-slate-900 uppercase tracking-widest">Spacing Protocol</label>
+                <div className="grid grid-cols-2 gap-4">
+                   {renderSimpleInput('padding', 'Padding')}
+                   {renderSimpleInput('margin', 'Margin')}
+                </div>
+             </div>
+
+             <div className="space-y-4">
+                <label className="block text-[10px] font-black text-slate-900 uppercase tracking-widest">Border Infrastructure</label>
+                <div className="grid grid-cols-2 gap-4">
+                   {renderSimpleInput('borderWidth', 'Width')}
+                   <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter ml-1">Style</label>
+                      <select 
+                        value={selected.props.borderStyle || 'solid'} 
+                        onChange={(e) => updateProp('borderStyle', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] font-bold focus:ring-1 focus:ring-indigo-500 outline-none uppercase appearance-none"
+                      >
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                        <option value="none">None</option>
+                      </select>
+                   </div>
+                </div>
+                {renderSimpleInput('borderColor', 'Border Color')}
+             </div>
+
+             <div className="space-y-4">
+                <label className="block text-[10px] font-black text-slate-900 uppercase tracking-widest">Flex Layout Engine</label>
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter ml-1">Direction</label>
+                      <select 
+                        value={selected.props.flexDirection || 'column'} 
+                        onChange={(e) => updateProp('flexDirection', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] font-bold focus:ring-1 focus:ring-indigo-500 outline-none uppercase appearance-none"
+                      >
+                        <option value="column">Vertical</option>
+                        <option value="row">Horizontal</option>
+                      </select>
+                   </div>
+                   {renderSimpleInput('gap', 'Gap Spacing')}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter ml-1">Alignment</label>
+                      <select 
+                        value={selected.props.alignItems || 'stretch'} 
+                        onChange={(e) => updateProp('alignItems', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] font-bold focus:ring-1 focus:ring-indigo-500 outline-none uppercase appearance-none"
+                      >
+                        <option value="flex-start">Start</option>
+                        <option value="center">Center</option>
+                        <option value="flex-end">End</option>
+                        <option value="stretch">Stretch</option>
+                      </select>
+                   </div>
+                   <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter ml-1">Justification</label>
+                      <select 
+                        value={selected.props.justifyContent || 'flex-start'} 
+                        onChange={(e) => updateProp('justifyContent', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] font-bold focus:ring-1 focus:ring-indigo-500 outline-none uppercase appearance-none"
+                      >
+                        <option value="flex-start">Start</option>
+                        <option value="center">Center</option>
+                        <option value="flex-end">End</option>
+                        <option value="space-between">Between</option>
+                        <option value="space-around">Around</option>
+                      </select>
+                   </div>
+                </div>
+             </div>
+          </div>
+        )}
       </div>
       
       <div className="mt-auto p-6 bg-gray-50/50">
         <button 
-          onClick={() => actions.delete(selected.id)}
+          onClick={() => {
+            if (selected?.id) {
+              actions.selectNode(null); 
+              actions.delete(selected.id);
+            }
+          }}
           className="w-full py-3 bg-rose-50 text-rose-600 text-[10px] font-black uppercase rounded-2xl border border-rose-100 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
         >
           Remove Component
@@ -431,7 +541,7 @@ export const SettingsPanel = () => {
       </div>
     </div>
   ) : (
-    <div className="w-80 bg-white border-l border-gray-100 flex flex-col items-center justify-center p-12 text-center opacity-30">
+    <div className="w-[380px] bg-white border-l border-gray-100 flex flex-col items-center justify-center p-12 text-center opacity-30">
       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-200 mb-6">
         <FiMousePointer className="w-6 h-6" />
       </div>
