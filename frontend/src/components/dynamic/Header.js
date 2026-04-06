@@ -21,7 +21,13 @@ function Header({ config, theme, providedData }) {
     subtitleWeight = '500',
     padding = '2.5rem',
     shadow = 'none', // 'none', 'sm', 'md', 'lg'
-    textColor = ''
+    textColor = '',
+    
+    // Typography Extensions
+    titleItalic = false,
+    titleUnderline = false,
+    subtitleItalic = false,
+    subtitleUnderline = false
   } = config;
 
   const [localData, setLocalData] = React.useState(null);
@@ -100,12 +106,16 @@ function Header({ config, theme, providedData }) {
       )}
 
       <h1 
-        className="tracking-tight italic font-black leading-none"
+        className="tracking-tight leading-none"
         style={{ 
             fontSize: titleSize, 
             fontWeight: titleWeight,
             color: finalTextColor,
-            letterSpacing: '-0.025em'
+            letterSpacing: '-0.025em',
+            fontStyle: titleItalic ? 'italic' : 'normal',
+            textDecoration: titleUnderline ? 'underline' : 'none',
+            textDecorationThickness: titleUnderline ? '3px' : 'auto',
+            textUnderlineOffset: titleUnderline ? '8px' : 'auto'
         }}
       >
         {resolvedTitle}
@@ -119,7 +129,10 @@ function Header({ config, theme, providedData }) {
                 fontWeight: subtitleWeight,
                 color: finalTextColor,
                 opacity: 0.75,
-                margin: alignment === 'center' ? '0.75rem auto 0' : '0.75rem 0 0'
+                margin: alignment === 'center' ? '0.75rem auto 0' : '0.75rem 0 0',
+                fontStyle: subtitleItalic ? 'italic' : 'normal',
+                textDecoration: subtitleUnderline ? 'underline' : 'none',
+                textUnderlineOffset: '4px'
             }}
         >
             {resolvedSubtitle}

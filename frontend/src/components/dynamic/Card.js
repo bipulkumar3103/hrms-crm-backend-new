@@ -1,131 +1,250 @@
-import React, { useState } from 'react';
-import { api } from '../../utils/api';
-import ColorChip from './ColorChip';
-import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiCalendar, FiUser, FiBox, FiCheckCircle, FiInfo } from 'react-icons/fi';
 
-const getBorderStyle = (style, theme) => {
-    if (!style?.border_color_variant) return {};
-    return {
-        borderColor: theme[`theme_${style.border_color_variant}_color`],
-        borderWidth: '2px',
-        borderStyle: 'solid',
+/**
+ * UniversalField Component
+ * Handles automatic formatting for different data types within the card.
+ */
+const UniversalField = ({ label, value, path, theme }) => {
+  if (value === null || value === undefined || value === '') return null;
+
+  // 1. Images / Avatars
+  const isImage = typeof value === 'string' && (
+    value.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) || 
+    path?.includes('avatar') || path?.includes('logo') || path?.includes('image')
+  );
+
+  if (isImage) {
+    return (
+      <div className="flex flex-col mb-4">
+        {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">{label}</span>}
+        <div className="w-16 h-16 rounded-2xl border-2 border-white shadow-md overflow-hidden bg-gray-50">
+          <img src={value} alt={label || 'Asset'} className="w-full h-full object-cover" />
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Statuses / Badges
+  const isStatus = path?.toLowerCase().includes('status') || path?.toLowerCase().includes('role') || path?.toLowerCase().includes('state');
+  if (isStatus) {
+    const status = String(value).toLowerCase();
+    let bg = 'bg-gray-100', text = 'text-gray-600', dot = 'bg-gray-400';
+    if (['active', 'success', 'completed', 'admin', 'verified'].includes(status)) {
+        bg = 'bg-emerald-50'; text = 'text-emerald-700'; dot = 'bg-emerald-500';
+    } else if (['pending', 'invited', 'onboarding', 'waiting'].includes(status)) {
+        bg = 'bg-amber-50'; text = 'text-amber-700'; dot = 'bg-amber-500';
+    } else if (['inactive', 'failed', 'rejected'].includes(status)) {
+        bg = 'bg-rose-50'; text = 'text-rose-700'; dot = 'bg-rose-500';
     }
-}
-
-const renderElement = (element, theme, token) => {
-    const valueStyle = {
-        color: theme.theme_text_color
-    };
-
-    switch (element.format) {
-        case 'link':
-            return <a href={element.value} style={{color: theme.theme_primary_color}} className="hover:underline">{element.value}</a>;
-        case 'color_chip':
-            return <ColorChip color={element.value} />;
-        case 'logo':
-            return <LogoUpload value={element.value} token={token} />;
-        case 'text':
-        default:
-            return <span style={valueStyle}>{element.value}</span>;
-    }
-}
-
-const LogoUpload = ({ value, token }) => {
-    const [logo, setLogo] = useState(value);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleFileChange = (e) => {
-        setSelectedFile(e.target.files[0]);
-    };
-
-    const handleUpload = async () => {
-        if (!selectedFile) {
-            setError('Please select a file to upload.');
-            return;
-        }
-
-        setUploading(true);
-        setError('');
-
-        const formData = new FormData();
-        formData.append('logo', selectedFile);
-
-        try {
-            const res = await api.post('/uploads/company-logo', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
-            setLogo(res.data.data.logo_url);
-            setSelectedFile(null);
-        } catch (err) {
-            console.error(err);
-            setError('Failed to upload logo. Please ensure it is a valid image file.');
-        } finally {
-            setUploading(false);
-        }
-    };
 
     return (
-        <div className="flex flex-col items-end">
-            <div className="flex items-center space-x-4">
-                {logo && <img src={logo} alt="Company Logo" className="h-16 w-16 rounded-lg object-cover"/>}
-                <input type="file" accept="image/*" onChange={handleFileChange} className="text-sm"/>
-            </div>
-            {selectedFile &&
-                <button 
-                    onClick={handleUpload} 
-                    disabled={uploading} 
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-                >
-                    {uploading ? 'Uploading...' : 'Upload'}
-                </button>
-            }
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-        </div>
+      <div className="flex flex-col mb-3">
+        {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{label}</span>}
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider ${bg} ${text} border border-current/10 w-fit`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${dot} mr-2 shadow-[0_0_8px_rgba(0,0,0,0.1)]`}></span>
+          {value}
+        </span>
+      </div>
     );
-}
+  }
 
-
-function Card({ config, theme, token }) {
-  const { title, elements, style } = config;
+  // 3. Regular Text / Dates
+  const isDate = typeof value === 'string' && (value.match(/^\d{4}-\d{2}-\d{2}/) || path?.includes('date'));
+  let displayValue = value;
+  if (isDate) {
+    try {
+      displayValue = new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {}
+  }
 
   return (
-    <div 
-        className={`bg-white rounded-lg shadow-${style?.shadow || 'none'} p-6 mb-6`}
-        style={getBorderStyle(style, theme)}
-    >
-      <h2 
-        className="text-2xl font-bold mb-4 border-b pb-2"
-        style={{ 
-            color: theme.theme_text_color, 
-            borderColor: theme.theme_secondary_color 
-        }}
-      >
-          {title}
-      </h2>
-      <div className="space-y-3">
-        {elements && elements.map((el, index) => (
-          <div key={index} className="flex justify-between items-center">
-            <p style={{color: theme?.theme_text_color || '#333', opacity: 0.9}} className="font-semibold">{el.label}</p>
-            {renderElement(el, theme || {}, token)}
-          </div>
-        ))}
-        {/* Support Nested Layout Array for Advanced CMS Capabilities */}
-        {config.children && config.children.length > 0 && (
-          <div className="mt-4 border-t pt-4 border-dashed border-gray-200">
-             <SchemaEngine 
-                  schemaOverride={{ components: config.children }}
-                  token={token}
-                  onNavigate={config.onNavigate}
-              />
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col mb-3">
+      {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">{label}</span>}
+      <p className="text-[14px] font-semibold text-gray-800 flex items-center leading-tight">
+        {isDate && <FiCalendar className="mr-2 opacity-30" size={14} />}
+        {displayValue}
+      </p>
     </div>
   );
+};
+
+/**
+ * Enterprise Elite Card
+ * A premium, data-aware layout block.
+ */
+function Card({ config, theme, providedData }) {
+  const { 
+    title = '', 
+    subtitle = '', 
+    dataSource = '',
+    fields = [],
+    style = {},
+    backgroundType = 'solid', // 'solid', 'gradient', 'glass'
+    backgroundGradient = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
+    backgroundColor = '',
+    glassOpacity = 0.5,
+    glassBlur = '10px',
+    shadow = 'md',
+    layout = 'vertical', // 'vertical', 'grid-2'
+    accentColor = '',
+    padding = '1.5rem',
+    
+    // Typography Features
+    titleSize = '1.25rem',
+    titleColor = '',
+    titleItalic = false,
+    titleUnderline = false,
+    subtitleSize = '0.875rem',
+    subtitleColor = '',
+    subtitleItalic = false,
+    subtitleUnderline = false
+  } = config;
+
+  const [localData, setLocalData] = useState(null);
+  const [loading, setLoading] = useState(!!dataSource);
+
+  useEffect(() => {
+    if (dataSource) {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          const { api } = require('../../utils/api');
+          const res = await api.get(dataSource);
+          setLocalData(res.data);
+        } catch (e) {
+          console.error('[Card Fetch Error]', e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }
+  }, [dataSource]);
+
+  const activeData = localData || providedData;
+
+  // --- Dynamic String Resolver ---
+  const resolveDynamicString = (str) => {
+    if (!str || typeof str !== 'string' || !activeData) return str;
+    return str.replace(/\{\{(.*?)\}\}/g, (match, path) => {
+      const keys = path.trim().split('.');
+      let val = activeData;
+      for (const key of keys) {
+        val = val ? val[key] : null;
+      }
+      return val !== null && val !== undefined ? val : match;
+    });
+  };
+
+  const resolvedTitle = resolveDynamicString(title);
+  const resolvedSubtitle = resolveDynamicString(subtitle);
+
+  // --- Style Engineering ---
+  const shadowMap = {
+    none: 'none',
+    sm: '0 1px 2px rgba(0,0,0,0.05)',
+    md: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
+    lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+    xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
+    '2xl': '0 25px 50px -12px rgba(0,0,0,0.25)'
+  };
+
+  const getBackground = () => {
+    if (backgroundType === 'gradient') return { background: backgroundGradient };
+    if (backgroundType === 'glass') return {
+      backgroundColor: `rgba(255, 255, 255, ${glassOpacity})`,
+      backdropFilter: `blur(${glassBlur})`,
+      WebkitBackdropFilter: `blur(${glassBlur})`,
+      border: '1px solid rgba(255, 255, 255, 0.4)'
+    };
+    return { backgroundColor: backgroundColor || '#ffffff' };
+  };
+
+  const cardStyle = {
+    ...getBackground(),
+    borderRadius: style.borderRadius || '24px',
+    boxShadow: shadowMap[shadow] || shadowMap.md,
+    padding: padding,
+    borderLeft: accentColor ? `5px solid ${accentColor}` : (style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || '#e2e8f0'}` : 'none'),
+    ...style
+  };
+
+  const textStyle = (baseSize, baseColor, isItalic, isUnderline) => ({
+    fontSize: baseSize,
+    color: baseColor || theme?.theme_text_color || '#1e293b',
+    fontStyle: isItalic ? 'italic' : 'normal',
+    textDecoration: isUnderline ? 'underline' : 'none',
+    textDecorationThickness: isUnderline ? '2px' : 'auto',
+    textUnderlineOffset: isUnderline ? '4px' : 'auto'
+  });
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5, boxShadow: shadowMap.xl }}
+      className="relative overflow-hidden transition-all duration-300 group"
+      style={cardStyle}
+    >
+      <div className="relative z-10">
+        {/* Card Header Area */}
+        {(resolvedTitle || resolvedSubtitle) && (
+          <div className="mb-6">
+            {resolvedTitle && (
+              <h3 
+                className="font-black tracking-tight leading-tight mb-1" 
+                style={textStyle(titleSize, titleColor, titleItalic, titleUnderline)}
+              >
+                {resolvedTitle}
+              </h3>
+            )}
+            {resolvedSubtitle && (
+              <p 
+                className="font-medium opacity-60 leading-relaxed" 
+                style={textStyle(subtitleSize, subtitleColor, subtitleItalic, subtitleUnderline)}
+              >
+                {resolvedSubtitle}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Content Area */}
+        <div className={layout === 'grid-2' ? 'grid grid-cols-2 gap-x-6' : 'space-y-1'}>
+          {loading ? (
+            <div className="flex items-center space-x-2 py-4">
+              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-75"></div>
+              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-150"></div>
+            </div>
+          ) : (
+            fields.map((field, idx) => (
+              <UniversalField 
+                key={idx} 
+                label={field.label} 
+                value={activeData ? resolveDynamicString(field.bind ? (getValue(activeData, field.bind) || '') : (field.value || '')) : (field.value || '')}
+                path={field.bind}
+                theme={theme}
+              />
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Decorative Accent */}
+      {!accentColor && backgroundType === 'solid' && (
+        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-indigo-100/50 transition-colors duration-500" />
+      )}
+    </motion.div>
+  );
 }
+
+// Helper to safely resolve dot notation
+const getValue = (obj, path) => {
+    if (!path) return null;
+    return path.split('.').reduce((o, p) => (o ? o[p] : null), obj);
+};
 
 export default Card;

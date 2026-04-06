@@ -3,7 +3,7 @@ import { api } from '../../utils/api';
 import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
 import { useAlert } from '../../context/AlertContext';
 import { useConfirmation } from '../../context/ConfirmationContext';
-import { FiSearch, FiLayout, FiTrash2, FiPlusCircle, FiCheck, FiSettings, FiZap, FiMoreVertical, FiBox } from 'react-icons/fi';
+import { FiSearch, FiLayout, FiTrash2, FiPlusCircle, FiCheck, FiSettings, FiZap, FiMoreVertical, FiBox, FiType } from 'react-icons/fi';
 
 /**
  * Deep-flatten an object into dot-notated paths (e.g. user.profile.name)
@@ -273,11 +273,31 @@ function UIBuilder({ token }) {
               alignment: 'left',
               backgroundType: 'solid',
               padding: '2.5rem',
-              shadow: 'none'
+              shadow: 'none',
+              titleSize: '2.25rem',
+              titleWeight: '900',
+              subtitleSize: '1.1rem',
+              subtitleWeight: '500'
           });
           setAvailablePaths([]);
       }
-      else if (type === 'card') setConfigFormData({ title: 'Data Container' });
+      else if (type === 'card') {
+          setConfigFormData({ 
+              title: 'Data Container',
+              subtitle: '',
+              dataSource: '',
+              layout: 'vertical',
+              backgroundType: 'solid',
+              shadow: 'md',
+              padding: '1.5rem',
+              titleSize: '1.25rem',
+              titleColor: '#1e293b',
+              subtitleSize: '0.875rem',
+              subtitleColor: '#64748b',
+              fields: []
+          });
+          setAvailablePaths([]);
+      }
       else if (type === 'form') {
           setConfigFormData({ title: 'Submit Request', submitEndpoint: '/api/v1/forms/submit', submitLabel: 'Submit Data' });
           setConfigFormFields([{ id: Date.now(), name: "message", label: "Your Message", type: "textarea", required: true }]);
@@ -423,16 +443,28 @@ function UIBuilder({ token }) {
             shadow: configFormData.shadow
           };
       } else if (configType === 'header') {
-          block.config.title = configFormData.title;
-          block.config.subtitle = configFormData.subtitle;
-          block.config.dataSource = configFormData.dataSource;
-          block.config.alignment = configFormData.alignment;
-          block.config.backgroundType = configFormData.backgroundType;
-          block.config.shadow = configFormData.shadow;
-          block.config.backgroundColor = configFormData.backgroundColor;
-          block.config.padding = configFormData.padding;
+          block.config = {
+              ...block.config,
+              ...configFormData,
+              // Explicitly ensuring fields aren't lost if they exist
+              style: {
+                  ...block.config.style,
+                  padding: configFormData.padding,
+                  margin: configFormData.margin,
+                  width: configFormData.width
+              }
+          };
       } else if (configType === 'card') {
-          block.config.title = configFormData.title;
+          block.config = {
+              ...block.config,
+              ...configFormData,
+              style: {
+                  ...block.config.style,
+                  padding: configFormData.padding,
+                  margin: configFormData.margin,
+                  width: configFormData.width
+              }
+          };
       } else if (configType === 'form') {
           block.config.title = configFormData.title;
           block.config.submitEndpoint = configFormData.submitEndpoint;
@@ -939,6 +971,7 @@ function UIBuilder({ token }) {
                                       {[
                                           { id: 'data', label: 'Data', icon: <FiSearch /> },
                                           { id: 'content', label: 'Content', icon: <FiLayout /> },
+                                          { id: 'typography', label: 'Typography', icon: <FiType /> },
                                           { id: 'style', label: 'Styles', icon: <FiSettings /> }
                                       ].map(tab => (
                                           <button 
@@ -977,18 +1010,103 @@ function UIBuilder({ token }) {
                                   )}
 
                                   {modalTab === 'content' && (
-                                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                          <div>
-                                              <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1.5">Main Title</label>
-                                              <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all font-bold" 
-                                                  placeholder="e.g. Welcome, {{first_name}}"
-                                                  value={configFormData.title || ''} onChange={e => setConfigFormData({...configFormData, title: e.target.value})} />
+                                      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                          <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                              <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Header Content Architecture</label>
+                                              <div className="space-y-4">
+                                                  <div>
+                                                      <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Elite Title</label>
+                                                      <input type="text" placeholder="Title (e.g. Welcome, {{name}})" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                                                          value={configFormData.title || ''} onChange={e => setConfigFormData({...configFormData, title: e.target.value})} />
+                                                  </div>
+                                                  <div>
+                                                      <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Subtext / Paragraph</label>
+                                                      <textarea placeholder="Subtitle content..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none min-h-[100px] transition-all" 
+                                                          value={configFormData.subtitle || ''} onChange={e => setConfigFormData({...configFormData, subtitle: e.target.value})} />
+                                                  </div>
+                                              </div>
                                           </div>
-                                          <div>
-                                              <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1.5">Subtitle</label>
-                                              <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all" 
-                                                  placeholder="e.g. Manage your {{department}} portal"
-                                                  value={configFormData.subtitle || ''} onChange={e => setConfigFormData({...configFormData, subtitle: e.target.value})} />
+
+                                          {availablePaths.length > 0 && (
+                                              <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 animate-in slide-in-from-top-2 duration-400">
+                                                  <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-1">Discovered API Paths</label>
+                                                  <p className="text-[10px] text-indigo-400 mb-3 font-medium">Click to synchronize and copy to clipboard.</p>
+                                                  <div className="flex flex-wrap gap-2">
+                                                      {availablePaths.map(path => (
+                                                          <button 
+                                                              key={path}
+                                                              type="button" 
+                                                              onClick={() => {
+                                                                  navigator.clipboard.writeText(`{{${path}}}`);
+                                                                  showAlert({ title: 'Metadata Linked', message: `{{${path}}} has been successfully buffered for insertion.`, type: 'success' });
+                                                              }}
+                                                              className="px-2.5 py-1.5 bg-white border border-indigo-200 rounded-lg text-[9px] font-mono font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95 hover:border-indigo-400"
+                                                          >
+                                                              {path}
+                                                          </button>
+                                                      ))}
+                                                  </div>
+                                              </div>
+                                          )}
+                                      </div>
+                                  )}
+
+                                  {modalTab === 'typography' && (
+                                      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                          {/* Title Typography */}
+                                          <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                              <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Main Title Typography</label>
+                                              <div className="grid grid-cols-2 gap-4 mb-4">
+                                                  <div>
+                                                      <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1.5">Size (rem/px)</label>
+                                                      <input type="text" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold focus:outline-none" 
+                                                          placeholder="2.25rem" value={configFormData.titleSize || ''} onChange={e => setConfigFormData({...configFormData, titleSize: e.target.value})} />
+                                                  </div>
+                                                  <div>
+                                                      <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1.5">Weight</label>
+                                                      <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none"
+                                                          value={configFormData.titleWeight || '900'} onChange={e => setConfigFormData({...configFormData, titleWeight: e.target.value})}>
+                                                          <option value="400">Regular</option>
+                                                          <option value="600">Semi Bold</option>
+                                                          <option value="700">Bold</option>
+                                                          <option value="900">Black</option>
+                                                      </select>
+                                                  </div>
+                                              </div>
+                                              <div className="flex gap-2">
+                                                  <button type="button" onClick={() => setConfigFormData({...configFormData, titleItalic: !configFormData.titleItalic})} 
+                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                  <button type="button" onClick={() => setConfigFormData({...configFormData, titleUnderline: !configFormData.titleUnderline})} 
+                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                              </div>
+                                          </div>
+
+                                          {/* Subtitle Typography */}
+                                          <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                              <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Subtitle Typography</label>
+                                              <div className="grid grid-cols-2 gap-4 mb-4">
+                                                  <div>
+                                                      <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1.5">Size</label>
+                                                      <input type="text" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold focus:outline-none" 
+                                                          placeholder="1.1rem" value={configFormData.subtitleSize || ''} onChange={e => setConfigFormData({...configFormData, subtitleSize: e.target.value})} />
+                                                  </div>
+                                                  <div>
+                                                      <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1.5">Weight</label>
+                                                      <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none"
+                                                          value={configFormData.subtitleWeight || '500'} onChange={e => setConfigFormData({...configFormData, subtitleWeight: e.target.value})}>
+                                                          <option value="300">Light</option>
+                                                          <option value="400">Regular</option>
+                                                          <option value="500">Medium</option>
+                                                          <option value="600">Semi Bold</option>
+                                                      </select>
+                                                  </div>
+                                              </div>
+                                              <div className="flex gap-2">
+                                                  <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleItalic: !configFormData.subtitleItalic})} 
+                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                  <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleUnderline: !configFormData.subtitleUnderline})} 
+                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                              </div>
                                           </div>
                                       </div>
                                   )}
@@ -1013,7 +1131,7 @@ function UIBuilder({ token }) {
                                                </div>
                                                <div>
                                                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Background</label>
-                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none" value={configFormData.backgroundType || 'solid'} onChange={e => setConfigFormData({...configFormData, backgroundType: e.target.value})}>
+                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none focus:bg-white" value={configFormData.backgroundType || 'solid'} onChange={e => setConfigFormData({...configFormData, backgroundType: e.target.value})}>
                                                        <option value="solid">Solid Color</option>
                                                        <option value="gradient">Indigo Gradient</option>
                                                        <option value="glass">Glassmorphism</option>
@@ -1021,7 +1139,7 @@ function UIBuilder({ token }) {
                                                </div>
                                                <div>
                                                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Shadow</label>
-                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none" value={configFormData.shadow || 'none'} onChange={e => setConfigFormData({...configFormData, shadow: e.target.value})}>
+                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none focus:bg-white" value={configFormData.shadow || 'none'} onChange={e => setConfigFormData({...configFormData, shadow: e.target.value})}>
                                                        <option value="none">Flat</option>
                                                        <option value="sm">Soft</option>
                                                        <option value="md">Std</option>
@@ -1032,9 +1150,211 @@ function UIBuilder({ token }) {
                                       </div>
                                   )}
                               </div>
-                          )}
+                           )}
 
-                          {configType === 'form' && (
+                           {configType === 'card' && (
+                               <div className="space-y-5">
+                                   {/* Tab Navigation for Card */}
+                                   <div className="flex border-b border-gray-100 mb-4 sticky top-0 bg-white z-20 -mx-4 px-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                                       {[
+                                           { id: 'data', label: 'Data', icon: <FiSearch /> },
+                                           { id: 'content', label: 'Content', icon: <FiLayout /> },
+                                           { id: 'typography', label: 'Typography', icon: <FiType /> },
+                                           { id: 'style', label: 'Styles', icon: <FiSettings /> }
+                                       ].map(tab => (
+                                           <button 
+                                               key={tab.id}
+                                               type="button"
+                                               onClick={() => setModalTab(tab.id)}
+                                               className={`flex items-center gap-2 px-4 py-3 text-xs font-black transition-all border-b-2 ${modalTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                           >
+                                               {tab.icon}
+                                               {tab.label}
+                                           </button>
+                                       ))}
+                                   </div>
+
+                                   {modalTab === 'data' && (
+                                       <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                            <div>
+                                               <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Independent Fetching</label>
+                                               <div className="flex gap-2">
+                                                   <input type="text" placeholder="/api/v1/..." className="flex-1 font-mono text-sm px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white outline-none transition-all" 
+                                                       value={configFormData.dataSource || ''} onChange={e => setConfigFormData({...configFormData, dataSource: e.target.value})} />
+                                                   <button type="button" onClick={discoverTableSchema} disabled={isFetchingSchema} className="px-5 py-2 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 disabled:opacity-50 transition-all">
+                                                       Scan
+                                                   </button>
+                                               </div>
+                                               <p className="mt-2 text-[10px] text-gray-400 italic font-medium">Leave blank to inherit data from the page context.</p>
+                                           </div>
+                                           {availablePaths.length > 0 && (
+                                               <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3">
+                                                   <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"><FiCheck /></div>
+                                                   <div className="text-[10px] text-emerald-800 font-black uppercase tracking-widest leading-none">Paths Synced: {availablePaths.length} Available</div>
+                                               </div>
+                                           )}
+                                       </div>
+                                   )}
+
+                                    {modalTab === 'content' && (
+                                       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                            {/* Header Section */}
+                                            <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                                <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Card Branding</label>
+                                                <input type="text" placeholder="Card Title (e.g. My Profile)" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 outline-none" 
+                                                    value={configFormData.title || ''} onChange={e => setConfigFormData({...configFormData, title: e.target.value})} />
+                                                <input type="text" placeholder="Subtitle (optional)" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none" 
+                                                    value={configFormData.subtitle || ''} onChange={e => setConfigFormData({...configFormData, subtitle: e.target.value})} />
+                                            </div>
+
+                                            {availablePaths.length > 0 && (
+                                                <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                                                    <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-2">Dynamic Data Assistant</label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {availablePaths.map(path => (
+                                                            <button 
+                                                                key={path}
+                                                                type="button" 
+                                                                onClick={() => {
+                                                                    navigator.clipboard.writeText(`{{${path}}}`);
+                                                                    showAlert({ title: 'Path Copied', message: `{{${path}}} ready to paste.`, type: 'success' });
+                                                                }}
+                                                                className="px-2 py-1 bg-white border border-indigo-200 rounded-lg text-[9px] font-mono font-bold text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                                                            >
+                                                                {path}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Fields Section */}
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-center px-4">
+                                                    <label className="text-[10px] uppercase font-black text-indigo-600 tracking-widest leading-none">Dynamic Fields</label>
+                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, fields: [...(configFormData.fields || []), { label: 'New Field', bind: '' }]})} className="text-[10px] font-black bg-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-sm hover:translate-y-[-1px] active:translate-y-0 transition-all">+ Add Item</button>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {(configFormData.fields || []).map((f, idx) => (
+                                                        <div key={idx} className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm flex gap-3 relative animate-in zoom-in-95 duration-200">
+                                                            <div className="flex-1 space-y-2">
+                                                                <input type="text" placeholder="Label" className="w-full text-[10px] font-black uppercase text-gray-400 bg-transparent outline-none mb-1 border-b border-gray-50 focus:border-indigo-200 transition-colors" value={f.label} onChange={e => {
+                                                                    const n = [...configFormData.fields]; n[idx].label = e.target.value; setConfigFormData({...configFormData, fields: n});
+                                                                }} />
+                                                                <select className="w-full text-xs font-mono font-bold text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 outline-none" value={f.bind} onChange={e => {
+                                                                    const n = [...configFormData.fields]; n[idx].bind = e.target.value; setConfigFormData({...configFormData, fields: n});
+                                                                }}>
+                                                                    <option value="">-- Bind Variable --</option>
+                                                                    {availablePaths.map(p => <option key={p} value={p}>{p}</option>)}
+                                                                </select>
+                                                            </div>
+                                                            <button type="button" onClick={() => {
+                                                                const n = configFormData.fields.filter((_, i) => i !== idx); setConfigFormData({...configFormData, fields: n});
+                                                            }} className="text-gray-300 hover:text-rose-500 transition-colors self-center"><FiTrash2 /></button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                       </div>
+                                   )}
+
+                                   {modalTab === 'typography' && (
+                                       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                               <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Title Appearance</label>
+                                               <div className="grid grid-cols-2 gap-4 mb-4">
+                                                   <div>
+                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Color Palette</label>
+                                                       <input type="color" className="w-full h-10 border-0 p-0 bg-transparent cursor-pointer rounded-xl" value={configFormData.titleColor || '#1e293b'} onChange={e => setConfigFormData({...configFormData, titleColor: e.target.value})} />
+                                                   </div>
+                                                   <div>
+                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Text Size</label>
+                                                       <input type="text" placeholder="1.25rem" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold focus:outline-none" value={configFormData.titleSize || ''} onChange={e => setConfigFormData({...configFormData, titleSize: e.target.value})} />
+                                                   </div>
+                                               </div>
+                                               <div className="flex gap-2">
+                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, titleItalic: !configFormData.titleItalic})} 
+                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, titleUnderline: !configFormData.titleUnderline})} 
+                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                               </div>
+                                           </div>
+
+                                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                               <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Subtitle Appearance</label>
+                                               <div className="grid grid-cols-2 gap-4 mb-4">
+                                                   <div>
+                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Text Color</label>
+                                                       <input type="color" className="w-full h-10 border-0 p-0 bg-transparent cursor-pointer rounded-xl" value={configFormData.subtitleColor || '#64748b'} onChange={e => setConfigFormData({...configFormData, subtitleColor: e.target.value})} />
+                                                   </div>
+                                                   <div>
+                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Text Size</label>
+                                                       <input type="text" placeholder="0.875rem" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold focus:outline-none" value={configFormData.subtitleSize || ''} onChange={e => setConfigFormData({...configFormData, subtitleSize: e.target.value})} />
+                                                   </div>
+                                               </div>
+                                               <div className="flex gap-2">
+                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleItalic: !configFormData.subtitleItalic})} 
+                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleUnderline: !configFormData.subtitleUnderline})} 
+                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                               </div>
+                                           </div>
+                                       </div>
+                                   )}
+
+                                   {modalTab === 'style' && (
+                                       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                           <div className="grid grid-cols-2 gap-4">
+                                                <div className="col-span-2">
+                                                   <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest mb-3 leading-none">Layout Pattern</label>
+                                                   <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
+                                                       {[
+                                                           { id: 'vertical', label: 'Stack' },
+                                                           { id: 'grid-2', label: 'Grid x2' }
+                                                       ].map(l => (
+                                                           <button 
+                                                               key={l.id}
+                                                               type="button"
+                                                               onClick={() => setConfigFormData({...configFormData, layout: l.id})}
+                                                               className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${configFormData.layout === l.id ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                                           >
+                                                               {l.label}
+                                                           </button>
+                                                       ))}
+                                                   </div>
+                                                </div>
+                                               <div>
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Visual Mode</label>
+                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none focus:bg-white" value={configFormData.backgroundType || 'solid'} onChange={e => setConfigFormData({...configFormData, backgroundType: e.target.value})}>
+                                                       <option value="solid">Sleek White</option>
+                                                       <option value="gradient">Ultra Gradient</option>
+                                                       <option value="glass">Glass Focus</option>
+                                                   </select>
+                                               </div>
+                                               <div>
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Shadow Level</label>
+                                                   <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none focus:bg-white" value={configFormData.shadow || 'md'} onChange={e => setConfigFormData({...configFormData, shadow: e.target.value})}>
+                                                       <option value="none">Flat</option>
+                                                       <option value="sm">Soft</option>
+                                                       <option value="md">Std</option>
+                                                       <option value="lg">Deep</option>
+                                                       <option value="xl">Ultra</option>
+                                                   </select>
+                                               </div>
+                                               <div className="col-span-2">
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Side Accent Color</label>
+                                                   <div className="flex gap-4 items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                                                       <input type="color" className="w-10 h-10 rounded-xl border-0 cursor-pointer p-0 bg-transparent" value={configFormData.accentColor || '#6366f1'} onChange={e => setConfigFormData({...configFormData, accentColor: e.target.value})} />
+                                                       <input type="text" placeholder="#hex" className="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-mono font-bold text-indigo-600 focus:outline-none" value={configFormData.accentColor || ''} onChange={e => setConfigFormData({...configFormData, accentColor: e.target.value})} />
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                   )}
+                               </div>
+                           )}
+
+                           {configType === 'form' && (
                               <div className="space-y-5">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       <div className="col-span-2 md:col-span-1">
