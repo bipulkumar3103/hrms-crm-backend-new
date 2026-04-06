@@ -18,7 +18,7 @@ def _get_user():
 
 
 @forms_blueprint.route('/submit', methods=['POST'])
-@forms_blueprint.route('/<string:form_slug>', methods=['POST'])
+@forms_blueprint.route('/<path:form_slug>', methods=['POST'])
 @jwt_required()
 def submit_form(form_slug='submit'):
     """

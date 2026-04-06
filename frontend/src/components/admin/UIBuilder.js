@@ -491,13 +491,21 @@ function UIBuilder({ token }) {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <button 
           onClick={() => setActiveView('builder')}
-          className={`px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm ${activeView === 'builder' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+          className="px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm"
+          style={{ 
+            backgroundColor: activeView === 'builder' ? 'var(--theme-primary)' : 'white', 
+            color: activeView === 'builder' ? 'white' : '#6b7280'
+          }}
         >
           Layout Builder
         </button>
         <button 
           onClick={() => setActiveView('submissions')}
-          className={`px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm ${activeView === 'submissions' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+          className="px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm"
+          style={{ 
+            backgroundColor: activeView === 'submissions' ? 'var(--theme-primary)' : 'white', 
+            color: activeView === 'submissions' ? 'white' : '#6b7280'
+          }}
         >
           Form Submissions
         </button>
@@ -508,7 +516,7 @@ function UIBuilder({ token }) {
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 gap-6">
             <div className="flex-shrink-0">
                 <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                  <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-100">
+                  <div className="p-2 rounded-xl text-white shadow-lg" style={{ backgroundColor: 'var(--theme-primary)' }}>
                     <FiLayout size={20} />
                   </div>
                   Enterprise Layout Builder
@@ -568,7 +576,8 @@ function UIBuilder({ token }) {
               <button 
                 onClick={handleSave} 
                 disabled={saving}
-                className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 px-10 rounded-[1.25rem] shadow-[0_10px_20px_-5px_rgba(79,70,229,0.4)] hover:shadow-[0_15px_25px_-5px_rgba(79,70,229,0.5)] disabled:opacity-50 transition-all border-b-4 border-indigo-800 text-sm flex items-center justify-center gap-3 active:border-b-0 active:translate-y-1"
+                className="flex-1 md:flex-none text-white font-black py-3.5 px-10 rounded-[1.25rem] shadow-xl disabled:opacity-50 transition-all text-sm flex items-center justify-center gap-3 active:translate-y-1"
+                style={{ backgroundColor: 'var(--theme-primary)' }}
               >
                 {saving ? (
                   <>
@@ -598,11 +607,11 @@ function UIBuilder({ token }) {
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <h3 className="font-bold text-gray-900 mb-4 pb-4 border-b border-gray-100">Drag/Add Blocks</h3>
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <button onClick={() => openConfigModal('header')} className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 hover:border-indigo-200 text-gray-700 hover:text-indigo-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm">Header</button>
-              <button onClick={() => openConfigModal('card')} className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 hover:border-indigo-200 text-gray-700 hover:text-indigo-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm">Data Container</button>
-              <button onClick={() => openConfigModal('table')} className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 hover:border-indigo-200 text-gray-700 hover:text-indigo-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm">Data Table</button>
-              <button onClick={() => openConfigModal('button')} className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 hover:border-indigo-200 text-gray-700 hover:text-indigo-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm">Action Link</button>
-              <button onClick={() => openConfigModal('form')} className="col-span-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm">Entry Form</button>
+              <button onClick={() => openConfigModal('header')} className="bg-gray-50 border border-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] hover:border-[var(--theme-primary)]/20">Header</button>
+              <button onClick={() => openConfigModal('card')} className="bg-gray-50 border border-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] hover:border-[var(--theme-primary)]/20">Data Container</button>
+              <button onClick={() => openConfigModal('table')} className="bg-gray-50 border border-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] hover:border-[var(--theme-primary)]/20">Data Table</button>
+              <button onClick={() => openConfigModal('button')} className="bg-gray-50 border border-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] hover:border-[var(--theme-primary)]/20">Action Link</button>
+              <button onClick={() => openConfigModal('form')} className="col-span-2 font-semibold py-3 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center" style={{ backgroundColor: 'var(--theme-secondary)', color: 'var(--theme-primary)', border: '1px solid var(--theme-primary)' }}>Entry Form</button>
             </div>
             <div className="flex justify-between items-center bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-2xl border-t border-gray-100">
               <span className="text-gray-500 text-xs font-bold uppercase tracking-wider">Developer Options</span>

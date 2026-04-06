@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .bg-theme-primary {
+    background-color: var(--theme-primary);
+  }
+  .bg-theme-secondary {
+    background-color: var(--theme-secondary);
+  }
+  .bg-theme-accent {
+    background-color: var(--theme-accent);
+  }
+  
+  .text-theme-primary {
+    color: var(--theme-primary);
+  }
+  .text-theme-secondary {
+    color: var(--theme-secondary);
+  }
+  .text-theme-accent {
+    color: var(--theme-accent);
+  }
+
+  .border-theme-primary {
+    border-color: var(--theme-primary);
+  }
+  .border-theme-secondary {
+    border-color: var(--theme-secondary);
+  }
+  .border-theme-accent {
+    border-color: var(--theme-accent);
+  }
+  
+  .ring-theme-primary {
+    --tw-ring-color: var(--theme-primary);
+  }
+}

@@ -11,7 +11,7 @@ function Header({ config, theme, providedData }) {
     style = {},
     alignment = 'left',
     backgroundType = 'solid', // 'solid', 'gradient', 'glass'
-    backgroundGradient = 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+    backgroundGradient = 'linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-accent) 100%)',
     backgroundColor = '',
     glassOpacity = 0.7,
     glassBlur = '12px',
@@ -88,7 +88,6 @@ function Header({ config, theme, providedData }) {
 
   const containerStyle = {
     ...getBackgroundStyle(),
-    padding: padding,
     borderRadius: style.borderRadius || '24px',
     boxShadow: shadowMap[shadow] || 'none',
     textAlign: alignment,
@@ -99,19 +98,21 @@ function Header({ config, theme, providedData }) {
   const finalTextColor = textColor || theme?.theme_text_color || '#1e293b';
 
   return (
-    <header className="relative overflow-hidden transition-all duration-500" style={containerStyle}>
+    <header 
+      className={`relative overflow-hidden transition-all duration-500 rounded-3xl ${padding === '2.5rem' ? 'p-6 md:p-10' : ''}`}
+      style={{ ...containerStyle, padding: padding === '2.5rem' ? undefined : padding }}
+    >
       {/* Visual Accent for Center alignment */}
       {alignment === 'center' && (
-        <div className="mx-auto w-12 h-1 bg-indigo-500 rounded-full mb-4 opacity-50" />
+        <div className="mx-auto w-12 h-1.5 rounded-full mb-5 opacity-40" style={{ backgroundColor: 'var(--theme-primary)' }} />
       )}
 
       <h1 
-        className="tracking-tight leading-none"
+        className="tracking-tighter leading-[1.1] md:leading-none"
         style={{ 
-            fontSize: titleSize, 
+            fontSize: alignment === 'center' ? `calc(${titleSize} * 0.8)` : titleSize, 
             fontWeight: titleWeight,
             color: finalTextColor,
-            letterSpacing: '-0.025em',
             fontStyle: titleItalic ? 'italic' : 'normal',
             textDecoration: titleUnderline ? 'underline' : 'none',
             textDecorationThickness: titleUnderline ? '3px' : 'auto',
@@ -123,13 +124,13 @@ function Header({ config, theme, providedData }) {
       
       {resolvedSubtitle && (
         <p 
-            className="mt-3 max-w-2xl"
+            className="mt-4 max-w-2xl text-[0.95rem] md:text-[1.1rem]"
             style={{ 
                 fontSize: subtitleSize, 
                 fontWeight: subtitleWeight,
                 color: finalTextColor,
-                opacity: 0.75,
-                margin: alignment === 'center' ? '0.75rem auto 0' : '0.75rem 0 0',
+                opacity: 0.7,
+                margin: alignment === 'center' ? '1rem auto 0' : '1rem 0 0',
                 fontStyle: subtitleItalic ? 'italic' : 'normal',
                 textDecoration: subtitleUnderline ? 'underline' : 'none',
                 textUnderlineOffset: '4px'

@@ -15,7 +15,18 @@ const componentMap = {
   form: DynamicForm,
 };
 
-const getValue = (obj, path) => path.split('.').reduce((o, p) => (o ? o[p] : null), obj);
+export const getValue = (obj, path) => {
+  if (!obj || !path) return null;
+  return path.split('.').reduce((o, p) => (o ? o[p] : null), obj);
+};
+
+export const resolveDynamicString = (str, data) => {
+  if (!str || typeof str !== 'string' || !data) return str;
+  return str.replace(/\{\{(.*?)\}\}/g, (match, path) => {
+    const val = getValue(data, path.trim());
+    return val !== null && val !== undefined ? String(val) : match;
+  });
+};
 
 const bindData = (ui, data) => {
   if (!data) return ui;
@@ -142,8 +153,8 @@ function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, on
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-full min-h-[300px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
-        <p className="text-indigo-400 font-bold text-xs uppercase tracking-widest animate-pulse">Syncing Remote Metadata...</p>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 mb-4" style={{ borderColor: 'var(--theme-primary)' }}></div>
+        <p className="font-bold text-xs uppercase tracking-widest animate-pulse" style={{ color: 'var(--theme-primary)' }}>Syncing Remote Metadata...</p>
       </div>
     );
   }

@@ -107,7 +107,10 @@ def create_app(config_name='default'):
     app.register_blueprint(employees_blueprint, url_prefix='/api/v1/employees')
     app.register_blueprint(users_blueprint, url_prefix='/api/v1/users')
     app.register_blueprint(ui_blueprint, url_prefix='/api/v1/ui')
-    app.register_blueprint(forms_blueprint, url_prefix='/api/v1/forms')
+    
+    # Universal Catch-All for Dynamic Forms (Must be Registered LAST)
+    # This captures any POST /api/v1/<path> that wasn't claimed above.
+    app.register_blueprint(forms_blueprint, url_prefix='/api/v1')
 
     with app.app_context():
         db.create_all()

@@ -10,13 +10,15 @@ const PremiumLoader = ({ message = "Loading...", fullScreen = true }) => {
             <motion.div 
                 animate={{ rotate: 360 }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="absolute w-24 h-24 rounded-full border-[3px] border-dashed border-[#3730A3]/40 shadow-[0_0_15px_rgba(55,48,163,0.1)]"
+                className="absolute w-24 h-24 rounded-full border-[3px] border-dashed shadow-sm"
+                style={{ borderColor: 'var(--theme-secondary)', opacity: 0.4 }}
             />
             {/* The Secondary Reverse Spinning Solid Ring */}
             <motion.div 
                 animate={{ rotate: -360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="absolute w-16 h-16 rounded-full border-2 border-t-[#3730A3] border-r-transparent border-b-[#3730A3] border-l-transparent shadow-[0_0_20px_rgba(55,48,163,0.2)]"
+                className="absolute w-16 h-16 rounded-full border-2 border-r-transparent border-l-transparent shadow-sm"
+                style={{ borderTopColor: 'var(--theme-primary)', borderBottomColor: 'var(--theme-primary)' }}
             />
             {/* Central Pulsing Orb */}
             <motion.div 
@@ -40,7 +42,8 @@ const PremiumLoader = ({ message = "Loading...", fullScreen = true }) => {
                         initial={{ width: 0 }}
                         animate={{ width: "100%" }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="h-[2px] bg-gradient-to-r from-transparent via-[#3730A3] to-transparent mt-2 rounded-full"
+                        className="h-[2px] mt-2 rounded-full"
+                        style={{ background: `linear-gradient(to right, transparent, var(--theme-primary), transparent)` }}
                     />
                 </motion.div>
             )}

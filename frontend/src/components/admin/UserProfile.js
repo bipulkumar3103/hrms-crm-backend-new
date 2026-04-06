@@ -17,7 +17,7 @@ const InputField = ({ label, type="text", value, onChange }) => (
 
 const DisplayField = ({ icon: Icon, label, value }) => (
     <div className="flex items-start bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <div className="mt-0.5 p-2 bg-indigo-50 rounded-lg text-[var(--theme-primary)] mr-3">
+        <div className="mt-0.5 p-2 rounded-lg mr-3" style={{ backgroundColor: 'var(--theme-secondary)', color: 'var(--theme-primary)' }}>
             <Icon size={18}/>
         </div>
         <div>
@@ -119,7 +119,7 @@ function UserProfile({ token }) {
     return (
         <div className="mx-auto w-full">
             {saveStatus && (
-                <div className={`mb-6 p-4 rounded-xl text-sm font-semibold flex items-center shadow-sm ${saveStatus.includes('Failed') ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-[#e0e7ff] text-[#3730A3] border border-[#c7d2fe]'}`}>
+                <div className={`mb-6 p-4 rounded-xl text-sm font-semibold flex items-center shadow-sm ${saveStatus.includes('Failed') ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] border border-[var(--theme-primary)]/20'}`}>
                     <FiCheckCircle className="mr-2" size={18}/> {saveStatus}
                 </div>
             )}
@@ -133,7 +133,7 @@ function UserProfile({ token }) {
             <div className="bg-white rounded-[24px] shadow-[0_4px_34px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden relative">
                 
                 {/* Enterprise Header Area */}
-                <div className="h-40 bg-gradient-to-r from-[var(--theme-primary,#3730A3)] to-indigo-800 relative overflow-hidden">
+                <div className="h-40 relative overflow-hidden" style={{ background: `linear-gradient(to right, var(--theme-primary), var(--theme-accent))` }}>
                     <button 
                         onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
                         className="absolute top-5 right-5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center transition-all shadow-md z-20"
@@ -207,7 +207,7 @@ function UserProfile({ token }) {
                                     <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-3">
                                         {userData?.first_name} {userData?.last_name}
                                     </h1>
-                                    <p className="text-[18px] font-semibold text-[var(--theme-primary)] flex items-center">
+                                    <p className="text-[18px] font-semibold text-[var(--theme-primary)] flex items-center mt-3">
                                         {userData?.job_title || 'Title Unassigned'} <span className="mx-3 text-gray-200">|</span> {userData?.department || 'Dept Unassigned'}
                                     </p>
                                 </div>
@@ -244,7 +244,7 @@ function UserProfile({ token }) {
                                     <div className="flex justify-end sticky bottom-4 z-50">
                                         <button 
                                             onClick={handleSave}
-                                            className="px-10 py-4 rounded-xl text-white font-extrabold transition-all shadow-[0_8px_30px_rgb(55,48,163,0.3)] hover:scale-105 active:scale-95 flex items-center text-[15px]"
+                                            className="px-10 py-4 rounded-xl text-white font-extrabold transition-all shadow-xl hover:scale-105 active:scale-95 flex items-center text-[15px]"
                                             style={{ backgroundColor: 'var(--theme-primary)' }}
                                         >
                                             <FiSave className="mr-3" size={20}/> Synchronize All Changes to Registry

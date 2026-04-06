@@ -63,7 +63,7 @@ const UniversalCell = ({ value, path, row }) => {
     return (
       <div className="flex flex-wrap gap-1.5">
         {value.map((item, idx) => (
-          <span key={idx} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded text-[10px] font-bold border border-indigo-100">
+          <span key={idx} className="px-2 py-0.5 rounded text-[10px] font-bold border" style={{ backgroundColor: 'var(--theme-secondary)', color: 'var(--theme-primary)', borderColor: 'var(--theme-primary)', opacity: 0.2 }}>
             {String(item)}
           </span>
         ))}
@@ -242,15 +242,15 @@ function Table({ config, token, providedData }) {
       style={containerStyle}
     >
       {/* Table Header */}
-      <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-white">
-        <div>
-           <h3 className="text-xl font-bold text-gray-800 tracking-tight flex items-center">
-             <FiBox className="mr-3 opacity-60" style={{ color: style.borderColor || '#6366f1' }} size={20}/>
+      <div className="px-5 md:px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-white">
+        <div className="min-w-0 pr-4">
+           <h3 className="text-lg md:text-xl font-bold text-gray-800 tracking-tight flex items-center truncate">
+             <FiBox className="mr-3 flex-shrink-0" style={{ color: 'var(--theme-primary)' }} size={20}/>
              {config.title || 'Dynamic Record Set'}
            </h3>
-           <p className="text-[12px] text-gray-400 font-medium mt-0.5 ml-8 italic">Rendering {dataList.length} total entries from secure cloud.</p>
+           <p className="text-[11px] text-gray-400 font-medium mt-1 ml-8 italic truncate">Rendering {dataList.length} total entries from secure cloud.</p>
         </div>
-        <button className="p-2.5 bg-gray-50 text-gray-400 hover:bg-gray-100 rounded-xl transition-colors">
+        <button className="p-2.5 bg-gray-50 text-gray-400 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0">
           <FiMoreVertical size={18}/>
         </button>
       </div>
@@ -261,7 +261,7 @@ function Table({ config, token, providedData }) {
           <thead>
             <tr className="bg-gray-50/50">
               {config.columns?.filter(c => c && c.header).map((col, idx) => (
-                <th key={idx} className="px-8 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-[0.1em] border-b border-gray-50">
+                <th key={idx} className="px-5 md:px-8 py-4 text-left text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.1em] border-b border-gray-50 whitespace-nowrap">
                   {col.header}
                 </th>
               ))}
@@ -282,7 +282,7 @@ function Table({ config, token, providedData }) {
               </tr>
             ) : (
               dataList.map((row, rowIdx) => (
-                <tr key={rowIdx} className="group hover:bg-indigo-50/30 transition-all duration-200 cursor-default">
+                <tr key={rowIdx} className="group transition-all duration-200 cursor-default" style={{ hoverBackgroundColor: 'var(--theme-secondary)', opacity: 0.3 }}>
                   {config.columns?.filter(c => c && c.header).map((col, colIdx) => {
                     const path = col.bind || '';
                     let value = path.split('.').reduce((o, p) => (o ? o[p] : null), row);
@@ -295,7 +295,7 @@ function Table({ config, token, providedData }) {
                     }
 
                     return (
-                      <td key={colIdx} className="px-8 py-5 group-hover:px-9 transition-all duration-300">
+                      <td key={colIdx} className="px-5 md:px-8 py-5 transition-all duration-300">
                          <UniversalCell value={value} path={path} row={row} />
                       </td>
                     );
@@ -308,11 +308,11 @@ function Table({ config, token, providedData }) {
       </div>
 
        {/* Footer Info */}
-      <div className="px-8 py-5 flex justify-between items-center" style={{ backgroundColor: `${style.borderColor}08` || '#f9fafb' }}>
-         <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Autonomous Data Governance System</span>
-         <div className="flex items-center space-x-1.5">
+      <div className="px-5 md:px-8 py-5 flex justify-between items-center bg-gray-50/30">
+         <span className="text-[9px] md:text-[10px] font-bold text-gray-300 uppercase tracking-widest truncate mr-4">Autonomous Data Governance System</span>
+         <div className="flex items-center space-x-1.5 flex-shrink-0">
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.borderColor || '#10b981', boxShadow: `0 0 8px ${style.borderColor}80` }}></span>
-            <span className="text-[11px] font-bold" style={{ color: style.borderColor || '#059669' }}>Secure Link Active</span>
+            <span className="text-[10px] md:text-[11px] font-bold" style={{ color: style.borderColor || '#059669' }}>Secure Link Active</span>
          </div>
       </div>
     </div>

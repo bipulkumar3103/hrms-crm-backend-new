@@ -6,8 +6,10 @@ import { FiCalendar, FiUser, FiBox, FiCheckCircle, FiInfo } from 'react-icons/fi
  * UniversalField Component
  * Handles automatic formatting for different data types within the card.
  */
-const UniversalField = ({ label, value, path, theme }) => {
+const UniversalField = ({ label, value, path, theme, alignment }) => {
   if (value === null || value === undefined || value === '') return null;
+
+  const isCenter = alignment === 'center';
 
   // 1. Images / Avatars
   const isImage = typeof value === 'string' && (
@@ -17,7 +19,7 @@ const UniversalField = ({ label, value, path, theme }) => {
 
   if (isImage) {
     return (
-      <div className="flex flex-col mb-4">
+      <div className={`flex flex-col mb-4 ${isCenter ? 'items-center' : ''}`}>
         {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">{label}</span>}
         <div className="w-16 h-16 rounded-2xl border-2 border-white shadow-md overflow-hidden bg-gray-50">
           <img src={value} alt={label || 'Asset'} className="w-full h-full object-cover" />
@@ -40,7 +42,7 @@ const UniversalField = ({ label, value, path, theme }) => {
     }
 
     return (
-      <div className="flex flex-col mb-3">
+      <div className={`flex flex-col mb-3 ${isCenter ? 'items-center' : ''}`}>
         {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{label}</span>}
         <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider ${bg} ${text} border border-current/10 w-fit`}>
           <span className={`w-1.5 h-1.5 rounded-full ${dot} mr-2 shadow-[0_0_8px_rgba(0,0,0,0.1)]`}></span>
@@ -60,7 +62,7 @@ const UniversalField = ({ label, value, path, theme }) => {
   }
 
   return (
-    <div className="flex flex-col mb-3">
+    <div className={`flex flex-col mb-3 ${isCenter ? 'items-center text-center' : ''}`}>
       {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">{label}</span>}
       <p className="text-[14px] font-semibold text-gray-800 flex items-center leading-tight">
         {isDate && <FiCalendar className="mr-2 opacity-30" size={14} />}
@@ -90,6 +92,7 @@ function Card({ config, theme, providedData }) {
     layout = 'vertical', // 'vertical', 'grid-2'
     accentColor = '',
     padding = '1.5rem',
+    alignment = '', // Support for centering
     
     // Typography Features
     titleSize = '1.25rem',
@@ -166,7 +169,6 @@ function Card({ config, theme, providedData }) {
     ...getBackground(),
     borderRadius: style.borderRadius || '24px',
     boxShadow: shadowMap[shadow] || shadowMap.md,
-    padding: padding,
     borderLeft: accentColor ? `5px solid ${accentColor}` : (style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || '#e2e8f0'}` : 'none'),
     ...style
   };
@@ -185,16 +187,16 @@ function Card({ config, theme, providedData }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5, boxShadow: shadowMap.xl }}
-      className="relative overflow-hidden transition-all duration-300 group"
-      style={cardStyle}
+      className={`relative overflow-hidden transition-all duration-300 group ${padding === '1.5rem' ? 'p-5 md:p-8' : ''}`}
+      style={{ ...cardStyle, padding: padding === '1.5rem' ? undefined : padding }}
     >
       <div className="relative z-10">
         {/* Card Header Area */}
         {(resolvedTitle || resolvedSubtitle) && (
-          <div className="mb-6">
+          <div className={`mb-6 ${alignment === 'center' || !alignment ? 'text-center' : ''}`}>
             {resolvedTitle && (
               <h3 
-                className="font-black tracking-tight leading-tight mb-1" 
+                className="font-black tracking-tight leading-tight mb-2 text-lg md:text-xl" 
                 style={textStyle(titleSize, titleColor, titleItalic, titleUnderline)}
               >
                 {resolvedTitle}
@@ -202,7 +204,7 @@ function Card({ config, theme, providedData }) {
             )}
             {resolvedSubtitle && (
               <p 
-                className="font-medium opacity-60 leading-relaxed" 
+                className="font-medium opacity-60 leading-relaxed text-[13px] md:text-sm" 
                 style={textStyle(subtitleSize, subtitleColor, subtitleItalic, subtitleUnderline)}
               >
                 {resolvedSubtitle}
@@ -212,18 +214,19 @@ function Card({ config, theme, providedData }) {
         )}
 
         {/* Content Area */}
-        <div className={layout === 'grid-2' ? 'grid grid-cols-2 gap-x-6' : 'space-y-1'}>
+        <div className={layout === 'grid-2' ? 'grid grid-cols-1 md:grid-cols-2 gap-x-6' : 'space-y-1'}>
           {loading ? (
             <div className="flex items-center space-x-2 py-4">
-              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-75"></div>
-              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-150"></div>
+              <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--theme-primary)' }}></div>
+              <div className="w-2 h-2 rounded-full animate-bounce delay-75" style={{ backgroundColor: 'var(--theme-primary)' }}></div>
+              <div className="w-2 h-2 rounded-full animate-bounce delay-150" style={{ backgroundColor: 'var(--theme-primary)' }}></div>
             </div>
           ) : (
             fields.map((field, idx) => (
               <UniversalField 
                 key={idx} 
                 label={field.label} 
+                alignment={alignment || 'center'} // Smart default for user's aesthetic
                 value={activeData ? resolveDynamicString(field.bind ? (getValue(activeData, field.bind) || '') : (field.value || '')) : (field.value || '')}
                 path={field.bind}
                 theme={theme}
@@ -235,7 +238,7 @@ function Card({ config, theme, providedData }) {
 
       {/* Decorative Accent */}
       {!accentColor && backgroundType === 'solid' && (
-        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-indigo-100/50 transition-colors duration-500" />
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-3xl opacity-10 transition-colors duration-500 group-hover:opacity-20" style={{ backgroundColor: 'var(--theme-primary)' }} />
       )}
     </motion.div>
   );

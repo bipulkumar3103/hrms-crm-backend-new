@@ -44,8 +44,8 @@ function DynamicForm({ config, token, currentRoute }) {
   const formStyle = config.style || {};
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6" style={formStyle}>
-      {config.title && <h3 className="text-xl font-bold text-gray-800 mb-4">{config.title}</h3>}
+    <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 mb-6 transition-all" style={formStyle}>
+      {config.title && <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-5 tracking-tight text-center md:text-left">{config.title}</h3>}
       {status.message && (
           <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
               {status.message}
@@ -63,7 +63,8 @@ function DynamicForm({ config, token, currentRoute }) {
                   value={formData[field.name] || ''}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={field.placeholder || ''}
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 outline-none resize-none"
+                  style={{ '--tw-ring-color': 'var(--theme-primary)' }}
                   rows="4"
                 />
             ) : (
@@ -73,16 +74,17 @@ function DynamicForm({ config, token, currentRoute }) {
                   value={formData[field.name] || ''}
                   onChange={(e) => handleChange(e, field.name)}
                   placeholder={field.placeholder || ''}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 outline-none"
+                  style={{ '--tw-ring-color': 'var(--theme-primary)' }}
                 />
             )}
           </div>
         ))}
-        <div className="pt-2">
+        <div className="pt-2 flex justify-center md:justify-start">
             <button 
                 type="submit" 
                 disabled={status.loading}
-                className="px-6 py-2.5 font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm disabled:opacity-50 transition-all"
+                className="px-8 py-3 font-black text-sm uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg disabled:opacity-50 transition-all active:scale-95"
                 style={{ backgroundColor: 'var(--theme-primary)' }}
             >
                 {status.loading ? 'Submitting...' : (config.submitLabel || 'Submit')}

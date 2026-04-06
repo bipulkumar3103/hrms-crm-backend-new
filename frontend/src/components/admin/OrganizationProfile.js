@@ -157,9 +157,9 @@ function OrganizationProfile({ token }) {
             <div className="bg-white rounded-[24px] shadow-[0_4px_34px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden relative">
                 
                 {/* Enterprise Header Area */}
-                <div className="h-40 bg-gradient-to-r from-[var(--theme-primary,#3730A3)] to-indigo-800 relative overflow-hidden">
+                <div className="h-40 relative overflow-hidden" style={{ background: `linear-gradient(to right, var(--theme-primary), var(--theme-accent))` }}>
                     {!isSuperAdmin && (
-                        <div className="absolute top-5 right-5 bg-yellow-500/80 backdrop-blur-md border border-yellow-400 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center shadow-md z-20">
+                        <div className="absolute top-5 right-5 backdrop-blur-md border text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center shadow-md z-20" style={{ backgroundColor: 'rgba(245, 158, 11, 0.8)', borderColor: '#fbbf24' }}>
                             <FiSettings className="mr-2"/> Protected View (Read Only)
                         </div>
                     )}
@@ -250,7 +250,8 @@ function OrganizationProfile({ token }) {
                                             {isSuperAdmin ? (
                                                 <input 
                                                     type="text" 
-                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+                                                    style={{ focusBorderColor: 'var(--theme-primary)', focusRingColor: 'var(--theme-primary)' }}
                                                     value={details.name}
                                                     onChange={e => setDetails({...details, name: e.target.value})}
                                                 />
@@ -323,7 +324,7 @@ function OrganizationProfile({ token }) {
                                             <button 
                                                 onClick={handleDetailsUpdate}
                                                 disabled={detailsStatus === 'Updating...'}
-                                                className="px-8 py-3.5 rounded-xl text-white font-extrabold transition-all shadow-[0_8px_30px_rgb(55,48,163,0.3)] hover:scale-105 active:scale-95 text-[14px]"
+                                                className="px-8 py-3.5 rounded-xl text-white font-extrabold transition-all hover:scale-105 active:scale-95 text-[14px]"
                                                 style={{ backgroundColor: 'var(--theme-primary)' }}
                                             >
                                                 Synchronize Directory

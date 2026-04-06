@@ -13,11 +13,11 @@ function Button({ config, onNavigate }) {
     btnClasses += "bg-white border text-gray-700 hover:bg-gray-50 border-gray-200";
   } else {
     // Default to primary
-    btnClasses += "text-white text-[var(--theme-bg)] hover:opacity-90 shadow-[0_4px_14px_rgba(0,0,0,0.1)]";
+    btnClasses += "text-white hover:opacity-90 shadow-md";
   }
 
   return (
-    <div className="mb-4">
+    <div className="mb-4 flex justify-center md:justify-start">
       <button 
         onClick={handleClick} 
         className={btnClasses}

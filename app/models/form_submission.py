@@ -25,6 +25,8 @@ class FormSubmission(db.Model):
             'company_id': self.company_id,
             'submitted_by': self.submitted_by,
             'submitter_name': f"{self.submitter.first_name or ''} {self.submitter.last_name or ''}".strip() if self.submitter else 'Unknown',
+            'submitter_email': self.submitter.email if self.submitter else 'Unknown',
+            'submitter_avatar': self.submitter.avatar_small_url if self.submitter else None,
             'form_name': self.form_name,
             'source_route': self.source_route,
             'form_slug': self.form_slug,
