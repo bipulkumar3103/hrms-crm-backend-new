@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html, body, button, input, select, textarea {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  }
+}
+
 @layer utilities {
   .bg-theme-primary {
     background-color: var(--theme-primary);
@@ -11,6 +17,15 @@
   }
   .bg-theme-accent {
     background-color: var(--theme-accent);
+  }
+  
+  /* Global Brand Hover Synchronization */
+  .hover\:bg-gray-50:hover, 
+  .hover\:bg-gray-100:hover,
+  .hover\:bg-slate-50:hover,
+  .hover\:bg-slate-100:hover {
+    background-color: var(--theme-secondary, #d3d1ff) !important;
+    color: var(--theme-primary, #3730A3) !important;
   }
   
   .text-theme-primary {
@@ -35,5 +50,57 @@
   
   .ring-theme-primary {
     --tw-ring-color: var(--theme-primary);
+  }
+
+  /* Elite Responsive Architectural System */
+  .elite-responsive {
+    width: var(--width, auto);
+    height: var(--height, auto);
+    padding: var(--padding, 0);
+    margin: var(--margin, 0);
+    display: var(--display, flex);
+    flex-direction: var(--flex-direction, row);
+    align-items: var(--align-items, center); /* Refined default */
+    justify-content: var(--justify-content, center); /* Refined default */
+    gap: var(--gap, 0);
+    flex-wrap: var(--flex-wrap, nowrap);
+  }
+
+  /* Structural Container Overrides (For Enterprise Divs) */
+  .elite-container {
+    align-items: var(--align-items, stretch) !important;
+    justify-content: var(--justify-content, flex-start) !important;
+  }
+
+  /* Tablet Protocol */
+  @media (max-width: 1024px) {
+    .elite-responsive {
+      width: var(--width-tablet, var(--width));
+      height: var(--height-tablet, var(--height));
+      padding: var(--padding-tablet, var(--padding));
+      margin: var(--margin-tablet, var(--margin));
+      display: var(--display-tablet, var(--display));
+      flex-direction: var(--flex-direction-tablet, var(--flex-direction));
+      align-items: var(--align-items-tablet, var(--align-items));
+      justify-content: var(--justify-content-tablet, var(--justify-content));
+      gap: var(--gap-tablet, var(--gap));
+      flex-wrap: var(--flex-wrap-tablet, var(--flex-wrap));
+    }
+  }
+
+  /* Mobile Enterprise Protocol */
+  @media (max-width: 640px) {
+    .elite-responsive {
+      width: var(--width-mobile, var(--width-tablet, var(--width)));
+      height: var(--height-mobile, var(--height-tablet, var(--height)));
+      padding: var(--padding-mobile, var(--padding-tablet, var(--padding)));
+      margin: var(--margin-mobile, var(--margin-tablet, var(--margin)));
+      display: var(--display-mobile, var(--display-tablet, var(--display)));
+      flex-direction: var(--flex-direction-mobile, var(--flex-direction-tablet, var(--flex-direction)));
+      align-items: var(--align-items-mobile, var(--align-items-tablet, var(--align-items)));
+      justify-content: var(--justify-content-mobile, var(--justify-content-tablet, var(--justify-content)));
+      gap: var(--gap-mobile, var(--gap-tablet, var(--gap)));
+      flex-wrap: var(--flex-wrap-mobile, var(--flex-wrap-tablet, var(--flex-wrap)));
+    }
   }
 }

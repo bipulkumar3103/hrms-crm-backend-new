@@ -763,7 +763,7 @@ function UIBuilder({ token }) {
                 <tbody className="divide-y divide-gray-100">
                   {submissions.map(sub => (
                     <React.Fragment key={sub.id}>
-                      <tr className="hover:bg-gray-50/50 transition-colors">
+                      <tr className="hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)]/50 transition-colors">
                         <td className="px-6 py-4 font-bold text-gray-900 text-sm">{sub.submitter_name}</td>
                         <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
                           <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-indigo-100 whitespace-nowrap">{sub.form_name}</span>
@@ -827,7 +827,7 @@ function UIBuilder({ token }) {
                           onChange={e => setNewRouteName(e.target.value)}
                       />
                       <div className="flex justify-end gap-3">
-                          <button type="button" onClick={() => setIsNewRouteModalOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Cancel</button>
+                          <button type="button" onClick={() => setIsNewRouteModalOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg">Cancel</button>
                           <button type="submit" className="px-4 py-2 font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Create Route</button>
                       </div>
                   </form>

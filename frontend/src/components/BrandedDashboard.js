@@ -157,7 +157,7 @@ const BrandedDashboard = () => {
                  onClick={() => setActiveTab(id)}
                  className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} 
                              rounded-lg transition-all duration-200 relative
-                             ${isActive ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] font-semibold' : 'text-gray-600 hover:bg-gray-100 font-medium'}
+                             ${isActive ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] font-semibold' : 'text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] font-medium'}
                  `}
                >
                    {isActive && !isSidebarCollapsed && (
@@ -249,7 +249,7 @@ const BrandedDashboard = () => {
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-gray-50 transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
+                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
                      >
                         <motion.div 
                             className="text-lg group-hover:text-[var(--theme-primary)] transition-colors"
@@ -277,7 +277,7 @@ const BrandedDashboard = () => {
                         <div className="relative border-r border-gray-100 pr-2 pl-1" ref={notifRef}>
                             <button 
                                 onClick={() => setIsNotifOpen(!isNotifOpen)}
-                                className="relative p-2 text-gray-600 hover:bg-gray-50 rounded-full transition-colors flex items-center justify-center cursor-pointer"
+                                className="relative p-2 text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-full transition-colors flex items-center justify-center cursor-pointer"
                             >
                                 <FiBell size={20} />
                                 <span className="absolute top-1.5 right-1.5 w-[15px] h-[15px] bg-red-500 border-2 border-white rounded-full text-[8px] font-bold text-white flex items-center justify-center leading-none">3</span>
@@ -322,7 +322,7 @@ const BrandedDashboard = () => {
                         <div className="relative pl-1 pr-1" ref={profileRef}>
                             <button 
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className="flex items-center space-x-2.5 p-1.5 pr-3 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+                                className="flex items-center space-x-2.5 p-1.5 pr-3 rounded-full hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors cursor-pointer"
                             >
                                 <div className="w-[30px] h-[30px] rounded-full bg-[var(--theme-secondary)] border border-white flex items-center justify-center">
                                     <FiUser size={16} className="text-[var(--theme-primary)]"/>
@@ -342,13 +342,13 @@ const BrandedDashboard = () => {
                                         className="absolute right-0 mt-4 w-52 bg-white rounded-xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 z-50 p-2"
                                     >
                                         <div className="p-1 space-y-0.5">
-                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg hover:text-gray-900 font-medium">
                                                 <FiBox className="mr-3 text-gray-400" size={16}/> My Organization
                                             </a>
-                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg hover:text-gray-900 font-medium">
                                                 <FiUsers className="mr-3 text-gray-400" size={16}/> My Profile
                                             </a>
-                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
+                                            <a href="#" className="flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg hover:text-gray-900 font-medium">
                                                 <FiSettings className="mr-3 text-gray-400" size={16}/> Settings
                                             </a>
                                             {actualIsAdminOrSuper && (
@@ -400,7 +400,7 @@ const BrandedDashboard = () => {
                                     >
                                         <FiPlus className="mr-2" size={20}/> Invite New Employee
                                     </button>
-                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-all shadow-sm active:scale-95">
                                         <FiBarChart2 className="mr-2 text-gray-400" size={20}/> Build Analytical Report
                                     </button>
                                 </div>
@@ -431,7 +431,7 @@ const BrandedDashboard = () => {
                                     >
                                         <FiPlus className="mr-2" size={20}/> Request Time Off
                                     </button>
-                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-all shadow-sm active:scale-95">
                                         <FiMessageSquare className="mr-2 text-gray-400" size={20}/> Send Message
                                     </button>
                                 </div>
@@ -459,7 +459,7 @@ const BrandedDashboard = () => {
                                                 <p className="text-gray-500 text-[12px] mt-0.5">Virtual Teams Meeting</p>
                                             </div>
                                         </div>
-                                        <button className="w-full py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold rounded-xl text-[13px] transition-colors mt-2 shadow-sm">View Full Calendar</button>
+                                        <button className="w-full py-2.5 bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] border border-gray-200 text-gray-700 font-semibold rounded-xl text-[13px] transition-colors mt-2 shadow-sm">View Full Calendar</button>
                                     </div>
                                 </div>
 
@@ -526,7 +526,7 @@ const BrandedDashboard = () => {
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                             className="bg-white rounded-[24px] shadow-2xl w-full max-w-lg p-8 relative z-10 border border-gray-100"
                         >
-                            <button onClick={() => setIsMailConfigModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 rounded-full p-2 focus:outline-none"><FiX size={20}/></button>
+                            <button onClick={() => setIsMailConfigModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-full p-2 focus:outline-none"><FiX size={20}/></button>
                             <div className="mb-6">
                                 <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4 border border-indigo-100">
                                    <FiSettings className="text-[var(--theme-primary)]" size={24}/>
@@ -591,7 +591,7 @@ const BrandedDashboard = () => {
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                             className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-100"
                         >
-                            <button onClick={() => setIsInviteModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 rounded-full p-1.5 focus:outline-none">
+                            <button onClick={() => setIsInviteModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-full p-1.5 focus:outline-none">
                                 <FiX size={20}/>
                             </button>
                             
@@ -648,7 +648,7 @@ const BrandedDashboard = () => {
                                         </button>
                                     </div>
                                     <p className="text-[13px] text-gray-500 px-2">Distribute this secure access string to the recipient. They will use it to bypass standard registration and associate seamlessly with the organization profile.</p>
-                                    <button onClick={() => setIsInviteModalOpen(false)} className="w-full py-3.5 border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-colors">Finalize Process</button>
+                                    <button onClick={() => setIsInviteModalOpen(false)} className="w-full py-3.5 border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors">Finalize Process</button>
                                 </div>
                             )}
                         </motion.div>

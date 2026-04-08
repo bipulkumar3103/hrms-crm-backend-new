@@ -250,7 +250,7 @@ function Table({ config, token, providedData }) {
            </h3>
            <p className="text-[11px] text-gray-400 font-medium mt-1 ml-8 italic truncate">Rendering {dataList.length} total entries from secure cloud.</p>
         </div>
-        <button className="p-2.5 bg-gray-50 text-gray-400 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0">
+        <button className="p-2.5 bg-gray-50 text-gray-400 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-xl transition-colors flex-shrink-0">
           <FiMoreVertical size={18}/>
         </button>
       </div>

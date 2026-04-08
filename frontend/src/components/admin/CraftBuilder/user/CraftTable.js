@@ -40,7 +40,7 @@ const UniversalCell = ({ value, path }) => {
       config = { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-500' };
     }
     return (
-      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.text} border border-current opacity-80`}>
+      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold ${config.bg} ${config.text} border border-current opacity-80`}>
         <span className={`w-1.5 h-1.5 rounded-full ${config.dot} mr-2`}></span>
         {value}
       </span>
@@ -110,15 +110,15 @@ export const CraftTable = ({ title, dataSource, columns = [], ...props }) => {
     >
       <div className="px-10 py-8 border-b border-gray-50 flex justify-between items-center bg-white/50 backdrop-blur-sm">
         <div>
-           <h3 className="text-2xl font-black text-gray-900 tracking-tight flex items-center">
+           <h3 className="text-2xl font-semibold text-gray-900 tracking-tight flex items-center">
              <FiBox className="mr-4" size={24} style={{ color: 'var(--theme-primary)' }}/>
              {title || 'Smart Data Entity'}
            </h3>
-           <p className="text-[11px] text-gray-400 font-bold mt-1.5 ml-10 uppercase tracking-[0.2em] italic">
+           <p className="text-[11px] text-gray-400 font-semibold mt-1.5 ml-10 italic">
              {loading ? 'Synchronizing Remote Stream...' : `Active Node Instance: ${dataSource || 'None Linked'}`}
            </p>
         </div>
-        <button className="w-10 h-10 bg-gray-50 text-gray-400 hover:bg-gray-100 rounded-2xl flex items-center justify-center transition-all">
+        <button className="w-10 h-10 bg-gray-50 text-gray-400 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-2xl flex items-center justify-center transition-all">
           <FiMoreVertical size={20}/>
         </button>
       </div>
@@ -128,7 +128,7 @@ export const CraftTable = ({ title, dataSource, columns = [], ...props }) => {
           <thead>
             <tr className="bg-gray-50/30">
               {(columns.length > 0 ? columns : [{header: 'Property', bind: 'name'}, {header: 'Attribute', bind: 'email'}]).map((col, idx) => (
-                <th key={idx} className="px-10 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">
+                <th key={idx} className="px-10 py-5 text-left text-[11px] font-semibold text-gray-400 border-b border-gray-50">
                   {col.header}
                 </th>
               ))}
@@ -140,7 +140,7 @@ export const CraftTable = ({ title, dataSource, columns = [], ...props }) => {
                  <td colSpan={columns.length || 2} className="px-10 py-16 text-center">
                    <div className="flex flex-col items-center opacity-20">
                      <FiBox size={48} className="mb-4" />
-                     <p className="text-xs font-black uppercase tracking-widest">No Active Records Detected</p>
+                     <p className="text-xs font-semibold">No Active Records Detected</p>
                    </div>
                  </td>
                </tr>

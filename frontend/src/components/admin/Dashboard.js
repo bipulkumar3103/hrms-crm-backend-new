@@ -6,7 +6,7 @@ import {
     FiBell, FiChevronDown, FiChevronRight, FiLogOut, FiInfo, FiGrid,
     FiMessageSquare, FiPieChart, FiMonitor, FiCheckCircle,
     FiArrowRight, FiArrowLeft, FiUser, FiPlus, FiX, FiCopy, FiCheck,
-    FiClock, FiFileText, FiAward, FiMenu
+    FiClock, FiFileText, FiAward, FiMenu, FiLayout, FiZap, FiLayers
 } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
 import { useAlert } from '../../context/AlertContext';
@@ -15,7 +15,8 @@ import OrganizationProfile from './OrganizationProfile';
 import UIBuilder from './UIBuilder';
 import CraftBuilder from './CraftBuilder/CraftBuilder';
 import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
-import { FiLayout, FiZap } from 'react-icons/fi';
+import TimesheetModule from '../enterprise/timesheets/TimesheetModule';
+import ProjectAdmin from '../enterprise/timesheets/ProjectAdmin';
 
 const StatCard = ({ icon, label, value, color }) => (
     <motion.div
@@ -59,6 +60,7 @@ const Dashboard = ({ token, logout }) => {
         if (managementTabs.includes(tab)) return ['Management', tab];
         if (platformTabs.includes(tab)) return ['Platform', tab];
         if (adminTabs.includes(tab)) return ['Admin', tab];
+        if (tab === 'Timesheets' || tab === 'Project Registry') return ['Apps', tab];
         return [tab];
     };
 
@@ -178,13 +180,13 @@ const Dashboard = ({ token, logout }) => {
                     onClick={() => setActiveTab(id)}
                     className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} 
                              rounded-lg transition-all duration-200 relative
-                             ${isActive ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] font-semibold' : 'text-gray-600 hover:bg-gray-100 font-medium'}
-                 `}
+                             ${isActive ? 'bg-[var(--theme-secondary,#d3d1ff)] text-[var(--theme-primary)] font-bold' : 'text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] font-medium'}
+                  `}
                 >
                     {isActive && !isSidebarCollapsed && (
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[var(--theme-primary)] rounded-r-md"></div>
                     )}
-                    <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-[var(--theme-primary)]' : 'text-gray-500 group-hover:text-gray-700'} transition-colors`}>
+                    <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-[var(--theme-primary)]' : 'text-gray-400 group-hover:text-[var(--theme-primary)]'} transition-colors`}>
                         {icon}
                     </div>
                     {!isSidebarCollapsed && (
@@ -209,14 +211,14 @@ const Dashboard = ({ token, logout }) => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[40] lg:hidden"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[8] lg:hidden"
                     />
                 )}
             </AnimatePresence>
 
             {/* SIDEBAR (Dribbble Layout) */}
             <aside className={`
-                fixed lg:relative top-0 bottom-0 left-0 z-[50]
+                fixed lg:relative top-0 bottom-0 left-0 z-[10]
                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 ${isSidebarCollapsed ? 'w-[84px]' : 'w-[260px]'} 
                 flex-shrink-0 bg-white m-0 lg:m-4 lg:rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.03)] 
@@ -266,6 +268,8 @@ const Dashboard = ({ token, logout }) => {
                                 <NavItem icon={<FiMessageSquare />} label="Collaboration" id="Collaboration" />
                                 <NavItem icon={<FiUsers />} label="Employees" id="Employees" />
                                 <NavItem icon={<FiBarChart2 />} label="Reports" id="Reports" />
+                                <NavItem icon={<FiClock />} label="Timesheets" id="Timesheets" />
+                                <NavItem icon={<FiLayers />} label="Project Registry" id="Project Registry" />
 
                                 {!isSidebarCollapsed && (
                                     <div className="mt-8 mb-3 px-3">
@@ -283,6 +287,7 @@ const Dashboard = ({ token, logout }) => {
                                 <NavItem icon={<FiCheckCircle />} label="My Tasks" id="My Tasks" />
                                 <NavItem icon={<FiMessageSquare />} label="Messages" id="Messages" />
                                 <NavItem icon={<FiInfo />} label="Directory" id="Directory" />
+                                <NavItem icon={<FiClock />} label="Timesheets" id="Timesheets" />
                             </>
                         )}
                     </ul>
@@ -298,7 +303,7 @@ const Dashboard = ({ token, logout }) => {
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-gray-50 transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
+                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
                     >
                         <motion.div
                             className="text-lg group-hover:text-[var(--theme-primary)] transition-colors"
@@ -315,7 +320,7 @@ const Dashboard = ({ token, logout }) => {
             {/* MAIN CONTENT AREA */}
             <div className="flex-1 flex flex-col overflow-hidden pt-6 px-4 md:px-8 pb-8">
                 {/* TOP NAV (Enterprise Hierarchical Style) */}
-                <header className="mb-8 px-0 md:px-2 flex flex-col border-b border-gray-50 pb-6">
+                <header className="px-0 md:px-2 flex flex-col border-b border-gray-50 pb-3">
                     {/* Level 1: Global Actions */}
                     <div className="flex justify-between items-center h-[40px]">
                         <div className="flex items-center">
@@ -327,12 +332,12 @@ const Dashboard = ({ token, logout }) => {
                             </button>
                         </div>
 
-                        <div className="flex items-center space-x-1.5 bg-white px-1.5 py-1.5 rounded-full shadow-sm border border-gray-200/60 z-30 relative mr-1 md:mr-2">
+                        <div className="flex items-center space-x-1.5 bg-white px-1.5 py-1.5 rounded-full shadow-sm border border-gray-200/60 z-[5] relative mr-1 md:mr-2">
                             {/* Notifications Cluster */}
                             <div className="relative border-r border-gray-100 pr-2 pl-1" ref={notifRef}>
                                 <button
                                     onClick={() => setIsNotifOpen(!isNotifOpen)}
-                                    className="relative p-2 text-gray-600 hover:bg-gray-50 rounded-full transition-colors flex items-center justify-center cursor-pointer"
+                                    className="relative p-2 text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-full transition-colors flex items-center justify-center cursor-pointer"
                                 >
                                     <FiBell size={20} />
                                     <span className="absolute top-1.5 right-1.5 w-[15px] h-[15px] bg-red-500 border-2 border-white rounded-full text-[8px] font-bold text-white flex items-center justify-center leading-none">3</span>
@@ -369,7 +374,7 @@ const Dashboard = ({ token, logout }) => {
                             <div className="relative pl-1 pr-1" ref={profileRef}>
                                 <button
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                    className="flex items-center space-x-2.5 p-1.5 pr-3 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+                                    className="flex items-center space-x-2.5 p-1.5 pr-3 rounded-full hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors cursor-pointer"
                                 >
                                     <div className="w-[30px] h-[30px] rounded-full bg-[var(--theme-secondary)] border border-white flex items-center justify-center">
                                         <FiUser size={16} className="text-[var(--theme-primary)]" />
@@ -391,24 +396,24 @@ const Dashboard = ({ token, logout }) => {
                                             className="absolute right-0 mt-4 w-52 bg-white rounded-xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 z-50 p-2"
                                         >
                                             <div className="p-1 space-y-0.5">
-                                                <button onClick={() => { setActiveTab('My Organization'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
-                                                    <FiBox className="mr-3 text-gray-400" size={16} /> My Organization
+                                                <button onClick={() => { setActiveTab('My Organization'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg font-medium transition-all">
+                                                    <FiBox className="mr-3 text-gray-400 group-hover:text-[var(--theme-primary)]" size={16} /> My Organization
                                                 </button>
-                                                <button onClick={() => { setActiveTab('My Profile'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
-                                                    <FiUser className="mr-3 text-gray-400" size={16} /> My Profile
+                                                <button onClick={() => { setActiveTab('My Profile'); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg font-medium transition-all">
+                                                    <FiUser className="mr-3 text-gray-400 group-hover:text-[var(--theme-primary)]" size={16} /> My Profile
                                                 </button>
-                                                <button onClick={() => setIsProfileOpen(false)} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg hover:text-gray-900 font-medium">
-                                                    <FiSettings className="mr-3 text-gray-400" size={16} /> Settings
+                                                <button onClick={() => setIsProfileOpen(false)} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg font-medium transition-all">
+                                                    <FiSettings className="mr-3 text-gray-400 group-hover:text-[var(--theme-primary)]" size={16} /> Settings
                                                 </button>
 
                                                 <div className="border-t border-gray-100 my-1.5"></div>
 
                                                 {viewAsEmployee ? (
-                                                    <button onClick={() => { setViewAsEmployee(false); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg font-medium">
+                                                    <button onClick={() => { setViewAsEmployee(false); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg font-medium transition-all">
                                                         <FiMonitor className="mr-3 opacity-60" size={16} /> View as Admin
                                                     </button>
                                                 ) : (
-                                                    <button onClick={() => { setViewAsEmployee(true); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-gray-50 rounded-lg font-medium">
+                                                    <button onClick={() => { setViewAsEmployee(true); setIsProfileOpen(false); }} className="w-full flex items-center px-3 py-2 text-[13.5px] text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg font-medium transition-all">
                                                         <FiUsers className="mr-3 opacity-60" size={16} /> View as Employee
                                                     </button>
                                                 )}
@@ -426,8 +431,12 @@ const Dashboard = ({ token, logout }) => {
                         </div>
                     </div>
 
-                    {/* Level 2: Breadcrumb Hierarchy */}
-                    <div className="mt-6 flex items-center text-[10px] md:text-[11px] font-black text-gray-400 tracking-[0.12em] px-1 group">
+                </header>
+
+                {/* MAIN ADMIN CONTENT PANELS */}
+                <main className="flex-1 overflow-y-auto scroll-smooth pl-4 pb-8">
+                    {/* Level 2: Breadcrumb Hierarchy (Now behind/below nav) */}
+                    <div className="mb-6 flex items-center text-[10px] md:text-[11px] font-black text-gray-400 tracking-[0.12em] px-1 group">
                         <div className="flex items-center bg-gray-50/50 px-2.5 py-1.5 rounded-lg border border-gray-100 group-hover:border-gray-200 transition-all">
                             <FiHome size={12} className="mr-2 opacity-50" />
                             {getBreadcrumbs(activeTab).map((crumb, idx, arr) => (
@@ -442,10 +451,7 @@ const Dashboard = ({ token, logout }) => {
                             ))}
                         </div>
                     </div>
-                </header>
 
-                {/* MAIN ADMIN CONTENT PANELS */}
-                <main className="flex-1 overflow-y-auto scroll-smooth pl-4 pb-8">
                     {activeTab === 'My Profile' ? (
                         <UserProfile token={token} />
                     ) : activeTab === 'My Organization' ? (
@@ -454,6 +460,10 @@ const Dashboard = ({ token, logout }) => {
                         <UIBuilder token={token} />
                     ) : activeTab === 'Craft Builder' ? (
                         <CraftBuilder token={token} api={api} />
+                    ) : activeTab === 'Timesheets' ? (
+                        <TimesheetModule token={token} api={api} user={user} />
+                    ) : activeTab === 'Project Registry' ? (
+                        <ProjectAdmin token={token} api={api} user={user} />
                     ) : isAdminOrSuper ? (
                         <>
                             {/* Admin Metrics Overview */}
@@ -482,7 +492,7 @@ const Dashboard = ({ token, logout }) => {
                                     >
                                         <FiPlus className="mr-2" size={20} /> Invite New Employee
                                     </button>
-                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                                    <button className="flex items-center px-6 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-all shadow-sm active:scale-95">
                                         <FiBarChart2 className="mr-2 text-gray-400" size={20} /> Build Analytical Report
                                     </button>
                                 </div>
@@ -516,7 +526,7 @@ const Dashboard = ({ token, logout }) => {
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                             className="bg-white rounded-[24px] shadow-2xl w-full max-w-lg p-8 relative z-10 border border-gray-100"
                         >
-                            <button onClick={() => setIsMailConfigModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 rounded-full p-2 focus:outline-none"><FiX size={20} /></button>
+                            <button onClick={() => setIsMailConfigModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-full p-2 focus:outline-none"><FiX size={20} /></button>
                             <div className="mb-6">
                                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 border" style={{ backgroundColor: 'var(--theme-secondary)', borderColor: 'var(--theme-primary)', opacity: 0.8 }}>
                                     <FiSettings className="text-[var(--theme-primary)]" size={24} />
@@ -581,7 +591,7 @@ const Dashboard = ({ token, logout }) => {
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                             className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-100"
                         >
-                            <button onClick={() => setIsInviteModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 rounded-full p-1.5 focus:outline-none">
+                            <button onClick={() => setIsInviteModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-full p-1.5 focus:outline-none">
                                 <FiX size={20} />
                             </button>
 
@@ -638,7 +648,7 @@ const Dashboard = ({ token, logout }) => {
                                         </button>
                                     </div>
                                     <p className="text-[13px] text-gray-500 px-2">Distribute this secure access string to the recipient. They will use it to bypass standard registration and associate seamlessly with the organization profile.</p>
-                                    <button onClick={() => setIsInviteModalOpen(false)} className="w-full py-3.5 border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-colors">Finalize Process</button>
+                                    <button onClick={() => setIsInviteModalOpen(false)} className="w-full py-3.5 border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors">Finalize Process</button>
                                 </div>
                             )}
                         </motion.div>

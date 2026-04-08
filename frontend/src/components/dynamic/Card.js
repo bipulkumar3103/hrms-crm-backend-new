@@ -2,6 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCalendar, FiUser, FiBox, FiCheckCircle, FiInfo } from 'react-icons/fi';
 
+const resolveColor = (val) => {
+  if (!val || val === 'transparent') return 'transparent';
+  const isHex = val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl');
+  if (isHex) return val;
+  
+  const presets = {
+    white: '#ffffff',
+    black: '#000000',
+    'gray-50': '#f9fafb',
+    'gray-100': '#f3f4f6',
+    'gray-200': '#e5e7eb',
+    'gray-300': '#d1d5db',
+    'gray-400': '#9ca3af',
+    'gray-500': '#6b7280',
+    'gray-600': '#4b5563',
+    'gray-700': '#374151',
+    'gray-800': '#1f2937',
+    'gray-900': '#111827',
+  };
+
+  if (presets[val.toLowerCase()]) return presets[val.toLowerCase()];
+  return `var(--theme-${val.replace('theme-', '')})`;
+};
+
+const toMetric = (val) => {
+  if (val === null || val === undefined || val === '') return undefined;
+  if (!isNaN(val) && typeof val !== 'boolean') return `${val}px`;
+  return val;
+};
+
 /**
  * UniversalField Component
  * Handles automatic formatting for different data types within the card.
@@ -162,14 +192,14 @@ function Card({ config, theme, providedData, children }) {
       WebkitBackdropFilter: `blur(${glassBlur})`,
       border: '1px solid rgba(255, 255, 255, 0.4)'
     };
-    return { backgroundColor: backgroundColor || '#ffffff' };
+    return { backgroundColor: resolveColor(backgroundColor) || '#ffffff' };
   };
 
   const cardStyle = {
     ...getBackground(),
-    borderRadius: style.borderRadius || '24px',
+    borderRadius: toMetric(style.borderRadius) || '24px',
     boxShadow: shadowMap[shadow] || shadowMap.md,
-    borderLeft: accentColor ? `5px solid ${accentColor}` : (style.borderWidth ? `${style.borderWidth}px solid ${style.borderColor || '#e2e8f0'}` : 'none'),
+    borderLeft: accentColor ? `5px solid ${resolveColor(accentColor)}` : (style.borderWidth ? `${toMetric(style.borderWidth)} solid ${resolveColor(style.borderColor) || '#e2e8f0'}` : 'none'),
     ...style
   };
 
@@ -191,27 +221,7 @@ function Card({ config, theme, providedData, children }) {
       style={{ ...cardStyle, padding: padding === '1.5rem' ? undefined : padding }}
     >
       <div className="relative z-10">
-        {/* Card Header Area */}
-        {(resolvedTitle || resolvedSubtitle) && (
-          <div className={`mb-6 ${alignment === 'center' || !alignment ? 'text-center' : ''}`}>
-            {resolvedTitle && (
-              <h3 
-                className="font-black tracking-tight leading-tight mb-2 text-lg md:text-xl" 
-                style={textStyle(titleSize, titleColor, titleItalic, titleUnderline)}
-              >
-                {resolvedTitle}
-              </h3>
-            )}
-            {resolvedSubtitle && (
-              <p 
-                className="font-medium opacity-60 leading-relaxed text-[13px] md:text-sm" 
-                style={textStyle(subtitleSize, subtitleColor, subtitleItalic, subtitleUnderline)}
-              >
-                {resolvedSubtitle}
-              </p>
-            )}
-          </div>
-        )}
+        {/* Pure Structural Content Area */}
 
         {/* Content Area */}
         <div className={layout === 'grid-2' ? 'grid grid-cols-1 md:grid-cols-2 gap-x-6' : 'space-y-1'}>

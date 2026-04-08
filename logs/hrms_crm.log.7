@@ -1,60 +1,77 @@
-2026-04-06 18:55:16,230 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:16,239 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:16,252 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:16,254 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:16,255 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:35,232 INFO: --- Incoming Request: POST /api/v1/ui/builder/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:35,234 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:35,236 INFO: Origin: http://localhost:5000/ [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:35,237 INFO: Body: {'route': '/employee/dashboard', 'schema': {'components': [{'id': 'xlt6DXZ7SM', 'type': 'container', 'config': {'width': '100%', 'height': 'auto', 'padding': '40px', 'margin': '00px', 'backgroundColor': 'transparent', 'borderRadius': '16px', 'borderWidth': '2px', 'borderStyle': 'dashed', 'borderColor': '#f1f5f9', 'flexDirection': 'row', 'alignItems': 'stretch', 'justifyContent': 'flex-start', 'gap': '16px'}, 'components': [{'id': 'tXYgH7JAqt', 'type': 'card', 'config': {'title': 'Enterprise Analytics Card', 'subtitle': 'Real-time monitoring and reporting.', 'padding': '20px', 'dataSource': '', 'fields': []}, 'components': [{'id': 'hlE8tnTGk2', 'type': 'card', 'config': {'title': 'Enterprise Analytics Card', 'subtitle': 'Real-time monitoring and reporting.', 'padding': '20px', 'dataSource': '/api/v1/users/me', 'fields': [{'bind': 'avatar_original_url', 'label': 'User Account'}]}}]}]}, {'id': 'niQJh0rvw1', 'type': 'container', 'config': {'width': '800P', 'height': 'auto', 'padding': '40px', 'margin': '0px', 'backgroundColor': 'transparent', 'borderRadius': '16px', 'borderWidth': '2px', 'borderStyle': 'dashed', 'borderColor': '#f1f5f9', 'flexDirection': 'column', 'alignItems': 'stretch', 'justifyContent': 'flex-start', 'gap': '16px'}, 'components': [{'id': '88qVSH0t9y', 'type': 'header', 'config': {'title': 'New Dynamic Header', 'subtitle': 'Manage your enterprise data with precision.', 'alignment': 'left', 'padding': '20px'}}]}, {'id': 'XMtvX5ieiS', 'type': 'container', 'config': {'width': '100%', 'height': 'auto', 'padding': '40px', 'margin': '0px', 'backgroundColor': 'transparent', 'borderRadius': '16px', 'borderWidth': '2px', 'borderStyle': 'dashed', 'borderColor': '#f1f5f9', 'flexDirection': 'column', 'alignItems': 'stretch', 'justifyContent': 'flex-start', 'gap': '16px'}}, {'id': 'OrA_78f1nt', 'type': 'form', 'config': {'title': 'Employee Onboarding', 'submitLabel': 'Finalize Deployment', 'submitEndpoint': '/api/v1/employees/onboard', 'fields': [{'label': 'Identity Key', 'name': 'full_name', 'placeholder': 'Personnel Name', 'required': True, 'type': 'text'}, {'label': 'Security Email', 'name': 'email', 'placeholder': 'corporate@access.link', 'required': True, 'type': 'email'}, {'label': 'Onboarding Notes', 'name': 'notes', 'placeholder': 'Additional metadata...', 'type': 'textarea'}], 'padding': '20px'}}]}} [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:69]
-2026-04-06 18:55:35,245 INFO: Updated layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:182]
-2026-04-06 18:55:35,498 INFO: --- Incoming Request: GET /api/v1/ui/builder/layouts --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:35,499 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:35,500 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:35,505 INFO: Admin 1 (company 1) listing 4 routes [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:115]
-2026-04-06 18:55:38,322 INFO: --- Incoming Request: GET /api/v1/onboarding/check-status --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:38,324 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:38,325 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:38,572 INFO: --- Incoming Request: GET /api/v1/onboarding/check-status --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:38,575 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:38,576 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:38,648 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:38,648 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:38,649 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:38,650 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:38,651 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:38,651 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:38,672 INFO: --- Incoming Request: GET /api/v1/company/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:38,674 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:38,674 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:38,676 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:38,677 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:38,679 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:41,961 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:41,962 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:41,963 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:41,966 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
-2026-04-06 18:55:42,239 INFO: --- Incoming Request: GET /api/v1/ui/layout --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,241 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,243 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:42,249 INFO: Serving custom layout: route=/employee/dashboard company_id=1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:44]
-2026-04-06 18:55:42,283 INFO: --- Incoming Request: GET /api/v1/ui/context --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,284 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,285 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:42,290 INFO: Serving unified UI context for user 1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:151]
-2026-04-06 18:55:42,298 INFO: --- Incoming Request: GET /api/v1/ui/context --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,299 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,301 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:42,306 INFO: Serving unified UI context for user 1 [in D:\Bipul-hrms\hrms-crm-backend-new\app\api\ui.py:151]
-2026-04-06 18:55:42,614 INFO: --- Incoming Request: GET /api/v1/api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,614 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,616 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,617 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,618 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:42,618 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:42,936 INFO: --- Incoming Request: GET /api/v1/api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,937 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,938 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
-2026-04-06 18:55:42,948 INFO: --- Incoming Request: GET /api/v1/users/me --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
-2026-04-06 18:55:42,949 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
-2026-04-06 18:55:42,951 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-07 17:33:10,131 ERROR: Exception on /api/v1/timesheets/projects [GET] [in D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py:838]
+Traceback (most recent call last):
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: projects.code
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask_cors\extension.py", line 178, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\flask_jwt_extended\view_decorators.py", line 170, in decorator
+    return current_app.ensure_sync(fn)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\app\api\timesheets.py", line 34, in list_projects
+    projects = Project.query.all()
+               ^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\orm\query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\orm\query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\orm\context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\sql\elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\Bipul-hrms\hrms-crm-backend-new\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: projects.code
+[SQL: SELECT projects.id AS projects_id, projects.name AS projects_name, projects.code AS projects_code, projects.description AS projects_description, projects.is_active AS projects_is_active, projects.created_at AS projects_created_at 
+FROM projects]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-04-07 17:33:10,437 INFO: --- Incoming Request: GET /api/v1/timesheets/employees-list --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-07 17:33:10,437 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-07 17:33:10,438 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]
+2026-04-07 17:33:10,454 INFO: --- Incoming Request: GET /api/v1/timesheets/projects --- [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:60]
+2026-04-07 17:33:10,455 INFO: Auth Header: PRESENT (Starts with: Bearer eyJhbGci...) [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:61]
+2026-04-07 17:33:10,456 INFO: Origin: None [in D:\Bipul-hrms\hrms-crm-backend-new\app\__init__.py:62]

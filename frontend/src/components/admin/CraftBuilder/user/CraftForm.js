@@ -19,10 +19,10 @@ export const CraftForm = ({ title, submitLabel, fields = [], ...props }) => {
     >
       <div className="mb-10 flex justify-between items-start">
         <div>
-          <h3 className="text-3xl font-black text-gray-900 tracking-tight leading-none mb-3 italic">
+          <h3 className="text-3xl font-semibold text-gray-900 tracking-tight leading-none mb-3 italic">
             {title || "Dynamic Protocol Form"}
           </h3>
-          <p className="text-[11px] text-gray-400 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+          <p className="text-[11px] text-gray-400 font-semibold flex items-center gap-2">
             <FiZap className="animate-pulse" style={{ color: 'var(--theme-primary)' }} />
             Enterprise Data Link Active
           </p>
@@ -38,7 +38,7 @@ export const CraftForm = ({ title, submitLabel, fields = [], ...props }) => {
             {label: 'Corporate Email', name: 'email', type: 'email', placeholder: 'name@company.com'}
         ]).map((field, idx) => (
           <div key={idx} className="group/field">
-            <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5 ml-1 transition-colors" style={{ groupHoverFieldColor: 'var(--theme-primary)' }}>
+            <label className="block text-[11px] font-semibold text-gray-400 mb-2.5 ml-1 transition-colors" style={{ groupHoverFieldColor: 'var(--theme-primary)' }}>
               {field.label}
               {field.required && <span className="text-rose-500 ml-1 opacity-50">*</span>}
             </label>
@@ -64,7 +64,7 @@ export const CraftForm = ({ title, submitLabel, fields = [], ...props }) => {
         <div className="pt-8">
             <button 
                 type="button" 
-                className="w-full py-5 text-white font-black text-sm uppercase tracking-[0.2em] rounded-3xl shadow-2xl hover:scale-[1.02] active:scale-100 transition-all flex items-center justify-center gap-4"
+                className="w-full py-5 text-white font-semibold text-sm rounded-3xl shadow-2xl hover:scale-[1.02] active:scale-100 transition-all flex items-center justify-center gap-4"
                 style={{ backgroundColor: 'var(--theme-primary)' }}
             >
                 <FiSend size={20} className="opacity-40" />
@@ -73,7 +73,7 @@ export const CraftForm = ({ title, submitLabel, fields = [], ...props }) => {
         </div>
       </div>
       
-      <div className="mt-12 flex items-center justify-center gap-3 text-[10px] text-gray-300 font-bold uppercase tracking-widest opacity-50 select-none pb-2">
+      <div className="mt-12 flex items-center justify-center gap-3 text-[10px] text-gray-300 font-semibold opacity-50 select-none pb-2">
          <FiBox /> Advanced Form Logic Layer 2
       </div>
     </div>

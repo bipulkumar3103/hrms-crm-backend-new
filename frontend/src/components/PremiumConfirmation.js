@@ -50,7 +50,7 @@ const PremiumConfirmation = ({ title, message, onConfirm, onCancel }) => {
                     <div className="p-8 pt-0 flex gap-4">
                         <button 
                             onClick={onCancel}
-                            className="flex-1 px-6 py-4 rounded-2xl bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 font-black text-xs uppercase tracking-widest transition-all"
+                            className="flex-1 px-6 py-4 rounded-2xl bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] text-gray-400 hover:text-gray-600 font-black text-xs uppercase tracking-widest transition-all"
                         >
                             Terminate Request
                         </button>

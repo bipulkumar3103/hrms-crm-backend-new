@@ -41,8 +41,8 @@ def create_app(config_name='default'):
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):
             os.mkdir('logs')
-        file_handler = RotatingFileHandler('logs/hrms_crm.log', maxBytes=10240,
-                                           backupCount=10)
+        file_handler = RotatingFileHandler('logs/hrms_crm.log', maxBytes=10*1024*1024,
+                                           backupCount=10, delay=True)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
         file_handler.setLevel(logging.INFO)
@@ -78,6 +78,7 @@ def create_app(config_name='default'):
     from app.models.ui_page import UIPage
     from app.models.page_permission import PagePermission
     from app.models.form_submission import FormSubmission
+    from app.models.timesheet import Project, ProjectAssignment, Timesheet, TimesheetDay, TimePunch
 
 
     from app.api.auth import auth_blueprint
@@ -89,6 +90,7 @@ def create_app(config_name='default'):
     from app.api.users import users_blueprint
     from app.api.ui import ui_blueprint
     from app.api.forms import forms_blueprint
+    from app.api.timesheets import timesheets_blueprint
 
 
     @jwt.user_lookup_loader
@@ -107,6 +109,7 @@ def create_app(config_name='default'):
     app.register_blueprint(employees_blueprint, url_prefix='/api/v1/employees')
     app.register_blueprint(users_blueprint, url_prefix='/api/v1/users')
     app.register_blueprint(ui_blueprint, url_prefix='/api/v1/ui')
+    app.register_blueprint(timesheets_blueprint, url_prefix='/api/v1/timesheets')
     
     # Universal Catch-All for Dynamic Forms (Must be Registered LAST)
     # This captures any POST /api/v1/<path> that wasn't claimed above.

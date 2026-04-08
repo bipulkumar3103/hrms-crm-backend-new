@@ -204,7 +204,7 @@ function CompleteProfile({ setToken }) {
                            <button 
                                 type="button" 
                                 onClick={(e) => { e.preventDefault(); setIsOpen(false); setTempColor(value); }} 
-                                className="flex-1 px-4 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 font-semibold rounded-lg text-[13px] transition-colors"
+                                className="flex-1 px-4 py-2 bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] border border-gray-200 text-gray-600 font-semibold rounded-lg text-[13px] transition-colors"
                             >
                                 Cancel
                            </button>

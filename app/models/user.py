@@ -55,3 +55,7 @@ class User(db.Model):
     def is_admin_or_super(self):
         """Returns True if the user has either the 'admin' or 'superadmin' role."""
         return any(role.name in ['admin', 'superadmin'] for role in self.roles)
+
+    # Hierarchy support for Enterprise Approvals
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    manager = db.relationship('User', remote_side=[id], backref=db.backref('reports', lazy='dynamic'))
