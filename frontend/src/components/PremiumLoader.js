@@ -35,7 +35,7 @@ const PremiumLoader = ({ message = "Loading...", fullScreen = true }) => {
                     transition={{ delay: 0.2 }}
                     className="absolute top-28 whitespace-nowrap"
                 >
-                    <span className="text-[13px] font-bold tracking-widest uppercase text-gray-500 bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-gray-400">
+                    <span className="text-[13px] font-bold tracking-widest uppercase text-gray-500">
                         {message}
                     </span>
                     <motion.div 
@@ -43,7 +43,7 @@ const PremiumLoader = ({ message = "Loading...", fullScreen = true }) => {
                         animate={{ width: "100%" }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                         className="h-[2px] mt-2 rounded-full"
-                        style={{ background: `linear-gradient(to right, transparent, var(--theme-primary), transparent)` }}
+                        style={{ background: 'var(--theme-primary)' }}
                     />
                 </motion.div>
             )}

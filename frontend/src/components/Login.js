@@ -307,7 +307,7 @@ const injectStyles = () => {
     }
     .nx-right-bg { 
       position: absolute; inset: 0; 
-      background: linear-gradient(145deg, #020617 0%, #1e1b4b 40%, #312E81 80%, #3730A3 100%);
+      background: #020617;
       opacity: 0.95;
     }
 

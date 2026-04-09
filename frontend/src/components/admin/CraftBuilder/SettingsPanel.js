@@ -973,7 +973,7 @@ export const SettingsPanel = () => {
               );
             }
             // Skip styling props here, they go in the specialized sections
-            if (['width', 'height', 'padding', 'margin', 'backgroundColor', 'borderRadius', 'borderWidth', 'borderStyle', 'borderColor', 'flexDirection', 'alignItems', 'justifyContent', 'gap', 'showIcon', 'iconSize'].includes(prop)) return null;
+            if (['width', 'height', 'maxWidth', 'minWidth', 'padding', 'margin', 'backgroundColor', 'borderRadius', 'borderWidth', 'borderStyle', 'borderColor', 'flexDirection', 'alignItems', 'justifyContent', 'gap', 'showIcon', 'iconSize'].includes(prop)) return null;
             if (Array.isArray(selected.props[prop])) return null;
             if (prop === 'icon') {
               const showIcon = selected.props.showIcon !== false;
@@ -1018,6 +1018,9 @@ export const SettingsPanel = () => {
             <div className="space-y-4">
               <label className="block text-[10px] font-semibold text-slate-900">Dimensions & Geometry</label>
               <div className="space-y-4">
+                {renderSimpleInput('maxWidth', 'Max Width (Enforced)')}
+                {renderSimpleInput('minWidth', 'Min Width (Minimum)')}
+                <div className="h-[1px] bg-gray-50 my-2" />
                 {renderSimpleInput('width', 'Width')}
                 {renderSimpleInput('height', 'Height')}
               </div>
@@ -1055,6 +1058,69 @@ export const SettingsPanel = () => {
                 {renderSimpleInput('justifyContent', 'Axis Alignment')}
               </div>
               {renderSimpleInput('flexWrap', 'Reflow Policy')}
+            </div>
+          </div>
+        )}
+
+        {/* Specialized Box Model for Buttons */}
+        {selected.name === 'CraftButton' && (
+          <div className="space-y-6 pt-6 border-t border-gray-100">
+            <div className="space-y-4">
+              <label className="block text-[10px] font-semibold text-slate-900">Action Architecture</label>
+              <div className="space-y-4">
+                {renderSimpleInput('label', 'Action Label')}
+                {renderSimpleInput('maxWidth', 'Max Width (Enforced)')}
+                {renderSimpleInput('minWidth', 'Min Width (Minimum)')}
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('fullWidth', 'Full Width Mode')}
+                  {renderSimpleInput('flexWrap', 'Content Wrapping')}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-[10px] font-semibold text-slate-900">Visual Branding</label>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('variant', 'Style Variant')}
+                  {renderSimpleInput('color', 'Prime Color')}
+                </div>
+                {renderSimpleInput('borderRadius', 'Button Radius')}
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('borderWidth', 'Border Width')}
+                  {renderSimpleInput('borderColor', 'Border Color')}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-[10px] font-semibold text-slate-900">Action Logistics</label>
+              <div className="space-y-4">
+                {renderSimpleInput('targetRoute', 'Target Routing')}
+                {renderSimpleInput('alignment', 'Button Alignment')}
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('padding', 'Padding')}
+                  {renderSimpleInput('margin', 'Margin')}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-[10px] font-semibold text-slate-900">Typography & Iconography</label>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('fontSize', 'Font Scale')}
+                  {renderSimpleInput('fontWeight', 'Weight')}
+                </div>
+                {renderSimpleInput('textColor', 'Label Color')}
+                <div className="pt-2 border-t border-gray-50 space-y-4">
+                  {renderSimpleInput('showIcon', 'Icon Visibility')}
+                  <div className="grid grid-cols-2 gap-4">
+                    {renderSimpleInput('icon', 'Icon Selection')}
+                    {renderSimpleInput('iconSize', 'Icon Scale')}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

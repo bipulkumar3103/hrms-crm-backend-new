@@ -77,7 +77,7 @@ const injectStyles = () => {
       }
       .nx-right-bg { 
         position: absolute; inset: 0; 
-        background: linear-gradient(145deg, #020617 0%, #1e1b4b 40%, #312E81 80%, #3730A3 100%);
+        background: var(--theme-primary);
         opacity: 0.95; 
       }
       .nx-abstract-circ { position: absolute; width: 600px; height: 600px; border-radius: 50%; opacity: 0.03; border: 1px solid #fff; left: -100px; top: -100px; }

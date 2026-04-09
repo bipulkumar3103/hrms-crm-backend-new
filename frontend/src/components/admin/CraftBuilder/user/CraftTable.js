@@ -101,14 +101,12 @@ export const CraftTable = ({ title, dataSource, columns = [], ...props }) => {
   return (
     <div 
       ref={(ref) => connect(drag(ref))}
-      className={`bg-white border overflow-hidden mb-8 transition-all rounded-[2rem] ${selected ? 'shadow-xl' : 'border-gray-100 hover:shadow-lg hover:shadow-gray-100'}`}
+      className={`bg-white border-2 overflow-hidden mb-8 transition-all rounded-[2rem] ${selected ? 'border-[var(--theme-primary)]' : 'border-gray-100 hover:border-gray-200'}`}
       style={{ 
-        boxShadow: selected ? `0 20px 25px -5px var(--theme-secondary), 0 8px 10px -6px var(--theme-secondary)` : 'none',
-        ring: selected ? `2px solid var(--theme-primary)` : 'none',
-        border: selected ? `1px solid var(--theme-primary)` : '1px solid #f1f5f9'
+        boxShadow: selected ? `0 10px 30px rgba(0,0,0,0.08)` : 'none',
       }}
     >
-      <div className="px-10 py-8 border-b border-gray-50 flex justify-between items-center bg-white/50 backdrop-blur-sm">
+      <div className="px-10 py-8 border-b border-gray-50 flex justify-between items-center bg-white">
         <div>
            <h3 className="text-2xl font-semibold text-gray-900 tracking-tight flex items-center">
              <FiBox className="mr-4" size={24} style={{ color: 'var(--theme-primary)' }}/>

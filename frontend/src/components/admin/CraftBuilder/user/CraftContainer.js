@@ -18,6 +18,8 @@ export const CraftContainer = ({
   flexWrap = 'nowrap',
   noStack = false,
   display = 'flex',
+  maxWidth = 'auto',
+  minWidth = 'auto',
   // Breakpoint Overrides
   widthTablet, widthMobile,
   heightTablet, heightMobile,
@@ -26,6 +28,8 @@ export const CraftContainer = ({
   gapTablet, gapMobile,
   flexDirectionTablet, flexDirectionMobile,
   displayTablet, displayMobile,
+  maxWidthTablet, maxWidthMobile,
+  minWidthTablet, minWidthMobile,
   children,
   ...props 
 }) => {
@@ -89,6 +93,14 @@ export const CraftContainer = ({
     '--gap-mobile': gapMobile || gapTablet || gap,
     '--flex-wrap': flexWrap,
     '--flex-wrap-mobile': noStack ? flexWrap : 'wrap',
+    '--max-width': maxWidth,
+    '--max-width-tablet': maxWidthTablet || maxWidth,
+    '--max-width-mobile': maxWidthMobile || maxWidthTablet || maxWidth,
+    '--min-width': minWidth,
+    '--min-width-tablet': minWidthTablet || minWidth,
+    '--min-width-mobile': minWidthMobile || minWidthTablet || minWidth,
+    maxWidth: 'var(--max-width)',
+    minWidth: 'var(--min-width)',
   };
 
   return (
@@ -149,14 +161,12 @@ CraftContainer.craft = {
     flexWrap: 'nowrap',
     noStack: false,
     display: 'flex',
+    maxWidth: 'auto',
+    minWidth: 'auto',
     // Breakpoint Defaults (undefined allows inheritance)
-    widthTablet: undefined, widthMobile: undefined,
-    heightTablet: undefined, heightMobile: undefined,
-    paddingTablet: undefined, paddingMobile: undefined,
-    marginTablet: undefined, marginMobile: undefined,
-    gapTablet: undefined, gapMobile: undefined,
-    flexDirectionTablet: undefined, flexDirectionMobile: undefined,
     displayTablet: undefined, displayMobile: undefined,
+    maxWidthTablet: undefined, maxWidthMobile: undefined,
+    minWidthTablet: undefined, minWidthMobile: undefined,
   },
   rules: {
     canDrag: () => true,

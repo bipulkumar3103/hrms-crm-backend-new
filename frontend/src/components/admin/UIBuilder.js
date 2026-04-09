@@ -515,7 +515,7 @@ function UIBuilder({ token }) {
         <>
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 gap-6">
             <div className="flex-shrink-0">
-                <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
                   <div className="p-2 rounded-xl text-white shadow-lg" style={{ backgroundColor: 'var(--theme-primary)' }}>
                     <FiLayout size={20} />
                   </div>
@@ -576,7 +576,7 @@ function UIBuilder({ token }) {
               <button 
                 onClick={handleSave} 
                 disabled={saving}
-                className="flex-1 md:flex-none text-white font-black py-3.5 px-10 rounded-[1.25rem] shadow-xl disabled:opacity-50 transition-all text-sm flex items-center justify-center gap-3 active:translate-y-1"
+                className="flex-1 md:flex-none text-white font-bold py-3.5 px-10 rounded-[1.25rem] shadow-xl disabled:opacity-50 transition-all text-sm flex items-center justify-center gap-3 active:translate-y-1"
                 style={{ backgroundColor: 'var(--theme-primary)' }}
               >
                 {saving ? (
@@ -633,7 +633,7 @@ function UIBuilder({ token }) {
                           <div className="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
                           <div className="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
                       </div>
-                      <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest ml-2">Schema Architect</span>
+                      <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest ml-2">Schema Architect</span>
                   </div>
                     <button 
                       onClick={() => {
@@ -645,7 +645,7 @@ function UIBuilder({ token }) {
                               type: 'success' 
                           });
                       }}
-                    className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest"
+                    className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest"
                   >
                     Copy JSON
                   </button>
@@ -657,7 +657,7 @@ function UIBuilder({ token }) {
                     className="w-full h-[500px] font-mono text-[12px] bg-transparent text-indigo-100 p-6 focus:outline-none resize-none leading-relaxed custom-dark-scrollbar"
                     spellCheck="false"
                   />
-                  <div className="absolute bottom-4 right-4 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[9px] font-black text-indigo-400 uppercase tracking-tighter backdrop-blur-sm">
+                  <div className="absolute bottom-4 right-4 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[9px] font-bold text-indigo-400 uppercase tracking-widest backdrop-blur-sm">
                       Live Sync Active
                   </div>
               </div>
@@ -910,18 +910,18 @@ function UIBuilder({ token }) {
                                  {modalTab === 'columns' && (
                                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                          <div className="flex justify-between items-center bg-gray-50 p-4 rounded-2xl mb-2 border border-gray-100">
-                                             <span className="text-[10px] font-black text-gray-900 uppercase">Registered Columns</span>
-                                             <button type="button" onClick={handleAddColumn} className="text-[10px] font-black bg-white text-gray-900 px-3 py-2 rounded-xl border border-gray-200 shadow-sm hover:translate-y-[-1px] active:translate-y-0 transition-all">+ Add Entry</button>
+                                             <span className="text-[10px] font-bold text-gray-900 uppercase">Registered Columns</span>
+                                             <button type="button" onClick={handleAddColumn} className="text-[10px] font-bold bg-white text-gray-900 px-3 py-2 rounded-xl border border-gray-200 shadow-sm hover:translate-y-[-1px] active:translate-y-0 transition-all">+ Add Entry</button>
                                          </div>
                                          {configTableColumns.map((col, idx) => (
                                              <div key={idx} className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm flex gap-4 items-start relative group">
                                                  <div className="flex-1 space-y-3">
                                                      <div>
-                                                         <label className="text-[9px] uppercase font-black text-gray-400 tracking-widest block mb-1">Header</label>
+                                                         <label className="text-[9px] uppercase font-bold text-gray-400 tracking-widest block mb-1">Header</label>
                                                          <input type="text" className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold focus:bg-white outline-none" value={col.header} onChange={e => handleUpdateColumn(idx, 'header', e.target.value)} />
                                                      </div>
                                                      <div>
-                                                         <label className="text-[9px] uppercase font-black text-gray-400 tracking-widest block mb-1">Mapping</label>
+                                                         <label className="text-[9px] uppercase font-bold text-gray-400 tracking-widest block mb-1">Mapping</label>
                                                          {availablePaths.length > 0 ? (
                                                              <select className="w-full px-3 py-2 bg-indigo-50/30 border border-indigo-100 rounded-xl text-xs font-mono font-bold text-indigo-700 outline-none" value={col.bind} onChange={e => handleUpdateColumn(idx, 'bind', e.target.value)}>
                                                                  <option value="">-- Select Field --</option>
@@ -987,7 +987,7 @@ function UIBuilder({ token }) {
                                               key={tab.id}
                                               type="button"
                                               onClick={() => setModalTab(tab.id)}
-                                              className={`flex items-center gap-2 px-4 py-3 text-xs font-black transition-all border-b-2 ${modalTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                              className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 ${modalTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                                           >
                                               {tab.icon}
                                               {tab.label}
@@ -1021,7 +1021,7 @@ function UIBuilder({ token }) {
                                   {modalTab === 'content' && (
                                       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                           <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                              <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Header Content Architecture</label>
+                                              <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest">Header Content Architecture</label>
                                               <div className="space-y-4">
                                                   <div>
                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Elite Title</label>
@@ -1038,7 +1038,7 @@ function UIBuilder({ token }) {
 
                                           {availablePaths.length > 0 && (
                                               <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 animate-in slide-in-from-top-2 duration-400">
-                                                  <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-1">Discovered API Paths</label>
+                                                  <label className="block text-[10px] uppercase font-bold text-indigo-600 tracking-widest mb-1">Discovered API Paths</label>
                                                   <p className="text-[10px] text-indigo-400 mb-3 font-medium">Click to synchronize and copy to clipboard.</p>
                                                   <div className="flex flex-wrap gap-2">
                                                       {availablePaths.map(path => (
@@ -1049,7 +1049,7 @@ function UIBuilder({ token }) {
                                                                   navigator.clipboard.writeText(`{{${path}}}`);
                                                                   showAlert({ title: 'Metadata Linked', message: `{{${path}}} has been successfully buffered for insertion.`, type: 'success' });
                                                               }}
-                                                              className="px-2.5 py-1.5 bg-white border border-indigo-200 rounded-lg text-[9px] font-mono font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95 hover:border-indigo-400"
+                                                              className="px-2.5 py-1.5 bg-white border border-indigo-200 rounded-lg text-[9px] font-mono font-bold text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95 hover:border-indigo-400"
                                                           >
                                                               {path}
                                                           </button>
@@ -1064,7 +1064,7 @@ function UIBuilder({ token }) {
                                       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                           {/* Title Typography */}
                                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                              <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Main Title Typography</label>
+                                              <label className="block text-[10px] uppercase font-bold text-indigo-600 tracking-widest mb-4">Main Title Typography</label>
                                               <div className="grid grid-cols-2 gap-4 mb-4">
                                                   <div>
                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1.5">Size (rem/px)</label>
@@ -1084,15 +1084,15 @@ function UIBuilder({ token }) {
                                               </div>
                                               <div className="flex gap-2">
                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, titleItalic: !configFormData.titleItalic})} 
-                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                      className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.titleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, titleUnderline: !configFormData.titleUnderline})} 
-                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                                      className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.titleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
                                               </div>
                                           </div>
 
                                           {/* Subtitle Typography */}
                                           <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                              <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Subtitle Typography</label>
+                                              <label className="block text-[10px] uppercase font-bold text-indigo-600 tracking-widest mb-4">Subtitle Typography</label>
                                               <div className="grid grid-cols-2 gap-4 mb-4">
                                                   <div>
                                                       <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1.5">Size</label>
@@ -1112,9 +1112,9 @@ function UIBuilder({ token }) {
                                               </div>
                                               <div className="flex gap-2">
                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleItalic: !configFormData.subtitleItalic})} 
-                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                      className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.subtitleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
                                                   <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleUnderline: !configFormData.subtitleUnderline})} 
-                                                      className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                                      className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.subtitleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
                                               </div>
                                           </div>
                                       </div>
@@ -1131,7 +1131,7 @@ function UIBuilder({ token }) {
                                                                key={align}
                                                                type="button"
                                                                onClick={() => setConfigFormData({...configFormData, alignment: align})}
-                                                               className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${configFormData.alignment === align ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                                               className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all ${configFormData.alignment === align ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                                                            >
                                                                {align}
                                                            </button>
@@ -1142,7 +1142,7 @@ function UIBuilder({ token }) {
                                                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Background</label>
                                                    <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none focus:bg-white" value={configFormData.backgroundType || 'solid'} onChange={e => setConfigFormData({...configFormData, backgroundType: e.target.value})}>
                                                        <option value="solid">Solid Color</option>
-                                                       <option value="gradient">Indigo Gradient</option>
+                                                       <option value="gradient">Brand Solid</option>
                                                        <option value="glass">Glassmorphism</option>
                                                    </select>
                                                </div>
@@ -1175,7 +1175,7 @@ function UIBuilder({ token }) {
                                                key={tab.id}
                                                type="button"
                                                onClick={() => setModalTab(tab.id)}
-                                               className={`flex items-center gap-2 px-4 py-3 text-xs font-black transition-all border-b-2 ${modalTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                               className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 ${modalTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                                            >
                                                {tab.icon}
                                                {tab.label}
@@ -1199,7 +1199,7 @@ function UIBuilder({ token }) {
                                            {availablePaths.length > 0 && (
                                                <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3">
                                                    <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"><FiCheck /></div>
-                                                   <div className="text-[10px] text-emerald-800 font-black uppercase tracking-widest leading-none">Paths Synced: {availablePaths.length} Available</div>
+                                                   <div className="text-[10px] text-emerald-800 font-bold uppercase tracking-widest leading-none">Paths Synced: {availablePaths.length} Available</div>
                                                </div>
                                            )}
                                        </div>
@@ -1209,7 +1209,7 @@ function UIBuilder({ token }) {
                                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                             {/* Header Section */}
                                             <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                                <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Card Branding</label>
+                                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest">Card Branding</label>
                                                 <input type="text" placeholder="Card Title (e.g. My Profile)" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 outline-none" 
                                                     value={configFormData.title || ''} onChange={e => setConfigFormData({...configFormData, title: e.target.value})} />
                                                 <input type="text" placeholder="Subtitle (optional)" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none" 
@@ -1218,7 +1218,7 @@ function UIBuilder({ token }) {
 
                                             {availablePaths.length > 0 && (
                                                 <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                                                    <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-2">Dynamic Data Assistant</label>
+                                                    <label className="block text-[10px] uppercase font-bold text-indigo-600 tracking-widest mb-2">Dynamic Data Assistant</label>
                                                     <div className="flex flex-wrap gap-2">
                                                         {availablePaths.map(path => (
                                                             <button 
@@ -1240,14 +1240,14 @@ function UIBuilder({ token }) {
                                             {/* Fields Section */}
                                             <div className="space-y-4">
                                                 <div className="flex justify-between items-center px-4">
-                                                    <label className="text-[10px] uppercase font-black text-indigo-600 tracking-widest leading-none">Dynamic Fields</label>
-                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, fields: [...(configFormData.fields || []), { label: 'New Field', bind: '' }]})} className="text-[10px] font-black bg-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-sm hover:translate-y-[-1px] active:translate-y-0 transition-all">+ Add Item</button>
+                                                    <label className="text-[10px] uppercase font-bold text-indigo-600 tracking-widest leading-none">Dynamic Fields</label>
+                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, fields: [...(configFormData.fields || []), { label: 'New Field', bind: '' }]})} className="text-[10px] font-bold bg-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-sm hover:translate-y-[-1px] active:translate-y-0 transition-all">+ Add Item</button>
                                                 </div>
                                                 <div className="space-y-3">
                                                     {(configFormData.fields || []).map((f, idx) => (
                                                         <div key={idx} className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm flex gap-3 relative animate-in zoom-in-95 duration-200">
                                                             <div className="flex-1 space-y-2">
-                                                                <input type="text" placeholder="Label" className="w-full text-[10px] font-black uppercase text-gray-400 bg-transparent outline-none mb-1 border-b border-gray-50 focus:border-indigo-200 transition-colors" value={f.label} onChange={e => {
+                                                                <input type="text" placeholder="Label" className="w-full text-[10px] font-bold uppercase text-gray-400 bg-transparent outline-none mb-1 border-b border-gray-50 focus:border-indigo-200 transition-colors" value={f.label} onChange={e => {
                                                                     const n = [...configFormData.fields]; n[idx].label = e.target.value; setConfigFormData({...configFormData, fields: n});
                                                                 }} />
                                                                 <select className="w-full text-xs font-mono font-bold text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 outline-none" value={f.bind} onChange={e => {
@@ -1270,7 +1270,7 @@ function UIBuilder({ token }) {
                                    {modalTab === 'typography' && (
                                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                               <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Title Appearance</label>
+                                               <label className="block text-[10px] uppercase font-bold text-indigo-600 tracking-widest mb-4">Title Appearance</label>
                                                <div className="grid grid-cols-2 gap-4 mb-4">
                                                    <div>
                                                        <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Color Palette</label>
@@ -1283,14 +1283,14 @@ function UIBuilder({ token }) {
                                                </div>
                                                <div className="flex gap-2">
                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, titleItalic: !configFormData.titleItalic})} 
-                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                       className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.titleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, titleUnderline: !configFormData.titleUnderline})} 
-                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.titleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                                       className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.titleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
                                                </div>
                                            </div>
 
                                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                               <label className="block text-[10px] uppercase font-black text-indigo-600 tracking-widest mb-4">Subtitle Appearance</label>
+                                               <label className="block text-[10px] uppercase font-bold text-indigo-600 tracking-widest mb-4">Subtitle Appearance</label>
                                                <div className="grid grid-cols-2 gap-4 mb-4">
                                                    <div>
                                                        <label className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Text Color</label>
@@ -1303,9 +1303,9 @@ function UIBuilder({ token }) {
                                                </div>
                                                <div className="flex gap-2">
                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleItalic: !configFormData.subtitleItalic})} 
-                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
+                                                       className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.subtitleItalic ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Italic</button>
                                                    <button type="button" onClick={() => setConfigFormData({...configFormData, subtitleUnderline: !configFormData.subtitleUnderline})} 
-                                                       className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all border ${configFormData.subtitleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
+                                                       className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all border ${configFormData.subtitleUnderline ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-400 border-gray-200'}`}>Underline</button>
                                                </div>
                                            </div>
                                        </div>
@@ -1315,7 +1315,7 @@ function UIBuilder({ token }) {
                                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                            <div className="grid grid-cols-2 gap-4">
                                                 <div className="col-span-2">
-                                                   <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest mb-3 leading-none">Layout Pattern</label>
+                                                   <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3 leading-none">Layout Pattern</label>
                                                    <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
                                                        {[
                                                            { id: 'vertical', label: 'Stack' },
@@ -1325,7 +1325,7 @@ function UIBuilder({ token }) {
                                                                key={l.id}
                                                                type="button"
                                                                onClick={() => setConfigFormData({...configFormData, layout: l.id})}
-                                                               className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${configFormData.layout === l.id ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                                               className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all ${configFormData.layout === l.id ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                                                            >
                                                                {l.label}
                                                            </button>
@@ -1336,7 +1336,7 @@ function UIBuilder({ token }) {
                                                    <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Visual Mode</label>
                                                    <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 outline-none focus:bg-white" value={configFormData.backgroundType || 'solid'} onChange={e => setConfigFormData({...configFormData, backgroundType: e.target.value})}>
                                                        <option value="solid">Sleek White</option>
-                                                       <option value="gradient">Ultra Gradient</option>
+                                                       <option value="gradient">Enterprise Solid</option>
                                                        <option value="glass">Glass Focus</option>
                                                    </select>
                                                </div>
@@ -1385,8 +1385,8 @@ function UIBuilder({ token }) {
                                   
                                   <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                       <div className="flex justify-between items-center mb-4">
-                                          <label className="text-[10px] uppercase font-black text-gray-900 tracking-widest">Input Architect</label>
-                                          <button type="button" onClick={handleAddField} className="text-[10px] font-black bg-white text-indigo-600 px-3 py-1.5 rounded-xl border border-indigo-100 shadow-sm hover:scale-105 transition-all">+ Add Input</button>
+                                          <label className="text-[10px] uppercase font-bold text-gray-900 tracking-widest">Input Architect</label>
+                                          <button type="button" onClick={handleAddField} className="text-[10px] font-bold bg-white text-indigo-600 px-3 py-1.5 rounded-xl border border-indigo-100 shadow-sm hover:scale-105 transition-all">+ Add Input</button>
                                       </div>
                                       <div className="space-y-3">
                                           {configFormFields.map(field => (
@@ -1394,11 +1394,11 @@ function UIBuilder({ token }) {
                                                   <button type="button" onClick={() => handleRemoveField(field.id)} className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs shadow-lg hover:scale-110 transition-all z-10">&times;</button>
                                                   <div className="grid grid-cols-2 gap-3">
                                                       <div>
-                                                          <label className="text-[8px] uppercase font-black text-gray-400 mb-1 block">ID Key</label>
+                                                          <label className="text-[8px] uppercase font-bold text-gray-400 mb-1 block">ID Key</label>
                                                           <input type="text" required className="w-full font-mono text-[10px] px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white transition-all outline-none" value={field.name} onChange={e => updateField(field.id, 'name', e.target.value)} />
                                                       </div>
                                                       <div>
-                                                          <label className="text-[8px] uppercase font-black text-gray-400 mb-1 block">Label</label>
+                                                          <label className="text-[8px] uppercase font-bold text-gray-400 mb-1 block">Label</label>
                                                           <input type="text" required className="w-full text-[10px] px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white transition-all outline-none" value={field.label} onChange={e => updateField(field.id, 'label', e.target.value)} />
                                                       </div>
                                                       <div className="col-span-2">
@@ -1420,15 +1420,15 @@ function UIBuilder({ token }) {
 
                           {/* Global Container Styling */}
                           <div className="p-4 md:p-5 bg-indigo-50/30 rounded-2xl border border-indigo-100 mt-4">
-                              <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest mb-4 flex items-center gap-2"><FiLayout /> Container Layout</p>
+                              <p className="text-[10px] font-bold text-indigo-700 uppercase tracking-widest mb-4 flex items-center gap-2"><FiLayout /> Container Layout</p>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div>
-                                      <label className="block text-[8px] uppercase font-black text-gray-400 mb-1">Width Override</label>
+                                      <label className="block text-[8px] uppercase font-bold text-gray-400 mb-1">Width Override</label>
                                       <input type="text" placeholder="Auto" className="w-full px-3 py-2 bg-white border border-gray-100 rounded-xl text-[11px] focus:ring-2 focus:ring-indigo-500 outline-none" 
                                           value={configFormData.width || ''} onChange={e => setConfigFormData({...configFormData, width: e.target.value})} />
                                   </div>
                                   <div>
-                                      <label className="block text-[8px] uppercase font-black text-gray-400 mb-1">Padding</label>
+                                      <label className="block text-[8px] uppercase font-bold text-gray-400 mb-1">Padding</label>
                                       <input type="text" placeholder="2rem" className="w-full px-3 py-2 bg-white border border-gray-100 rounded-xl text-[11px] focus:ring-2 focus:ring-indigo-500 outline-none" 
                                           value={configFormData.padding || ''} onChange={e => setConfigFormData({...configFormData, padding: e.target.value})} />
                                   </div>
@@ -1439,7 +1439,7 @@ function UIBuilder({ token }) {
                       {/* Sticky Premium Footer */}
                       <div className="flex justify-between items-center pt-4 md:pt-6 border-t border-gray-100 bg-white sticky bottom-0 -mx-6 px-6 z-30 mt-4 rounded-b-2xl shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
                            <button type="button" onClick={() => setIsConfigModalOpen(false)} className="px-4 md:px-6 py-2.5 md:py-3 text-xs md:text-sm font-bold text-gray-300 hover:text-gray-500 transition-all">Discard</button>
-                           <button type="submit" className="px-6 md:px-10 py-2.5 md:py-3 text-[11px] md:text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl md:rounded-2xl shadow-xl shadow-indigo-100 hover:shadow-indigo-200 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 md:gap-3">
+                           <button type="submit" className="px-6 md:px-10 py-2.5 md:py-3 text-[11px] md:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl md:rounded-2xl shadow-xl shadow-indigo-100 hover:shadow-indigo-200 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 md:gap-3">
                                <FiZap className="animate-pulse" />
                                Insert Block
                            </button>

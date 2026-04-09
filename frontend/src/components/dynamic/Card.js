@@ -74,7 +74,7 @@ const UniversalField = ({ label, value, path, theme, alignment }) => {
     return (
       <div className={`flex flex-col mb-3 ${isCenter ? 'items-center' : ''}`}>
         {label && <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{label}</span>}
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider ${bg} ${text} border border-current/10 w-fit`}>
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-widest ${bg} ${text} border border-current/10 w-fit`}>
           <span className={`w-1.5 h-1.5 rounded-full ${dot} mr-2 shadow-[0_0_8px_rgba(0,0,0,0.1)]`}></span>
           {value}
         </span>
@@ -114,8 +114,11 @@ function Card({ config, theme, providedData, children }) {
     fields = [],
     style = {},
     backgroundType = 'solid', // 'solid', 'gradient', 'glass'
-    backgroundGradient = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
     backgroundColor = '',
+    maxWidth = 'auto',
+    minWidth = 'auto',
+    maxWidthTablet, maxWidthMobile,
+    minWidthTablet, minWidthMobile,
     glassOpacity = 0.5,
     glassBlur = '10px',
     shadow = 'md',
@@ -185,7 +188,7 @@ function Card({ config, theme, providedData, children }) {
   };
 
   const getBackground = () => {
-    if (backgroundType === 'gradient') return { background: backgroundGradient };
+    if (backgroundType === 'gradient') return { backgroundColor: resolveColor(backgroundColor) || 'var(--theme-primary)' };
     if (backgroundType === 'glass') return {
       backgroundColor: `rgba(255, 255, 255, ${glassOpacity})`,
       backdropFilter: `blur(${glassBlur})`,
@@ -200,6 +203,14 @@ function Card({ config, theme, providedData, children }) {
     borderRadius: toMetric(style.borderRadius) || '24px',
     boxShadow: shadowMap[shadow] || shadowMap.md,
     borderLeft: accentColor ? `5px solid ${resolveColor(accentColor)}` : (style.borderWidth ? `${toMetric(style.borderWidth)} solid ${resolveColor(style.borderColor) || '#e2e8f0'}` : 'none'),
+    '--max-width': toMetric(maxWidth),
+    '--max-width-tablet': toMetric(maxWidthTablet || maxWidth),
+    '--max-width-mobile': toMetric(maxWidthMobile || maxWidthTablet || maxWidth),
+    '--min-width': toMetric(minWidth),
+    '--min-width-tablet': toMetric(minWidthTablet || minWidth),
+    '--min-width-mobile': toMetric(minWidthMobile || minWidthTablet || minWidth),
+    maxWidth: 'var(--max-width)',
+    minWidth: 'var(--min-width)',
     ...style
   };
 

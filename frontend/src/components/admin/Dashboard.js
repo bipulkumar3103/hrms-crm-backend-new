@@ -6,10 +6,11 @@ import {
     FiBell, FiChevronDown, FiChevronRight, FiLogOut, FiInfo, FiGrid,
     FiMessageSquare, FiPieChart, FiMonitor, FiCheckCircle,
     FiArrowRight, FiArrowLeft, FiUser, FiPlus, FiX, FiCopy, FiCheck,
-    FiClock, FiFileText, FiAward, FiMenu, FiLayout, FiZap, FiLayers
+    FiClock, FiFileText, FiAward, FiMenu, FiLayout, FiZap, FiLayers, FiShield
 } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
 import { useAlert } from '../../context/AlertContext';
+import EliteSelector from '../common/EliteSelector';
 import UserProfile from './UserProfile';
 import OrganizationProfile from './OrganizationProfile';
 import UIBuilder from './UIBuilder';
@@ -178,22 +179,25 @@ const Dashboard = ({ token, logout }) => {
             <li className={`group ${isSub ? 'mt-1' : 'mt-2'}`}>
                 <button
                     onClick={() => setActiveTab(id)}
-                    className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} 
-                             rounded-lg transition-all duration-200 relative
-                             ${isActive ? 'bg-[var(--theme-secondary,#d3d1ff)] text-[var(--theme-primary)] font-bold' : 'text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] font-medium'}
+                    className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} 
+                             rounded-xl transition-all duration-300 relative
+                             ${isActive 
+                                ? 'text-white font-bold shadow-lg shadow-[var(--theme-primary)]/20 shadow-blue-500/10' 
+                                : 'text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] font-semibold'}
                   `}
+                  style={isActive ? { backgroundColor: 'var(--theme-primary)', color: 'white' } : {}}
                 >
-                    {isActive && !isSidebarCollapsed && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[var(--theme-primary)] rounded-r-md"></div>
+                    {isActive && !isSidebarCollapsed && !isSub && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 bg-white/30 rounded-r-full shadow-sm"></div>
                     )}
-                    <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-[var(--theme-primary)]' : 'text-gray-400 group-hover:text-[var(--theme-primary)]'} transition-colors`}>
+                    <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[var(--theme-primary)]'} transition-colors flex items-center justify-center`}>
                         {icon}
                     </div>
                     {!isSidebarCollapsed && (
-                        <span className={`ml-3 text-[14px] ${isSub ? 'text-[13.5px] font-medium transition-all' : 'tracking-tight'} truncate`}>{label}</span>
+                        <span className={`ml-3.5 text-[14px] ${isSub ? 'text-[13.5px] font-semibold transition-all' : 'tracking-tight'} truncate`}>{label}</span>
                     )}
                     {!isSidebarCollapsed && !isSub && (label === 'Home' || label === 'Insights' || label === 'Collaboration') && (
-                        <FiChevronDown className="ml-auto opacity-50" size={14} />
+                        <FiChevronDown className={`ml-auto transition-transform duration-300 ${isActive ? 'text-white/80 rotate-180' : 'opacity-40'}`} size={14} />
                     )}
                 </button>
             </li>
@@ -254,10 +258,10 @@ const Dashboard = ({ token, logout }) => {
 
                         {/* Sub-items block for Home */}
                         {!isSidebarCollapsed && (
-                            <div className="ml-[22px] border-l border-gray-100 pl-2 mt-1 mb-3 space-y-0.5">
-                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-gray-400"></span>} label="Overview" id="Overview" />
-                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: 'var(--theme-primary)' }}></span>} label="Live Network" id="Live Network" />
-                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-gray-400"></span>} label="To-Do's" id="To-Dos" />
+                            <div className="ml-[24px] border-l-2 border-gray-100 pl-3 mt-1 mb-4 space-y-1">
+                                <NavItem isSub icon={<span className="w-1.5 h-1.5 rounded-full border-2 border-current opacity-40"></span>} label="Overview" id="Overview" />
+                                <NavItem isSub icon={<span className="w-1.5 h-1.5 rounded-full bg-current shadow-sm"></span>} label="Live Network" id="Live Network" />
+                                <NavItem isSub icon={<span className="w-1.5 h-1.5 rounded-full border-2 border-current opacity-40"></span>} label="To-Do's" id="To-Dos" />
                             </div>
                         )}
 
@@ -303,16 +307,16 @@ const Dashboard = ({ token, logout }) => {
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
+                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3.5'} rounded-xl text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-all group border-2 border-dashed border-gray-100/80 hover:border-[var(--theme-primary)] shadow-sm`}
                     >
                         <motion.div
-                            className="text-lg group-hover:text-[var(--theme-primary)] transition-colors"
-                            animate={{ x: isSidebarCollapsed ? [0, 4, 0] : [0, -4, 0] }}
+                            className="text-xl group-hover:text-[var(--theme-primary)] transition-colors"
+                            animate={{ x: isSidebarCollapsed ? [0, 5, 0] : [0, -5, 0] }}
                             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                         >
                             {isSidebarCollapsed ? <FiArrowRight /> : <FiArrowLeft />}
                         </motion.div>
-                        {!isSidebarCollapsed && <span className="ml-3 text-[14px] font-bold group-hover:text-gray-700 transition-colors truncate">Collapse</span>}
+                        {!isSidebarCollapsed && <span className="ml-3.5 text-[14px] font-bold tracking-tight transition-colors truncate">Collapse Protocol</span>}
                     </motion.button>
                 </div>
             </aside>
@@ -363,7 +367,7 @@ const Dashboard = ({ token, logout }) => {
                                                 <p className="text-xs text-gray-500 mt-1">SMTP Server has been successfully provisioned.</p>
                                             </div>
                                             <div className="p-3 bg-gray-50 text-center">
-                                                <button className="text-[11px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors">Clear All Logs</button>
+                                                <button className="text-[11px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors">Clear All Logs</button>
                                             </div>
                                         </motion.div>
                                     )}
@@ -436,12 +440,12 @@ const Dashboard = ({ token, logout }) => {
                 {/* MAIN ADMIN CONTENT PANELS */}
                 <main className="flex-1 overflow-y-auto scroll-smooth pl-4 pb-8">
                     {/* Level 2: Breadcrumb Hierarchy (Now behind/below nav) */}
-                    <div className="mb-6 flex items-center text-[10px] md:text-[11px] font-black text-gray-400 tracking-[0.12em] px-1 group">
+                    <div className="mb-6 flex items-center text-[10px] md:text-[11px] font-semibold text-gray-400 tracking-widest px-1 group">
                         <div className="flex items-center bg-gray-50/50 px-2.5 py-1.5 rounded-lg border border-gray-100 group-hover:border-gray-200 transition-all">
                             <FiHome size={12} className="mr-2 opacity-50" />
                             {getBreadcrumbs(activeTab).map((crumb, idx, arr) => (
                                 <React.Fragment key={idx}>
-                                    <span className={idx === arr.length - 1 ? "text-[var(--theme-primary)] font-black" : ""}>
+                                    <span className={idx === arr.length - 1 ? "text-[var(--theme-primary)] font-bold" : "font-semibold"}>
                                         {crumb}
                                     </span>
                                     {idx < arr.length - 1 && (

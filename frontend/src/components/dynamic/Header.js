@@ -1,4 +1,10 @@
 import React from 'react';
+ 
+const toMetric = (val) => {
+  if (val === null || val === undefined || val === '') return undefined;
+  if (!isNaN(val) && typeof val !== 'boolean') return `${val}px`;
+  return val;
+};
 
 /**
  * Enterprise Elite Header
@@ -11,8 +17,11 @@ function Header({ config, theme, providedData }) {
     style = {},
     alignment = 'left',
     backgroundType = 'solid', // 'solid', 'gradient', 'glass'
-    backgroundGradient = 'linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-accent) 100%)',
     backgroundColor = '',
+    maxWidth = 'auto',
+    minWidth = 'auto',
+    maxWidthTablet, maxWidthMobile,
+    minWidthTablet, minWidthMobile,
     glassOpacity = 0.7,
     glassBlur = '12px',
     titleSize = '2.25rem',
@@ -69,7 +78,7 @@ function Header({ config, theme, providedData }) {
 
   // --- Style Engineering ---
   const getBackgroundStyle = () => {
-    if (backgroundType === 'gradient') return { background: backgroundGradient };
+    if (backgroundType === 'gradient') return { backgroundColor: backgroundColor || theme?.theme_primary_color || '#6366f1' };
     if (backgroundType === 'glass') return { 
         backgroundColor: `rgba(255, 255, 255, ${glassOpacity})`,
         backdropFilter: `blur(${glassBlur})`,
@@ -92,6 +101,14 @@ function Header({ config, theme, providedData }) {
     boxShadow: shadowMap[shadow] || 'none',
     textAlign: alignment,
     borderLeft: backgroundType === 'solid' ? `6px solid ${theme?.theme_primary_color || '#6366f1'}` : 'none',
+    '--max-width': toMetric(maxWidth),
+    '--max-width-tablet': toMetric(maxWidthTablet || maxWidth),
+    '--max-width-mobile': toMetric(maxWidthMobile || maxWidthTablet || maxWidth),
+    '--min-width': toMetric(minWidth),
+    '--min-width-tablet': toMetric(minWidthTablet || minWidth),
+    '--min-width-mobile': toMetric(minWidthMobile || minWidthTablet || minWidth),
+    maxWidth: 'var(--max-width)',
+    minWidth: 'var(--min-width)',
     ...style
   };
 

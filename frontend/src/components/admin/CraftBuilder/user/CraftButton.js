@@ -15,9 +15,17 @@ export const CraftButton = ({
   iconSize = '',
   borderRadius = '',
   fontSize = '10px',
+  fontWeight = '700',
   textColor = 'white', 
   borderColor = '',
   borderWidth = '',
+  flexWrap = 'nowrap',
+  maxWidth = 'auto',
+  minWidth = 'auto',
+  maxWidthTablet, maxWidthMobile,
+  minWidthTablet, minWidthMobile,
+  padding = '',
+  margin = '',
   ...props 
 }) => {
   const { enabled } = useEditor((state) => ({
@@ -95,12 +103,30 @@ export const CraftButton = ({
       borderRadius: borderRadius || currentSize.radius,
       boxSizing: 'border-box',
       outline: 'none',
+      fontWeight: fontWeight,
+      // Precision Centering & Wrapping Implementation
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '0.625rem',
+      flexWrap: flexWrap,
+      textAlign: 'center',
       // Elite Breakpoint Variable Mapping
       '--width': fullWidth ? '100%' : 'fit-content',
       '--width-mobile': '100%',
+      '--max-width': maxWidth,
+      '--max-width-tablet': maxWidthTablet || maxWidth,
+      '--max-width-mobile': maxWidthMobile || maxWidthTablet || maxWidth,
+      '--min-width': minWidth,
+      '--min-width-tablet': minWidthTablet || minWidth,
+      '--min-width-mobile': minWidthMobile || minWidthTablet || minWidth,
+      maxWidth: 'var(--max-width)',
+      minWidth: 'var(--min-width)',
       // Dynamic depth shadow preserved
       boxShadow: actualShadow,
       transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      padding: padding || `${currentSize.py} ${currentSize.px}`,
+      margin: margin || '0',
     };
     
     // Professional Border System Overrides
@@ -134,7 +160,7 @@ export const CraftButton = ({
   };
 
   return (
-    <div className={`mb-4 flex items-center py-2 ${alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start'}`}>
+    <div className={`mb-4 flex items-center py-2 ${alignment === 'center' ? 'justify-center mx-auto' : alignment === 'right' ? 'justify-end ml-auto' : 'justify-start mr-auto'}`} style={{ width: fullWidth ? '100%' : 'fit-content' }}>
       <button 
         ref={(ref) => connect(drag(ref))}
         onClick={handleNavigate}
@@ -162,9 +188,18 @@ CraftButton.craft = {
     iconSize: '',
     borderRadius: '',
     fontSize: '10px',
+    fontWeight: '700',
     textColor: 'white',
     borderColor: '',
     borderWidth: '',
+    flexWrap: 'nowrap',
+    maxWidth: 'auto',
+    minWidth: 'auto',
+    maxWidthTablet: undefined, maxWidthMobile: undefined,
+    minWidthTablet: undefined, minWidthMobile: undefined,
+    padding: '',
+    margin: '',
+    alignment: 'center',
   },
   rules: {
     canDrag: () => true,

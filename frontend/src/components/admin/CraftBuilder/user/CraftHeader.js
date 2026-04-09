@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNode } from '@craftjs/core';
 
-export const CraftHeader = ({ title, subtitle, alignment = 'left', ...props }) => {
+export const CraftHeader = ({ title, subtitle, alignment = 'left', maxWidth = 'auto', minWidth = 'auto', maxWidthTablet, maxWidthMobile, minWidthTablet, minWidthMobile, ...props }) => {
   const { connectors: { connect, drag }, selected } = useNode((state) => ({
     selected: state.events.selected,
   }));
@@ -13,7 +13,15 @@ export const CraftHeader = ({ title, subtitle, alignment = 'left', ...props }) =
       style={{ 
         textAlign: alignment,
         ring: selected ? `2px solid var(--theme-primary)` : 'none',
-        boxShadow: selected ? `0 0 0 2px var(--theme-primary)` : 'none'
+        boxShadow: selected ? `0 0 0 2px var(--theme-primary)` : 'none',
+        maxWidth: maxWidth || 'none',
+        minWidth: minWidth || '0px',
+        '--max-width': maxWidth,
+        '--max-width-tablet': maxWidthTablet || maxWidth,
+        '--max-width-mobile': maxWidthMobile || maxWidthTablet || maxWidth,
+        '--min-width': minWidth,
+        '--min-width-tablet': minWidthTablet || minWidth,
+        '--min-width-mobile': minWidthMobile || minWidthTablet || minWidth,
       }}
     >
       <h1 className="text-4xl font-semibold text-gray-900 tracking-tight mb-4">
@@ -30,7 +38,10 @@ CraftHeader.craft = {
   props: {
     title: 'Organizational Governance Protocol',
     subtitle: 'Centralizing enterprise resource management and strategic oversight.',
-    alignment: 'left',
+    maxWidth: 'auto',
+    minWidth: 'auto',
+    maxWidthTablet: undefined, maxWidthMobile: undefined,
+    minWidthTablet: undefined, minWidthMobile: undefined,
   },
   rules: {
     canDrag: () => true,

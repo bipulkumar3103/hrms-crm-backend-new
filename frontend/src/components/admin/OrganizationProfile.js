@@ -157,7 +157,7 @@ function OrganizationProfile({ token }) {
             <div className="bg-white rounded-[24px] shadow-[0_4px_34px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden relative">
                 
                 {/* Enterprise Header Area */}
-                <div className="h-40 relative overflow-hidden" style={{ background: `linear-gradient(to right, var(--theme-primary), var(--theme-accent))` }}>
+                <div className="h-40 relative overflow-hidden" style={{ background: 'var(--theme-primary)' }}>
                     {!isSuperAdmin && (
                         <div className="absolute top-5 right-5 backdrop-blur-md border text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center shadow-md z-20" style={{ backgroundColor: 'rgba(245, 158, 11, 0.8)', borderColor: '#fbbf24' }}>
                             <FiSettings className="mr-2"/> Protected View (Read Only)

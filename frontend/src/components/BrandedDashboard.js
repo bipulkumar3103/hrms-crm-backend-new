@@ -157,20 +157,23 @@ const BrandedDashboard = () => {
                  onClick={() => setActiveTab(id)}
                  className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} 
                              rounded-lg transition-all duration-200 relative
-                             ${isActive ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] font-semibold' : 'text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] font-medium'}
+                             ${isActive 
+                                ? 'text-white font-semibold shadow-md' 
+                                : 'text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] font-medium'}
                  `}
+                 style={isActive ? { backgroundColor: 'var(--theme-primary)' } : {}}
                >
-                   {isActive && !isSidebarCollapsed && (
-                       <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[var(--theme-primary)] rounded-r-md"></div>
+                   {isActive && !isSidebarCollapsed && !isSub && (
+                       <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white/40 rounded-r-md"></div>
                    )}
-                   <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-[var(--theme-primary)]' : 'text-gray-500 group-hover:text-gray-700'} transition-colors`}>
+                   <div className={`${isSidebarCollapsed ? 'text-xl' : 'text-lg'} ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-[var(--theme-primary)]'} transition-colors flex items-center justify-center`}>
                        {icon}
                    </div>
                    {!isSidebarCollapsed && (
                        <span className={`ml-3 text-[14px] ${isSub ? 'text-[13.5px] font-medium transition-all' : 'tracking-tight'} truncate`}>{label}</span>
                    )}
                    {!isSidebarCollapsed && !isSub && (label === 'Home' || label === 'Insights' || label === 'Collaboration') && (
-                       <FiChevronDown className="ml-auto opacity-50" size={14} />
+                       <FiChevronDown className={`ml-auto ${isActive ? 'text-white/70' : 'opacity-50'}`} size={14} />
                    )}
                </button>
             </li>
@@ -208,9 +211,9 @@ const BrandedDashboard = () => {
                         {/* Sub-items block for Home */}
                         {!isSidebarCollapsed && (
                             <div className="ml-[22px] border-l border-gray-100 pl-2 mt-1 mb-3 space-y-0.5">
-                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-gray-400"></span>} label="Overview" id="Overview" />
-                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full bg-[var(--theme-primary)]"></span>} label="Live Network" id="Live Network" />
-                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-gray-400"></span>} label="To-Do's" id="To-Dos" />
+                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-current opacity-40"></span>} label="Overview" id="Overview" />
+                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full bg-current"></span>} label="Live Network" id="Live Network" />
+                                <NavItem isSub icon={<span className="w-[5px] h-[5px] rounded-full border border-current opacity-40"></span>} label="To-Do's" id="To-Dos" />
                             </div>
                         )}
 
@@ -249,7 +252,7 @@ const BrandedDashboard = () => {
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-colors group border border-dashed border-gray-200 hover:border-gray-300 shadow-sm`}
+                        className={`mt-4 w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'} rounded-lg text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-all group border border-dashed border-gray-200 hover:border-[var(--theme-primary)] shadow-sm`}
                      >
                         <motion.div 
                             className="text-lg group-hover:text-[var(--theme-primary)] transition-colors"
@@ -258,7 +261,7 @@ const BrandedDashboard = () => {
                         >
                             {isSidebarCollapsed ? <FiArrowRight /> : <FiArrowLeft />}
                         </motion.div>
-                        {!isSidebarCollapsed && <span className="ml-3 text-[14px] font-bold group-hover:text-gray-700 transition-colors truncate">Collapse</span>}
+                        {!isSidebarCollapsed && <span className="ml-3 text-[14px] font-bold transition-colors truncate">Collapse</span>}
                      </motion.button>
                 </div>
             </aside>
@@ -496,11 +499,11 @@ const BrandedDashboard = () => {
                                         <FiInfo className="mr-2 text-[var(--theme-primary)]"/> Announcements
                                     </h3>
                                     <div className="space-y-4">
-                                        <div className="border-l-2 border-[var(--theme-primary)] pl-4 py-1 bg-gradient-to-r from-gray-50 to-transparent pr-2 rounded-r-xl">
+                                        <div className="border-l-2 border-[var(--theme-primary)] pl-4 py-1 bg-gray-50 pr-2 rounded-r-xl">
                                             <p className="text-[10px] font-bold text-[var(--theme-primary)] uppercase tracking-wider mb-1">Company Wide</p>
                                             <p className="font-medium text-gray-800 text-[13.5px] leading-snug">Annual Company Retreat scheduled for August.</p>
                                         </div>
-                                        <div className="border-l-2 border-amber-400 pl-4 py-1 bg-gradient-to-r from-amber-50/50 to-transparent pr-2 rounded-r-xl">
+                                        <div className="border-l-2 border-amber-400 pl-4 py-1 bg-amber-50/50 pr-2 rounded-r-xl">
                                             <p className="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">Engineering Dept</p>
                                             <p className="font-medium text-gray-800 text-[13.5px] leading-snug">Server maintenance scheduled for this weekend.</p>
                                         </div>

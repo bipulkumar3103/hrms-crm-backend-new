@@ -72,7 +72,7 @@ const AcceptInvitation = () => {
     }
 
     return (
-        <div className="min-h-screen flex" style={{ background: `linear-gradient(145deg, #020617 0%, #1e1b4b 40%, #312E81 80%, ${primary} 100%)` }}>
+        <div className="min-h-screen flex" style={{ background: primary }}>
             {/* Left — decorative panel */}
             <div className="hidden lg:flex flex-1 flex-col justify-center items-center p-12 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10">

@@ -5,7 +5,11 @@ import { resolveDynamicString } from '../../../DynamicUIRenderer/SchemaEngine';
 
 export const CraftCard = ({ 
   title, subtitle, padding = '24px', borderRadius = '32px', background = 'white', dataSource, 
-  flexWrap = 'nowrap', noStack = false, display = 'block', 
+  flexWrap = 'nowrap', noStack = false,  display = 'block', 
+  maxWidth = 'auto',
+  minWidth = 'auto',
+  maxWidthTablet, maxWidthMobile,
+  minWidthTablet, minWidthMobile,
   // Breakpoint Overrides
   widthTablet, widthMobile,
   paddingTablet, paddingMobile,
@@ -54,8 +58,14 @@ export const CraftCard = ({
         '--display': display,
         '--display-tablet': displayTablet || display,
         '--display-mobile': displayMobile || displayTablet || display,
-        '--width-tablet': widthTablet,
-        '--width-mobile': widthMobile,
+        maxWidth: maxWidth || 'none',
+        minWidth: minWidth || '0px',
+        '--max-width': maxWidth,
+        '--max-width-tablet': maxWidthTablet || maxWidth,
+        '--max-width-mobile': maxWidthMobile || maxWidthTablet || maxWidth,
+        '--min-width': minWidth,
+        '--min-width-tablet': minWidthTablet || minWidth,
+        '--min-width-mobile': minWidthMobile || minWidthTablet || minWidth,
       }}
     >
       {/* Recursive children slot */}
@@ -83,13 +93,14 @@ CraftCard.craft = {
     borderRadius: '32px',
     dataSource: '',
     fields: [],
-    flexWrap: 'nowrap',
     noStack: false,
     display: 'block',
+    maxWidth: 'auto',
+    minWidth: 'auto',
     // Breakpoint Defaults
-    widthTablet: undefined, widthMobile: undefined,
-    paddingTablet: undefined, paddingMobile: undefined,
     displayTablet: undefined, displayMobile: undefined,
+    maxWidthTablet: undefined, maxWidthMobile: undefined,
+    minWidthTablet: undefined, minWidthMobile: undefined,
   },
   rules: {
     canDrag: () => true,

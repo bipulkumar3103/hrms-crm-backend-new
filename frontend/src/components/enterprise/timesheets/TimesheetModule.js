@@ -4,7 +4,7 @@ import TimesheetConsole from './TimesheetConsole';
 import ProjectAdmin from './ProjectAdmin';
 import ApprovalDashboard from './ApprovalDashboard';
 import TimesheetHistory from './TimesheetHistory';
-import { FiClock } from 'react-icons/fi';
+import { FiClock, FiLayers, FiList, FiCheckSquare } from 'react-icons/fi';
 
 const TimesheetModule = ({ user: initialUser, api: customApi }) => {
     const [user, setUser] = useState(initialUser || null);
@@ -33,42 +33,52 @@ const TimesheetModule = ({ user: initialUser, api: customApi }) => {
 
     return (
         <div className="nx-ts-container nx-ts-animate">
-            <header className="nx-ts-header">
-                <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white shadow-sm border border-gray-100 rounded-xl">
-                        <FiClock className="nx-ts-text-primary" size={24} />
+            <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center nx-ts-text-primary">
+                        <FiClock size={20} className="sm:hidden" />
+                        <FiClock size={24} className="hidden sm:block" />
                     </div>
                     <div>
-                        <h1 className="m-0 text-2xl font-black tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">Enterprise Timesheet Pro</h1>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 m-0">Organization Protocol Active</p>
+                        <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-gray-900 leading-none mb-1">Enterprise Timesheet Pro</h1>
+                        <p className="text-gray-400 font-semibold uppercase text-[8px] sm:text-[9px] tracking-[0.2em]">Organization Protocol Active</p>
                     </div>
                 </div>
-                <nav className="nx-ts-nav">
+                <nav className="flex items-center gap-1 sm:gap-2 bg-white/50 p-1 rounded-2xl border border-gray-100 w-full md:w-auto overflow-x-auto whitespace-nowrap scrollbar-hide">
                     <button
                         type="button"
-                        className={`nx-ts-nav-btn ${activeTab === 'console' ? 'active' : ''}`}
+                        className={`px-3 sm:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all hide-scrollbar flex items-center justify-center gap-2 flex-1 sm:flex-none ${activeTab === 'console' ? 'bg-[var(--theme-primary)] text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                         onClick={() => setActiveTab('console')}
+                        title="My Sheets"
                     >
-                        My Sheets
+                        <FiLayers size={14} className={activeTab === 'console' ? 'text-white' : 'text-gray-300'} />
+                        <span className="hidden xs:inline">My Sheets</span>
+                        <span className="xs:hidden">Sheets</span>
                     </button>
                     <button
                         type="button"
-                        className={`nx-ts-nav-btn ${activeTab === 'history' ? 'active' : ''}`}
+                        className={`px-3 sm:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all hide-scrollbar flex items-center justify-center gap-2 flex-1 sm:flex-none ${activeTab === 'history' ? 'bg-[var(--theme-primary)] text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                         onClick={() => setActiveTab('history')}
+                        title="My History"
                     >
-                        My History
+                        <FiList size={14} className={activeTab === 'history' ? 'text-white' : 'text-gray-300'} />
+                        <span className="hidden xs:inline">My History</span>
+                        <span className="xs:hidden">History</span>
                     </button>
                     {(isHrOrAdmin || isManager) && (
                         <button
                             type="button"
-                            className={`nx-ts-nav-btn ${activeTab === 'approvals' ? 'active' : ''}`}
+                            className={`px-3 sm:px-5 py-2.5 rounded-xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all hide-scrollbar flex items-center justify-center gap-2 flex-1 sm:flex-none ${activeTab === 'approvals' ? 'bg-[var(--theme-primary)] text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                             onClick={() => setActiveTab('approvals')}
+                            title="Review Queue"
                         >
-                            Review Queue
+                            <FiCheckSquare size={14} className={activeTab === 'approvals' ? 'text-white' : 'text-gray-300'} />
+                            <span className="hidden xs:inline">Review Queue</span>
+                            <span className="xs:hidden">Review</span>
                         </button>
                     )}
                 </nav>
-            </header>
+            </div>
 
             <main className="nx-ts-main">
                 {activeTab === 'console' && <TimesheetConsole user={user} />}

@@ -133,7 +133,7 @@ function UserProfile({ token }) {
             <div className="bg-white rounded-[24px] shadow-[0_4px_34px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden relative">
                 
                 {/* Enterprise Header Area */}
-                <div className="h-40 relative overflow-hidden" style={{ background: `linear-gradient(to right, var(--theme-primary), var(--theme-accent))` }}>
+                <div className="h-40 relative overflow-hidden" style={{ background: 'var(--theme-primary)' }}>
                     <button 
                         onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
                         className="absolute top-5 right-5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center transition-all shadow-md z-20"

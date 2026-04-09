@@ -234,11 +234,11 @@ function Table({ config, token, providedData }) {
     'lg': 'shadow-lg',
     'xl': 'shadow-xl'
   };
-  const shadowClass = shadowClassMap[style.shadow] || 'shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]';
+  const shadowClass = shadowClassMap[style.shadow] || 'shadow-[0_4px_20px_rgba(0,0,0,0.03)]';
 
   return (
     <div 
-      className={`w-full bg-white border overflow-hidden mb-8 transition-all hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.06)] ${shadowClass}`}
+    className={`w-full bg-white border overflow-hidden mb-8 transition-all ${shadowClass}`}
       style={containerStyle}
     >
       {/* Table Header */}
@@ -261,7 +261,7 @@ function Table({ config, token, providedData }) {
           <thead>
             <tr className="bg-gray-50/50">
               {config.columns?.filter(c => c && c.header).map((col, idx) => (
-                <th key={idx} className="px-5 md:px-8 py-4 text-left text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.1em] border-b border-gray-50 whitespace-nowrap">
+                <th key={idx} className="px-5 md:px-8 py-4 text-left text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 whitespace-nowrap">
                   {col.header}
                 </th>
               ))}
@@ -311,7 +311,7 @@ function Table({ config, token, providedData }) {
       <div className="px-5 md:px-8 py-5 flex justify-between items-center bg-gray-50/30">
          <span className="text-[9px] md:text-[10px] font-bold text-gray-300 uppercase tracking-widest truncate mr-4">Autonomous Data Governance System</span>
          <div className="flex items-center space-x-1.5 flex-shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.borderColor || '#10b981', boxShadow: `0 0 8px ${style.borderColor}80` }}></span>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.borderColor || '#10b981' }}></span>
             <span className="text-[10px] md:text-[11px] font-bold" style={{ color: style.borderColor || '#059669' }}>Secure Link Active</span>
          </div>
       </div>

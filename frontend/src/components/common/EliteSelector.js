@@ -66,7 +66,7 @@ const EliteSelector = ({
     return (
         <div className={`nx-ts-form-group relative ${className}`} ref={selectorRef}>
             {label && (
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-2 block px-1">
+                <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-2 block px-1">
                     {label}
                 </label>
             )}
@@ -135,15 +135,19 @@ const EliteSelector = ({
                                 }).map(opt => {
                                     const isDeactivated = opt.is_active === false;
                                     return (
-                                        <div 
+                                    <div 
                                             key={opt.id}
                                             className={`p-3.5 rounded-xl transition-all flex justify-between items-center mb-0.5 group 
                                                 ${isDeactivated 
                                                     ? 'bg-gray-50/50 cursor-not-allowed opacity-60' 
                                                     : String(opt.id) === String(value) 
-                                                        ? 'bg-[var(--theme-secondary,#d3d1ff)] text-[var(--theme-primary)] shadow-sm' 
+                                                        ? 'shadow-sm cursor-pointer' 
                                                         : 'cursor-pointer hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] text-gray-600'
                                                 }`}
+                                            style={!isDeactivated && String(opt.id) === String(value) ? {
+                                                backgroundColor: 'var(--theme-primary)',
+                                                color: 'white'
+                                            } : {}}
                                             onClick={(e) => {
                                                 if (isDeactivated) return;
                                                 e.stopPropagation();
@@ -154,20 +158,33 @@ const EliteSelector = ({
                                         >
                                             <div className="flex flex-col flex-1 overflow-hidden">
                                                 <div className="flex items-center gap-2">
-                                                    {opt.icon && <div className={`flex-shrink-0 ${isDeactivated ? 'text-gray-300' : String(opt.id) === String(value) ? 'text-[var(--theme-primary)]' : 'text-gray-400 group-hover:text-[var(--theme-primary)]'}`}>{opt.icon}</div>}
+                                                    {opt.icon && (
+                                                        <div className={`flex-shrink-0 ${
+                                                            isDeactivated 
+                                                                ? 'text-gray-300' 
+                                                                : String(opt.id) === String(value) 
+                                                                    ? 'text-white' 
+                                                                    : 'text-gray-400 group-hover:text-[var(--theme-primary)]'
+                                                        }`}>{opt.icon}</div>
+                                                    )}
                                                     <span className={`text-[13.5px] font-bold truncate ${isDeactivated ? 'line-through text-gray-400' : ''}`}>
-                                                        {opt.name} {isDeactivated && <span className="text-[10px] ml-1 opacity-50 font-black tracking-widest">(DEACTIVATED)</span>}
+                                                        {opt.name} {isDeactivated && <span className="text-[10px] ml-1 opacity-50 font-bold tracking-widest">(DEACTIVATED)</span>}
                                                     </span>
                                                 </div>
                                                 {(opt.code || opt.email) && (
                                                     <span className={`text-[10px] font-bold uppercase tracking-widest mt-1 pl-0 
-                                                        ${isDeactivated ? 'text-gray-300 line-through' : String(opt.id) === String(value) ? 'text-[var(--theme-primary)] opacity-60' : 'text-gray-400 group-hover:text-[var(--theme-primary)] group-hover:opacity-60'}`}>
+                                                        ${isDeactivated 
+                                                            ? 'text-gray-300 line-through' 
+                                                            : String(opt.id) === String(value) 
+                                                                ? 'opacity-70' 
+                                                                : 'text-gray-400 group-hover:text-[var(--theme-primary)] group-hover:opacity-60'
+                                                        }`}>
                                                         {opt.code || opt.email}
                                                     </span>
                                                 )}
                                             </div>
                                             {String(opt.id) === String(value) && !isDeactivated && (
-                                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--theme-primary)] shadow-sm" />
+                                                <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm flex-shrink-0" />
                                             )}
                                         </div>
                                     );

@@ -169,7 +169,7 @@ function SchemaEngine({ route, dataSource, token, dataMapper, schemaOverride, on
         <p className="text-rose-600 font-bold mb-2 text-sm uppercase tracking-tight">{error}</p>
         <button 
           onClick={fetchUiAndData}
-          className="mt-2 text-xs font-black text-indigo-500 hover:text-indigo-700 uppercase tracking-widest underline decoration-2 underline-offset-4"
+          className="mt-2 text-xs font-bold text-indigo-500 hover:text-indigo-700 uppercase tracking-widest underline decoration-2 underline-offset-4"
         >
           Attempt Force Re-sync
         </button>

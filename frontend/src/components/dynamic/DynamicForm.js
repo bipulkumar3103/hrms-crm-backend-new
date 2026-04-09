@@ -84,7 +84,7 @@ function DynamicForm({ config, token, currentRoute }) {
             <button 
                 type="submit" 
                 disabled={status.loading}
-                className="px-8 py-3 font-black text-sm uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg disabled:opacity-50 transition-all active:scale-95"
+                className="px-8 py-3 font-bold text-sm uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg disabled:opacity-50 transition-all active:scale-95"
                 style={{ backgroundColor: 'var(--theme-primary)' }}
             >
                 {status.loading ? 'Submitting...' : (config.submitLabel || 'Submit')}

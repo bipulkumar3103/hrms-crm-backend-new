@@ -48,9 +48,13 @@ const Container = ({ children, config }) => {
     borderRadius = 24,
     boxShadow = "none",
     noStack = false,
+    maxWidth = 'auto',
+    minWidth = 'auto',
     // Breakpoint Overrides
     widthTablet, widthMobile,
     heightTablet, heightMobile,
+    maxWidthTablet, maxWidthMobile,
+    minWidthTablet, minWidthMobile,
     paddingTablet, paddingMobile,
     flexDirectionTablet, flexDirectionMobile,
     gapTablet, gapMobile,
@@ -80,6 +84,14 @@ const Container = ({ children, config }) => {
     '--flex-wrap-mobile': noStack ? flexWrap : 'wrap',
     '--align-items': alignItems,
     '--justify-content': justifyContent,
+    '--max-width': toMetric(maxWidth),
+    '--max-width-tablet': toMetric(maxWidthTablet || maxWidth),
+    '--max-width-mobile': toMetric(maxWidthMobile || maxWidthTablet || maxWidth),
+    '--min-width': toMetric(minWidth),
+    '--min-width-tablet': toMetric(minWidthTablet || minWidth),
+    '--min-width-mobile': toMetric(minWidthMobile || minWidthTablet || minWidth),
+    maxWidth: 'var(--max-width)',
+    minWidth: 'var(--min-width)',
   };
 
   return (

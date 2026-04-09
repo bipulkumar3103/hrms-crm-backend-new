@@ -13,13 +13,21 @@ function Button({ config, onNavigate }) {
     icon = "FiArrowRight",
     showIcon = true,
     variant = "solid",
-    alignment = "left",
+    alignment = "center", // Enhanced default: Center
     fullWidth = false,
     targetRoute = "",
     fontSize = "",
     iconSize = "",
     borderRadius = "",
-    size = "md"
+    size = "md",
+    fontWeight = "700",
+    flexWrap = "nowrap",
+    maxWidth = "auto",
+    minWidth = "auto",
+    maxWidthTablet, maxWidthMobile,
+    minWidthTablet, minWidthMobile,
+    padding,
+    margin
   } = config || {};
 
   const IconComponent = Icons[icon] || Icons.FiArrowRight;
@@ -52,17 +60,28 @@ function Button({ config, onNavigate }) {
   const style = {
     backgroundColor: variant !== 'secondary' ? 'var(--theme-primary)' : undefined,
     fontSize: toMetric(fontSize) || toMetric(currentSize.fontSize),
-    padding: `${toMetric(currentSize.py)} ${toMetric(currentSize.px)}`,
+    fontWeight: fontWeight,
+    padding: padding || `${toMetric(currentSize.py)} ${toMetric(currentSize.px)}`,
+    margin: margin || '0',
     borderRadius: toMetric(borderRadius) || toMetric(currentSize.radius),
-    // Precision Centering Implementation
+    // Precision Centering & Wrapping Implementation
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '0.5rem',
+    gap: '0.625rem',
+    flexWrap: flexWrap,
     // Elite Breakpoint Variable Mapping
     '--width': fullWidth ? '100%' : 'fit-content',
     '--width-mobile': '100%',
-    '--flex-direction-mobile': 'row', // Force horizontal on mobile inside buttons
+    '--max-width': toMetric(maxWidth),
+    '--max-width-tablet': toMetric(maxWidthTablet || maxWidth),
+    '--max-width-mobile': toMetric(maxWidthMobile || maxWidthTablet || maxWidth),
+    '--min-width': toMetric(minWidth),
+    '--min-width-tablet': toMetric(minWidthTablet || minWidth),
+    '--min-width-mobile': toMetric(minWidthMobile || minWidthTablet || minWidth),
+    maxWidth: 'var(--max-width)',
+    minWidth: 'var(--min-width)',
+    textAlign: 'center',
   };
 
   return (
