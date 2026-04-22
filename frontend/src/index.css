@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --theme-primary: #3730A3;
+  --theme-primary-rgb: 55, 48, 163;
+  --theme-secondary: #e0e7ff;
+  --theme-secondary-rgb: 224, 231, 255;
+  --theme-accent: #1e293b;
+  --theme-bg: #f8fafc;
+  --theme-text: #0f172a;
+  
+  /* Calculated Shadow Protocol */
+  --theme-primary-glow: 0 20px 40px -10px rgba(var(--theme-primary-rgb), 0.15);
+  --theme-primary-border: rgba(var(--theme-primary-rgb), 0.1);
+  --theme-secondary-glow: 0 10px 25px -5px rgba(var(--theme-secondary-rgb), 0.3);
+}
+
 @layer base {
   html, body, button, input, select, textarea {
     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
@@ -103,4 +118,24 @@
       flex-wrap: var(--flex-wrap-mobile, var(--flex-wrap-tablet, var(--flex-wrap)));
     }
   }
+}
+
+/* Elite Scrollbar Protocol */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.audit-registry-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.audit-registry-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.audit-registry-scroll::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
 }

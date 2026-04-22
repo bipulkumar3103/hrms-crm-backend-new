@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 employees_blueprint = Blueprint('employees', __name__)
 
-@employees_blueprint.route('/', methods=['GET'], strict_slashes=False)
+@employees_blueprint.route('/all', methods=['GET'])
 @jwt_required()
 def get_employees():
     try:
@@ -28,9 +28,25 @@ def get_employees():
                 'id': u.id,
                 'name': f"{u.first_name or ''} {u.last_name or ''}".strip() or u.email,
                 'email': u.email,
-                'department': u.department or 'Unassigned',
-                'job_title': u.job_title or 'Employee',
-                'status': u.status
+                'department': u.dept_relationship.name if u.dept_relationship else (u.department or 'Unassigned'),
+                'job_title': u.designation_relationship.name if u.designation_relationship else (u.job_title or 'Employee'),
+                'department_id': u.department_id,
+                'designation_id': u.designation_id,
+                'manager_id': u.manager_id,
+                'manager_name': f"{u.manager.first_name} {u.manager.last_name}" if u.manager else "Unassigned / Direct Report",
+                'status': u.status,
+                'is_privileged': u.is_admin_or_super,
+                'roles': [r.name for r in u.roles],
+                'organization': {
+                    'department': {
+                        'id': u.department_id,
+                        'name': u.dept_relationship.name if u.dept_relationship else u.department
+                    } if u.department_id or u.department else None,
+                    'designation': {
+                        'id': u.designation_id,
+                        'name': u.designation_relationship.name if u.designation_relationship else u.job_title
+                    } if u.designation_id or u.job_title else None
+                }
             })
         
         logger.info(f"Returning {len(employee_data)} employees")

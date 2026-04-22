@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi';
 import { api } from '../../../utils/api';
 import { useAlert } from '../../../context/AlertContext';
+import { useAuth } from '../../../context/AuthContext';
 
 /* Elite Serializer: Converts Craft Node Tree to Standard UI Schema (Recursive) */
 const serializeToStandardSchema = (nodes) => {
@@ -117,7 +118,8 @@ const deserializeFromStandardSchema = (schema) => {
   return JSON.stringify(nodes);
 };
 
-const CraftBuilderInternal = ({ token }) => {
+const CraftBuilderInternal = () => {
+  const { token } = useAuth();
   const { actions, query, enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
@@ -455,7 +457,7 @@ const CraftBuilderInternal = ({ token }) => {
   );
 };
 
-const CraftBuilder = (props) => {
+const CraftBuilder = () => {
   return (
     <Editor
       resolver={{
@@ -467,7 +469,7 @@ const CraftBuilder = (props) => {
         CraftContainer
       }}
     >
-      <CraftBuilderInternal {...props} />
+      <CraftBuilderInternal />
     </Editor>
   );
 };

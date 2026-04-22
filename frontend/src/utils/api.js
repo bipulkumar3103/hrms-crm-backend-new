@@ -28,7 +28,10 @@ api.interceptors.response.use(response => {
 }, error => {
   console.error(`[API ERROR] ${error.response?.status || 'NETWORK'} ${error.config?.url}`, error.response?.data || error.message);
   if (error.response?.status === 401) {
-    console.error("[API Response] 401 Unauthorized - Token may be invalid or expired.");
+    console.error("[API Response] 401 Unauthorized - Token may be invalid or expired. Forces re-authentication.");
+    localStorage.removeItem('token');
+    // Force a full page reload to the root to trigger App.js logic and cleanup states
+    window.location.href = '/';
   }
   return Promise.reject(error);
 });

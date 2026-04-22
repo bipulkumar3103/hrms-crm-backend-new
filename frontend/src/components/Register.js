@@ -3,6 +3,7 @@ import { api } from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCheck, FiX, FiMail, FiGlobe } from 'react-icons/fi';
 import { useAlert } from '../context/AlertContext';
+import { useNavigate } from 'react-router-dom';
 
 /* ── Custom hook for debouncing input ── */
 const useDebounce = (value, delay) => {
@@ -116,10 +117,10 @@ function RightPanel() {
 /* ══════════════════════════════════════
    MAIN REGISTER COMPONENT
 ══════════════════════════════════════ */
-function Register({ setView }) {
+function Register() {
+  const navigate = useNavigate();
   const { showAlert } = useAlert();
   const [formData, setFormData] = useState({ company_name: '', company_domain: '', email: '', password: '' });
-  const [formError, setFormError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [validation, setValidation] = useState({
     domain: { status: 'idle', message: '' },
@@ -167,16 +168,16 @@ function Register({ setView }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSubmit) {
-      setFormError('Please fix the errors before submitting.');
+      showAlert('Please resolve validation errors before continuing.', 'warning');
       return;
     }
-    setIsLoading(true); setFormError('');
+    setIsLoading(true);
     try {
       await api.post('/auth/register', formData);
-      showAlert('Registration successful! Please log in to continue.', 'success');
-      if(setView) setView('login');
+      showAlert('Success! Account and workspace initialized.', 'success');
+      navigate('/auth/login');
     } catch (err) {
-      setFormError(err.response?.data?.message || 'An unexpected error occurred.');
+      showAlert(err.response?.data?.message || 'Synchronization failure. Verification failed.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -198,12 +199,6 @@ function Register({ setView }) {
           <div className="nx-form-area" style={{ maxWidth: 360 }}>
             <h1 className="nx-heading" style={{ fontSize: 24 }}>Create your account</h1>
             <p className="nx-subheading">Sign up to bring your team together in one workspace.</p>
-
-            {formError && (
-              <div className="nx-alert err">
-                <IcoErr /> {formError}
-              </div>
-            )}
 
             <form onSubmit={handleSubmit}>
               
@@ -267,7 +262,13 @@ function Register({ setView }) {
 
             <div className="nx-left-footer" style={{ marginTop: 12 }}>
               Already have an account?
-              <button type="button" onClick={() => setView && setView('login')}>Sign in here</button>
+              <button 
+                type="button" 
+                onClick={() => navigate('/auth/login')}
+                style={{ color: 'var(--theme-primary)' }}
+              >
+                Sign in here
+              </button>
             </div>
           </div>
         </div>

@@ -129,7 +129,8 @@ def check_onboarding_status():
         "has_company": has_company,
         "company_id": company_id,
         "profile_complete": profile_complete,
-        "roles": roles
+        "roles": roles,
+        "needs_password": not bool(user.password_hash)
     }
     
     print(f"--- PRINT DEBUG: [4/4] Sending final JSON response to frontend: ---")

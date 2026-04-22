@@ -1,21 +1,43 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { api } from '../../../utils/api';
-import { FiPlus, FiUserPlus, FiLayers, FiInfo, FiList, FiSearch, FiChevronDown, FiHash, FiUser, FiArrowRight, FiX } from 'react-icons/fi';
+import { FiPlus, FiUserPlus, FiLayers, FiInfo, FiList, FiSearch, FiChevronDown, FiHash, FiUser, FiArrowRight, FiX, FiActivity, FiBriefcase } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import EliteSelector from '../../common/EliteSelector';
+import { useAlert } from '../../../context/AlertContext';
+import { useAuth } from '../../../context/AuthContext';
+import PremiumLoader from '../../PremiumLoader';
 
-const ProjectAdmin = ({ user }) => {
+const ProjectAdmin = () => {
+    const { user } = useAuth();
+    const { showAlert } = useAlert();
     const [projects, setProjects] = useState([]);
     const [employees, setEmployees] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Modal States
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
+    // Form States
     const [newProject, setNewProject] = useState({ name: '', code: '', description: '' });
     const [assignment, setAssignment] = useState({ employee_id: '', project_id: '' });
-    const [createMsg, setCreateMsg] = useState('');
-    const [assignMsg, setAssignMsg] = useState('');
+
     const [isCreating, setIsCreating] = useState(false);
     const [isAssigning, setIsAssigning] = useState(false);
+    const [isToggling, setIsToggling] = useState(false);
 
     useEffect(() => {
         loadData();
+
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                setIsCreateModalOpen(false);
+                setIsAssignModalOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
     }, []);
 
     const loadData = async () => {
@@ -28,20 +50,22 @@ const ProjectAdmin = ({ user }) => {
             setEmployees(eRes.data);
         } catch (err) {
             console.error("Data load failed", err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
         setIsCreating(true);
-        setCreateMsg('');
         try {
-            await api.post('/timesheets/admin/projects', newProject);
-            setCreateMsg('Success: Identity registry entry created.');
+            await api.post('/timesheets/projects', newProject);
+            showAlert('Success: Identity registry entry created.', 'success');
             setNewProject({ name: '', code: '', description: '' });
+            setIsCreateModalOpen(false);
             loadData();
         } catch (err) {
-            setCreateMsg(`Error: ${err.response?.data?.error || 'Synchronization failure'}`);
+            showAlert(err.response?.data?.message || 'Synchronization failure during provisioning', 'error');
         } finally {
             setIsCreating(false);
         }
@@ -50,20 +74,17 @@ const ProjectAdmin = ({ user }) => {
     const handleAssign = async (e) => {
         e.preventDefault();
         setIsAssigning(true);
-        setAssignMsg('');
         try {
-            await api.post('/timesheets/admin/assign', assignment);
-            setAssignMsg('Success: Personnel mapping verified.');
+            await api.post('/timesheets/assign-project', assignment);
+            showAlert('Success: Personnel mapping verified.', 'success');
             setAssignment({ employee_id: '', project_id: '' });
+            setIsAssignModalOpen(false);
         } catch (err) {
-            setAssignMsg(`Error: ${err.response?.data?.error || 'Protocol failed'}`);
+            showAlert(err.response?.data?.message || 'Protocol failure during assignment', 'error');
         } finally {
             setIsAssigning(false);
         }
     };
-
-    const [expandedId, setExpandedId] = useState(null);
-    const [isToggling, setIsToggling] = useState(false);
 
     const handleToggleStatus = async (projectId) => {
         setIsToggling(true);
@@ -77,292 +98,285 @@ const ProjectAdmin = ({ user }) => {
         }
     };
 
+    if (isLoading) return <PremiumLoader message="Syncing Identity Registry..." />;
+
     return (
-        <div className="nx-ts-animate w-full">
-            {/* Elite Header Area */}
-            <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
-                <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center nx-ts-text-primary">
-                        <FiLayers size={20} className="sm:hidden" />
-                        <FiLayers size={24} className="hidden sm:block" />
-                    </div>
+        <div className="nx-ts-animate w-full flex flex-col gap-6 pb-12">
+
+            {/* --- ELITE COMMAND CENTER HEADER --- */}
+            <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full bg-white rounded-3xl border border-gray-100 shadow-[0_20px_50px_var(--theme-primary-rgb-low)]"
+            >
+                {/* Header Strip */}
+                <div className="px-6 py-5 sm:px-8 sm:py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--theme-primary)] text-white rounded-t-3xl border-b border-white/5">
                     <div>
-                        <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-gray-900 leading-none mb-1">Master Code Registry</h1>
-                        <p className="text-gray-400 font-semibold uppercase text-[8px] sm:text-[9px] tracking-[0.2em] whitespace-nowrap overflow-hidden text-ellipsis">Governance Protocol & Resource Provisioning</p>
+                        <div className="flex items-center gap-3 mb-1">
+                            <h1 className="text-xl font-black tracking-tight">
+                                Project Master Registry
+                            </h1>
+                            <div className="px-2 py-0.5 rounded-md bg-white/10 border border-white/20 flex items-center gap-1.5">
+                                <span className="text-[9px] font-black uppercase text-white/90 tracking-tighter">Governance Node</span>
+                            </div>
+                        </div>
+                        <p className="text-[11px] font-bold text-white/60 uppercase tracking-widest">
+                            Resource Provisioning & Policy Enforcement
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 self-start sm:self-auto">
+                        <button
+                            onClick={() => setIsAssignModalOpen(true)}
+                            className="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border border-white/10"
+                        >
+                            <FiUserPlus size={14} /> Assign Project
+                        </button>
+                        <button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border border-white/10"
+                        >
+                            <FiPlus size={14} /> Add Project
+                        </button>
                     </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl border border-gray-100 shadow-sm justify-center sm:justify-start">
-                        <FiList className="nx-ts-text-primary" size={16} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{projects.length} <span className="hidden xs:inline">Registered</span> Identifiers</span>
+
+                {/* Sub Metadata Strip */}
+                <div className="bg-gray-50/30 px-6 py-4 sm:px-8 flex items-center gap-10 border-b border-gray-50 uppercase">
+                    <div className="flex items-center gap-3">
+                        <FiLayers className="text-[var(--theme-primary)]" size={16} />
+                        <div>
+                            <span className="text-[10px] font-black text-gray-400 tracking-widest block leading-none mb-1">Active Modules</span>
+                            <span className="text-sm font-black text-gray-700">{projects.length} Registered</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="space-y-8">
-                {/* Unified Administrative Toolkit */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="w-full"
-                    style={{ 
-                        background: 'white',
-                        border: '1px solid #f1f5f9',
-                        borderRadius: '24px',
-                        overflow: 'visible',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.04)'
-                    }}
-                >
-                    {/* Section Header — Company Theme */}
-                    <div
-                        className="flex items-center gap-3 sm:gap-4 px-6 sm:px-8 py-5 sm:py-6"
-                        style={{ 
-                            backgroundColor: 'var(--theme-primary)',
-                            borderRadius: '24px 24px 0 0'
-                        }}
-                    >
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                            <FiPlus size={16} className="text-white sm:hidden" />
-                            <FiPlus size={18} className="text-white hidden sm:block" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <div className="text-white font-bold text-sm sm:text-[15px] tracking-tight leading-none truncate">Administrative Resource Provisioning</div>
-                            <div className="text-white/60 text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.15em] mt-1.5 whitespace-nowrap overflow-hidden text-ellipsis">Entity Creation & Personnel Binding</div>
-                        </div>
-                    </div>
-
-                    {/* Two-Panel Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-100" style={{ borderRadius: '0 0 24px 24px', overflow: 'visible' }}>
-
-                        <div className="p-6 sm:p-8 space-y-5">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--theme-secondary, #ede9fe)' }}>
-                                    <FiLayers size={13} style={{ color: 'var(--theme-primary)' }} />
-                                </div>
-                                <h3 className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--theme-primary)' }}>Initialize New Entity</h3>
+                {/* Grid Registry Body */}
+                <div className="p-6 sm:p-8">
+                    {projects.length === 0 ? (
+                        <div className="py-24 text-center">
+                            <div className="w-20 h-20 bg-gray-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-gray-100">
+                                <FiBriefcase size={32} className="text-gray-200" />
                             </div>
-
-
-                            <form onSubmit={handleCreateProject} className="space-y-4">
-                                <div>
-                                    <label className="block text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 mb-2 px-1">Project Identity</label>
-                                    <div className="nx-ts-input-wrap flex items-center justify-between transition-all px-0 border-gray-200 hover:border-[var(--theme-primary)]" style={{ height: '52px', background: 'white', borderRadius: '14px' }}>
-                                        <div className="flex items-center flex-1 overflow-hidden px-5 gap-3">
-                                            <FiLayers size={18} className="text-gray-300 flex-shrink-0" />
-                                            <input
-                                                className="bg-transparent border-none outline-none w-full text-[13px] font-semibold text-gray-700 placeholder-gray-400"
-                                                placeholder="e.g. Apollo Mission Control"
-                                                required
-                                                value={newProject.name}
-                                                onChange={e => setNewProject({ ...newProject, name: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 mb-2 px-1">Master Identifier (Code)</label>
-                                    <div className="nx-ts-input-wrap flex items-center justify-between transition-all px-0 border-gray-200 hover:border-[var(--theme-primary)]" style={{ height: '52px', background: 'white', borderRadius: '14px' }}>
-                                        <div className="flex items-center flex-1 overflow-hidden px-5 gap-3">
-                                            <FiHash size={18} className="text-gray-300 flex-shrink-0" />
-                                            <input
-                                                className="bg-transparent border-none outline-none w-full text-[13px] font-semibold text-gray-700 placeholder-gray-400 font-mono"
-                                                placeholder="e.g. PRJ-2024-001"
-                                                required
-                                                value={newProject.code}
-                                                onChange={e => setNewProject({ ...newProject, code: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isCreating || !newProject.name || !newProject.code}
-                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase transition-all duration-200"
-                                    style={{
-                                        height: '52px', borderRadius: '14px', border: 'none',
-                                        backgroundColor: (!newProject.name || !newProject.code) ? '#f1f5f9' : 'var(--theme-primary)',
-                                        color: (!newProject.name || !newProject.code) ? '#94a3b8' : '#ffffff',
-                                        cursor: (!newProject.name || !newProject.code) ? 'not-allowed' : 'pointer',
-                                        opacity: isCreating ? 0.75 : 1,
-                                    }}
-                                >
-                                    {isCreating
-                                        ? <><div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Deploying...</>
-                                        : <><FiArrowRight size={14} /> Provision Module</>
-                                    }
-                                </button>
-
-                                <AnimatePresence>
-                                    {createMsg && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                                            className={`text-[11px] font-bold py-3 px-4 rounded-xl border ${createMsg.startsWith('Error') ? 'bg-red-50 border-red-100 text-red-600' : 'border text-[var(--theme-primary)]'}`}
-                                            style={!createMsg.startsWith('Error') ? { backgroundColor: 'var(--theme-secondary, #ede9fe)', borderColor: 'var(--theme-primary)' } : {}}
-                                        >
-                                            {createMsg}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </form>
+                            <h3 className="text-sm font-black text-gray-800 uppercase tracking-widest mb-2">No Active Identifiers</h3>
+                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest max-w-[280px] mx-auto leading-relaxed">Establish your first protocol module to begin resource mapping.</p>
                         </div>
-
-                        {/* Panel 2: Personnel Binding */}
-                        <div className="p-6 sm:p-8 space-y-5">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--theme-secondary, #ede9fe)' }}>
-                                    <FiUserPlus size={13} style={{ color: 'var(--theme-primary)' }} />
-                                </div>
-                                <h3 className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--theme-primary)' }}>Personnel Mapping Protocol</h3>
-                            </div>
-
-                            <form onSubmit={handleAssign} className="space-y-4">
-                                <EliteSelector
-                                    label="Target Personnel"
-                                    placeholder="Select Employee"
-                                    options={employees}
-                                    value={assignment.employee_id}
-                                    onChange={(id) => setAssignment({ ...assignment, employee_id: id })}
-                                    icon={FiUser}
-                                />
-                                <EliteSelector
-                                    label="Destination Project"
-                                    placeholder="Select Project"
-                                    options={projects}
-                                    value={assignment.project_id}
-                                    onChange={(id) => setAssignment({ ...assignment, project_id: id })}
-                                    icon={FiLayers}
-                                />
-
-                                <button
-                                    type="submit"
-                                    disabled={isAssigning || !assignment.employee_id || !assignment.project_id}
-                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase transition-all duration-200"
-                                    style={{
-                                        height: '52px', borderRadius: '14px', border: 'none',
-                                        backgroundColor: (!assignment.employee_id || !assignment.project_id) ? '#f1f5f9' : 'var(--theme-primary)',
-                                        color: (!assignment.employee_id || !assignment.project_id) ? '#94a3b8' : '#ffffff',
-                                        cursor: (!assignment.employee_id || !assignment.project_id) ? 'not-allowed' : 'pointer',
-                                        opacity: isAssigning ? 0.75 : 1,
-                                    }}
-                                >
-                                    {isAssigning
-                                        ? <><div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Synchronizing...</>
-                                        : <><FiArrowRight size={14} /> Verify Personnel Mapping</>
-                                    }
-                                </button>
-
-                                <AnimatePresence>
-                                    {assignMsg && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                                            className={`text-[11px] font-bold py-3 px-4 rounded-xl border ${assignMsg.startsWith('Error') ? 'bg-red-50 border-red-100 text-red-600' : 'bg-green-50 border-green-100 text-green-700'}`}
-                                        >
-                                            {assignMsg}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </form>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Registry View - Vertical Accordion Protocol */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2 mb-4">
-                        <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-gray-400">Active Identifier Registry</div>
-                    </div>
-
-                    <div className="space-y-3">
-                        <AnimatePresence mode="wait">
-                            {projects.length === 0 ? (
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {projects.map((p) => (
                                 <motion.div
-                                    key="empty"
+                                    key={p.id}
+                                    layout
+                                    className={`bg-white rounded-[28px] border border-gray-100 transition-all group flex flex-col overflow-hidden ${p.is_active ? 'shadow-sm hover:shadow-xl hover:shadow-[var(--theme-primary)]/10' : 'opacity-70 grayscale bg-gray-50/50'}`}
+                                >
+                                    <div className="p-6 sm:p-7 flex-1">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-sm ${p.is_active ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] group-hover:bg-[var(--theme-primary)] group-hover:text-white' : 'bg-gray-200 text-gray-400'}`}>
+                                                <FiHash size={22} />
+                                            </div>
+                                            <div className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border ${p.is_active ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] border-[var(--theme-primary)]/20' : 'bg-gray-100 text-gray-400 border-gray-200'}`}>
+                                                {p.code}
+                                            </div>
+                                        </div>
+
+                                        <h3 className="text-[16px] font-black text-gray-800 tracking-tight mb-1 line-clamp-1" title={p.name}>{p.name}</h3>
+                                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 leading-relaxed opacity-70">
+                                            {p.is_active ? 'Active Protocol' : 'Decommissioned'}
+                                        </p>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">
+                                                <span>Resource Analytics</span>
+                                                <FiActivity size={10} className="opacity-40" />
+                                            </div>
+                                            <div className="flex items-center justify-between bg-gray-50/50 py-3 px-4 rounded-xl border border-gray-100/50">
+                                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Total Sourced</span>
+                                                <span className="text-[14px] font-black text-[var(--theme-primary)] leading-none">{p.total_hours}h</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Anchor */}
+                                    <div className="px-6 py-5 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between group/action">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            Governance Command
+                                        </span>
+                                        <button
+                                            onClick={() => handleToggleStatus(p.id)}
+                                            disabled={isToggling}
+                                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${p.is_active ? 'bg-white border border-gray-200 text-red-500 hover:bg-red-50 hover:border-red-100 hover:shadow-md' : 'bg-[var(--theme-primary)] text-white shadow-lg shadow-[var(--theme-primary)]/20 hover:scale-105'}`}
+                                            title={p.is_active ? "Decommission" : "Re-activate"}
+                                        >
+                                            <FiArrowRight size={14} className={p.is_active ? "" : "transform -rotate-45"} />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+
+            {/* --- ELITE MODALS --- */}
+            {/* Create Modal */}
+            {createPortal(
+                <AnimatePresence>
+                    {isCreateModalOpen && (
+                        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+                                <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="p-16 text-center bg-white rounded-3xl border-2 border-dashed border-gray-100 text-gray-400 text-sm font-semibold italic shadow-sm"
-                                >
-                                    No active identifiers discovered in the registry.
-                                </motion.div>
-                            ) : (
-                                projects.map((p, idx) => (
-                                <motion.div
-                                    key={p.id}
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    layout
-                                    className={`overflow-hidden transition-all duration-300 rounded-2xl border ${expandedId === p.id ? 'border-[var(--theme-primary)] shadow-xl ring-4 ring-indigo-50/50' : 'border-gray-100 shadow-sm'} ${!p.is_active ? 'bg-[var(--theme-bg)] opacity-70 grayscale' : 'bg-white'}`}
-                                >
-                                    {/* Accordion Trigger */}
-                                    <div
-                                        className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition-colors"
-                                        onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
+                                    onClick={() => setIsCreateModalOpen(false)}
+                                    className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm"
+                                />
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                                className="bg-white rounded-[32px] w-full max-w-md overflow-hidden relative z-[110] shadow-2xl"
+                            >
+                                <div className="px-8 py-8 bg-[var(--theme-primary)] text-white relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsCreateModalOpen(false)}
+                                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors shadow-sm"
                                     >
-                                        <div className="flex items-center justify-between w-full">
-                                            <div className="flex items-center gap-5">
-                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-inner ${p.is_active ? 'bg-gray-50 text-[var(--theme-primary)]' : 'bg-gray-200 text-gray-400'}`}>
-                                                    <FiHash size={24} />
-                                                </div>
-                                                <div>
-                                                    <div className={`text-[10px] font-bold tracking-widest uppercase mb-1 ${p.is_active ? 'text-[var(--theme-primary)]' : 'text-gray-400 line-through'}`}>{p.code}</div>
-                                                    <h4 className={`m-0 text-base font-bold tracking-tight transition-colors ${p.is_active ? 'text-gray-800' : 'text-gray-400 line-through'}`}>{p.name}</h4>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className={`hidden sm:flex px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-[0.15em] border transition-all ${p.is_active ? 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] border-[var(--theme-primary)]' : 'bg-gray-100 text-gray-400 border-gray-200'}`}>
-                                                    {p.is_active ? 'Active Protocol' : 'Decommissioned'}
-                                                </div>
-                                                <motion.div
-                                                    animate={{ rotate: expandedId === p.id ? 180 : 0 }}
-                                                    className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-300"
-                                                >
-                                                    <FiChevronDown size={22} />
-                                                </motion.div>
-                                            </div>
+                                        <FiX size={18} />
+                                    </button>
+                                    <h2 className="text-xl font-black tracking-tight flex items-center">
+                                        <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center mr-4">
+                                            <FiLayers size={20} />
                                         </div>
+                                        Initialize Protocol
+                                    </h2>
+                                    <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest mt-2 ml-14">New Administrative Resource</p>
+                                </div>
+
+                                <form onSubmit={handleCreateProject} className="p-8 space-y-6">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">Identity Name</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-[var(--theme-primary)] outline-none transition-all font-bold text-[14px] text-gray-700"
+                                            placeholder="e.g. Apollo Mission"
+                                            value={newProject.name}
+                                            onChange={e => setNewProject({ ...newProject, name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Master Identifier Code</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-2xl focus:bg-white focus:border-[var(--theme-primary)] outline-none transition-all font-bold text-[14px] text-[var(--theme-primary)] font-mono uppercase tracking-widest"
+                                            placeholder="PRJ-001"
+                                            value={newProject.code}
+                                            onChange={e => setNewProject({ ...newProject, code: e.target.value })}
+                                        />
                                     </div>
 
-                                        {/* Accordion Content */}
-                                        <AnimatePresence>
-                                            {expandedId === p.id && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    className="border-t border-gray-50 bg-gray-50/30 overflow-hidden"
-                                                >
-                                                    <div className="p-6 sm:p-8 flex flex-col md:flex-row items-stretch md:items-end justify-between gap-6">
-                                                        <div className="max-w-xl">
-                                                            <div className="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8] mb-3">Resource Metadata</div>
-                                                            <div className="text-base font-bold text-[var(--theme-primary)] mb-2">{p.total_hours}h Total Recorded</div>
-                                                            <p className="text-[13px] font-semibold text-gray-500 italic leading-relaxed">
-                                                                {p.description || "No metadata provided for this identifier. This entity is currently being tracked within the internal governance registry."}
-                                                            </p>
-                                                        </div>
-                                                        <div className="flex flex-col items-stretch gap-3 min-w-[220px]">
-                                                            <div className="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8] mb-1">Entity Governance</div>
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleToggleStatus(p.id); }}
-                                                                disabled={isToggling}
-                                                                className={`w-full py-4 rounded-xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-md active:scale-95 ${p.is_active ? 'bg-white text-red-500 border border-red-100 hover:bg-red-50' : 'bg-[var(--theme-primary)] text-white hover:scale-[1.02]'}`}
-                                                            >
-                                                                {isToggling ? 'Processing...' : (p.is_active ? 'Decommission Project' : 'Activate Project')}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </motion.div>
-                                ))
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </div>
-            </div>
+                                    <div className="flex gap-4 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsCreateModalOpen(false)}
+                                            className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-gray-200 transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            disabled={isCreating}
+                                            type="submit"
+                                            className="flex-1 py-4 bg-[var(--theme-primary)] text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-[var(--theme-primary)]/20 hover:scale-[1.02] active:scale-95 transition-all outline-none"
+                                        >
+                                            {isCreating ? "Deploying..." : "Provision Module"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
+
+            {/* Assign Modal */}
+            {createPortal(
+                <AnimatePresence>
+                    {isAssignModalOpen && (
+                        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsAssignModalOpen(false)}
+                                className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
+                            />
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                                className="bg-white rounded-[32px] w-full max-w-md overflow-hidden relative z-[110] shadow-2xl"
+                            >
+                                <div className="px-8 py-8 bg-[var(--theme-primary)] text-white relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsAssignModalOpen(false)}
+                                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors shadow-sm"
+                                    >
+                                        <FiX size={18} />
+                                    </button>
+                                    <h2 className="text-xl font-black tracking-tight flex items-center">
+                                        <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center mr-4">
+                                            <FiUserPlus size={20} />
+                                        </div>
+                                        Assign Project
+                                    </h2>
+                                    <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest mt-2 ml-14">Assign Employee to Project</p>
+                                </div>
+
+                                <form onSubmit={handleAssign} className="p-8 space-y-5">
+                                    <EliteSelector
+                                        label="Target Personnel"
+                                        placeholder="Select Employee"
+                                        options={employees}
+                                        value={assignment.employee_id}
+                                        onChange={(id) => setAssignment({ ...assignment, employee_id: id })}
+                                        icon={FiUser}
+                                    />
+                                    <EliteSelector
+                                        label="Destination Project"
+                                        placeholder="Select Project"
+                                        options={projects.filter(p => p.is_active)}
+                                        value={assignment.project_id}
+                                        onChange={(id) => setAssignment({ ...assignment, project_id: id })}
+                                        icon={FiLayers}
+                                    />
+
+                                    <div className="flex gap-4 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAssignModalOpen(false)}
+                                            className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-gray-200 transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            disabled={isAssigning || !assignment.employee_id || !assignment.project_id}
+                                            type="submit"
+                                            className="flex-1 py-4 bg-[var(--theme-primary)] text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-[var(--theme-primary)]/20 hover:scale-[1.02] active:scale-95 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isAssigning ? "Syncing..." : "Assign Protocol"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 };

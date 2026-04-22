@@ -3,6 +3,7 @@ import { api } from '../../utils/api';
 import SchemaEngine from '../DynamicUIRenderer/SchemaEngine';
 import { useAlert } from '../../context/AlertContext';
 import { useConfirmation } from '../../context/ConfirmationContext';
+import { useAuth } from '../../context/AuthContext';
 import { FiSearch, FiLayout, FiTrash2, FiPlusCircle, FiCheck, FiSettings, FiZap, FiMoreVertical, FiBox, FiType } from 'react-icons/fi';
 
 /**
@@ -22,7 +23,8 @@ const flattenObject = (obj, prefix = '') => {
   }, {});
 };
 
-function UIBuilder({ token }) {
+function UIBuilder() {
+  const { token } = useAuth();
   const { showAlert } = useAlert();
   const { confirm } = useConfirmation();
   const [activeView, setActiveView] = useState('builder'); // 'builder' | 'submissions'
@@ -548,7 +550,7 @@ function UIBuilder({ token }) {
                           <option value={selectedRoute}>{selectedRoute} (Unsaved)</option>
                       )}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 group-hover:text-indigo-500 transition-colors">
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 group-hover:text-[var(--theme-primary)] transition-colors">
                        <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                   </div>
                 </div>
@@ -558,7 +560,7 @@ function UIBuilder({ token }) {
                 <button 
                   onClick={() => setIsNewRouteModalOpen(true)}
                   title="Create New Route"
-                  className="p-2.5 text-indigo-600 hover:bg-white hover:shadow-sm rounded-xl transition-all active:scale-90"
+                  className="p-2.5 text-[var(--theme-primary)] hover:bg-white hover:shadow-sm rounded-xl transition-all active:scale-90"
                 >
                   <FiPlusCircle size={22} />
                 </button>
@@ -577,7 +579,10 @@ function UIBuilder({ token }) {
                 onClick={handleSave} 
                 disabled={saving}
                 className="flex-1 md:flex-none text-white font-bold py-3.5 px-10 rounded-[1.25rem] shadow-xl disabled:opacity-50 transition-all text-sm flex items-center justify-center gap-3 active:translate-y-1"
-                style={{ backgroundColor: 'var(--theme-primary)' }}
+                style={{ 
+                    backgroundColor: 'var(--theme-primary)',
+                    boxShadow: '0 10px 30px -5px var(--theme-primary-border)'
+                }}
               >
                 {saving ? (
                   <>
@@ -617,7 +622,7 @@ function UIBuilder({ token }) {
               <span className="text-gray-500 text-xs font-bold uppercase tracking-wider">Developer Options</span>
               <button 
                 onClick={() => setEditMode(!editMode)} 
-                className="text-indigo-600 text-sm font-semibold hover:text-indigo-800 transition-colors"
+                className="text-[var(--theme-primary)] text-sm font-semibold hover:opacity-80 transition-colors"
               >
                 {editMode ? 'Hide Code' : 'Show Code'}
               </button>
@@ -645,7 +650,7 @@ function UIBuilder({ token }) {
                               type: 'success' 
                           });
                       }}
-                    className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest"
+                    className="text-[10px] font-bold text-[var(--theme-primary)] hover:opacity-80 transition-colors uppercase tracking-widest"
                   >
                     Copy JSON
                   </button>
@@ -654,10 +659,10 @@ function UIBuilder({ token }) {
                   <textarea 
                     value={schemaText}
                     onChange={e => setSchemaText(e.target.value)}
-                    className="w-full h-[500px] font-mono text-[12px] bg-transparent text-indigo-100 p-6 focus:outline-none resize-none leading-relaxed custom-dark-scrollbar"
+                    className="w-full h-[500px] font-mono text-[12px] bg-transparent text-[var(--theme-primary)] p-6 focus:outline-none resize-none leading-relaxed custom-dark-scrollbar"
                     spellCheck="false"
                   />
-                  <div className="absolute bottom-4 right-4 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[9px] font-bold text-indigo-400 uppercase tracking-widest backdrop-blur-sm">
+                  <div className="absolute bottom-4 right-4 px-2 py-1 bg-[var(--theme-primary)]/10 border border-[var(--theme-primary)]/20 rounded text-[9px] font-bold text-[var(--theme-primary)] uppercase tracking-widest backdrop-blur-sm">
                       Live Sync Active
                   </div>
               </div>
@@ -730,13 +735,14 @@ function UIBuilder({ token }) {
               <input 
                 type="text" 
                 placeholder="Filter by Form Name..." 
-                className="w-full sm:w-auto px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                className="w-full sm:w-auto px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[var(--theme-primary)] text-sm"
                 value={submissionsFilter}
                 onChange={e => setSubmissionsFilter(e.target.value)}
               />
               <button 
                 onClick={() => fetchSubmissions(submissionsFilter)}
-                className="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold transition-all hover:bg-indigo-700 shadow-md shadow-indigo-100"
+                className="w-full sm:w-auto bg-[var(--theme-primary)] text-white px-6 py-2.5 rounded-xl font-bold transition-all hover:opacity-90 shadow-md"
+                style={{ boxShadow: '0 8px 20px -4px var(--theme-primary-border)' }}
               >
                 Search
               </button>
@@ -766,7 +772,7 @@ function UIBuilder({ token }) {
                       <tr className="hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)]/50 transition-colors">
                         <td className="px-6 py-4 font-bold text-gray-900 text-sm">{sub.submitter_name}</td>
                         <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                          <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-indigo-100 whitespace-nowrap">{sub.form_name}</span>
+                          <span className="bg-[var(--theme-secondary)] text-[var(--theme-primary)] px-2.5 py-1 rounded-lg text-xs font-bold border border-[var(--theme-primary)]/10 whitespace-nowrap">{sub.form_name}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-mono border border-gray-200 whitespace-nowrap">/forms/{sub.form_slug || 'submit'}</span>
@@ -776,7 +782,7 @@ function UIBuilder({ token }) {
                         <td className="px-6 py-4 text-right">
                           <button 
                             onClick={() => setExpandedSubId(expandedSubId === sub.id ? null : sub.id)}
-                            className="text-indigo-600 font-bold text-xs hover:underline mr-4"
+                            className="text-[var(--theme-primary)] font-bold text-xs hover:underline mr-4"
                           >
                             {expandedSubId === sub.id ? 'Hide Data' : 'View Data'}
                           </button>
@@ -822,13 +828,13 @@ function UIBuilder({ token }) {
                           type="text" 
                           required 
                           placeholder="/employee/settings" 
-                          className="w-full px-4 py-3 bg-gray-50 font-mono text-sm border border-gray-200 rounded-xl mb-6 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-4 py-3 bg-gray-50 font-mono text-sm border border-gray-200 rounded-xl mb-6 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--theme-primary)]"
                           value={newRouteName}
                           onChange={e => setNewRouteName(e.target.value)}
                       />
                       <div className="flex justify-end gap-3">
-                          <button type="button" onClick={() => setIsNewRouteModalOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] rounded-lg">Cancel</button>
-                          <button type="submit" className="px-4 py-2 font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Create Route</button>
+                          <button type="button" onClick={() => setIsNewRouteModalOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] rounded-lg">Cancel</button>
+                          <button type="submit" className="px-4 py-2 font-bold text-white bg-[var(--theme-primary)] hover:opacity-90 rounded-lg shadow-sm">Create Route</button>
                       </div>
                   </form>
               </div>

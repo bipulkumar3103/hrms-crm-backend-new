@@ -15,11 +15,11 @@ class Company(db.Model):
     profile_complete = db.Column(db.Boolean, default=False, nullable=False)
     
     # Theme color fields (HEX codes) - Increased length for safety
-    theme_primary_color = db.Column(db.String(10), default='#000000', nullable=False)
-    theme_secondary_color = db.Column(db.String(10), default='#ffffff', nullable=False)
-    theme_accent_color = db.Column(db.String(10), nullable=True)
-    theme_bg_color = db.Column(db.String(10), nullable=True)
-    theme_text_color = db.Column(db.String(10), nullable=True)
+    theme_primary_color = db.Column(db.String(10), default='#3730A3', nullable=False)
+    theme_secondary_color = db.Column(db.String(10), default='#e0e7ff', nullable=False)
+    theme_accent_color = db.Column(db.String(10), default='#1e293b', nullable=True)
+    theme_bg_color = db.Column(db.String(10), default='#f0f4f8', nullable=True)
+    theme_text_color = db.Column(db.String(10), default='#0f172a', nullable=True)
 
     # Mail Configuration Fields
     smtp_host = db.Column(db.String(255), nullable=True)

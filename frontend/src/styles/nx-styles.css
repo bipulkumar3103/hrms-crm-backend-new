@@ -186,7 +186,7 @@ body {
 }
 
 .nx-forgot-link:hover {
-  color: #3730a3;
+  color: var(--theme-primary, #3730a3);
 }
 
 .nx-input {

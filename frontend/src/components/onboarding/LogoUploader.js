@@ -2,8 +2,12 @@ import React, { useState, useRef } from 'react';
 import { api } from '../../utils/api';
 import { FiUploadCloud, FiImage, FiCheck, FiRefreshCw } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const LogoUploader = ({ companyId, setToken }) => {
+const LogoUploader = ({ companyId }) => {
+    const { login, refreshStatus } = useAuth();
+    const navigate = useNavigate();
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -41,8 +45,9 @@ const LogoUploader = ({ companyId, setToken }) => {
             
             const newToken = response.data.access_token;
             if (newToken) {
-                // By updating the token, App.js will reroute the user to the Dashboard automatically.
-                setToken(newToken);
+                login(newToken);
+                await refreshStatus();
+                navigate('/dashboard');
             } else {
                 throw new Error("Initialization failed securely.");
             }
@@ -137,10 +142,11 @@ const LogoUploader = ({ companyId, setToken }) => {
                 </button>
                 <div align="center">
                     <button 
-                        onClick={() => {
+                        onClick={async () => {
                             // Optionally let them skip logo directly
                             setIsUploading(true);
-                            setToken(localStorage.getItem('token')); // Usually triggers re-fetch if JWT changes
+                            await refreshStatus();
+                            navigate('/dashboard');
                         }}
                         disabled={isUploading}
                         className="mt-4 text-[13px] font-semibold text-gray-400 hover:text-gray-600 transition-colors bg-transparent border-none cursor-pointer"

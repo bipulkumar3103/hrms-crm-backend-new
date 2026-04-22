@@ -35,7 +35,7 @@ def get_my_company():
         "theme_text_color": company.theme_text_color
     }
 
-    if current_user.has_role('superadmin'):
+    if current_user.has_role('superadmin') or current_user.has_role('admin'):
         company_data.update({
             "smtp_host": company.smtp_host,
             "smtp_port": company.smtp_port,

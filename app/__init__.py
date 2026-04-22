@@ -79,6 +79,7 @@ def create_app(config_name='default'):
     from app.models.page_permission import PagePermission
     from app.models.form_submission import FormSubmission
     from app.models.timesheet import Project, ProjectAssignment, Timesheet, TimesheetDay, TimePunch
+    from app.models.organization import Department, Designation
 
 
     from app.api.auth import auth_blueprint
@@ -91,6 +92,8 @@ def create_app(config_name='default'):
     from app.api.ui import ui_blueprint
     from app.api.forms import forms_blueprint
     from app.api.timesheets import timesheets_blueprint
+    from app.api.organization import organization_blueprint
+    from app.api.organization_tree import org_tree_blueprint
 
 
     @jwt.user_lookup_loader
@@ -110,6 +113,8 @@ def create_app(config_name='default'):
     app.register_blueprint(users_blueprint, url_prefix='/api/v1/users')
     app.register_blueprint(ui_blueprint, url_prefix='/api/v1/ui')
     app.register_blueprint(timesheets_blueprint, url_prefix='/api/v1/timesheets')
+    app.register_blueprint(organization_blueprint, url_prefix='/api/v1/organization')
+    app.register_blueprint(org_tree_blueprint, url_prefix='/api/v1/organization')
     
     # Universal Catch-All for Dynamic Forms (Must be Registered LAST)
     # This captures any POST /api/v1/<path> that wasn't claimed above.

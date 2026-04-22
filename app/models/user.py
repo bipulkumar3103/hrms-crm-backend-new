@@ -22,9 +22,13 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     
     phone_number = db.Column(db.String(20), nullable=True)
-    job_title = db.Column(db.String(128), nullable=True)
-    department = db.Column(db.String(128), nullable=True)
+    job_title = db.Column(db.String(128), nullable=True) # Legacy string field
+    department = db.Column(db.String(128), nullable=True) # Legacy string field
     location = db.Column(db.String(128), nullable=True)
+    
+    # New relational organization support
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    designation_id = db.Column(db.Integer, db.ForeignKey('designations.id'), nullable=True)
     
     avatar_original_url = db.Column(db.String(255), nullable=True)
     avatar_medium_url = db.Column(db.String(255), nullable=True)
@@ -55,6 +59,11 @@ class User(db.Model):
     def is_admin_or_super(self):
         """Returns True if the user has either the 'admin' or 'superadmin' role."""
         return any(role.name in ['admin', 'superadmin'] for role in self.roles)
+
+    @property
+    def is_hr(self):
+        """Governance: Returns True if user belongs to the HR Department."""
+        return self.dept_relationship and self.dept_relationship.name.upper() == 'HR'
 
     # Hierarchy support for Enterprise Approvals
     manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)

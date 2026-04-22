@@ -4,6 +4,7 @@ import { api } from '../utils/api';
 import PremiumLoader from './PremiumLoader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCheckCircle, FiChevronRight, FiMapPin, FiPhone, FiGlobe } from 'react-icons/fi';
+import { useAlert } from '../context/AlertContext';
 
 /* ─── Global Styles Injection for Layout Consistency ─── */
 const injectStyles = () => {
@@ -16,7 +17,7 @@ const injectStyles = () => {
       .nx-root {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         min-height: 100vh;
-        background: #f0f4f8;
+        background: var(--theme-bg, #f0f4f8);
         display: flex; align-items: center; justify-content: center;
         padding: 24px;
         -webkit-font-smoothing: antialiased;
@@ -52,7 +53,7 @@ const injectStyles = () => {
         color: #0f172a; background: #fff; outline: none; transition: all .2s ease;
       }
       .nx-input::placeholder { color: #94a3b8; font-weight: 400; }
-      .nx-input:focus { border-color: #3730A3; box-shadow: 0 0 0 4px rgba(55,48,163,0.1); }
+      .nx-input:focus { border-color: var(--theme-primary); box-shadow: 0 0 0 4px var(--theme-primary-rgb-low); }
       
       .nx-color-block { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; transition: all .2s; cursor: pointer; }
       .nx-color-block:hover { border-color: #cbd5e1; background: #f8fafc; }
@@ -62,13 +63,13 @@ const injectStyles = () => {
       .nx-color-hex { flex: 1; padding: 4px 8px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: #475569; outline: none; text-transform: uppercase; font-family: monospace; }
   
       .nx-btn-primary {
-        width: 100%; height: 46px; background: #3730A3; border: none; border-radius: 10px;
+        width: 100%; height: 46px; background: var(--theme-primary); border: none; border-radius: 10px;
         color: #fff; font-size: 14.5px; font-weight: 700; cursor: pointer;
         transition: all .2s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
-        box-shadow: 0 4px 12px rgba(55,48,163,0.25); margin-top: 10px;
+        box-shadow: 0 4px 12px var(--theme-primary-rgb-low); margin-top: 10px;
       }
-      .nx-btn-primary:hover:not(:disabled) { background: #312E81; box-shadow: 0 6px 16px rgba(55,48,163,0.35); transform: translateY(-1px); }
-      .nx-btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 8px rgba(55,48,163,0.25); }
+      .nx-btn-primary:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 6px 16px var(--theme-primary-rgb-low); transform: translateY(-1px); }
+      .nx-btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 8px var(--theme-primary-rgb-low); }
       .nx-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
   
       /* Right Panel Split */
@@ -85,17 +86,26 @@ const injectStyles = () => {
       
       .nx-stepper { display: flex; gap: 8px; margin-bottom: 40px; }
       .nx-step { flex: 1; height: 4px; border-radius: 4px; background: #e2e8f0; transition: background 0.4s ease; }
-      .nx-step.active { background: #3730A3; }
+      .nx-step.active { background: var(--theme-primary); }
   
       @media (max-width: 860px) {
         .nx-right { display: none; }
         .nx-left  { width: 100%; border-right: none; padding: 32px 24px; }
       }
+
+      .nx-spin {
+        width: 15px; height: 15px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.35);
+        border-top-color: #fff;
+        animation: spin .65s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
     `;
     document.head.appendChild(s);
   };
 
-function CompleteProfile({ setToken }) {
+function CompleteProfile() {
+  const { showAlert } = useAlert();
   const [formData, setFormData] = useState({
     address: '',
     phone: '',
@@ -106,7 +116,6 @@ function CompleteProfile({ setToken }) {
     theme_bg_color: '#f0f4f8',
     theme_text_color: '#0f172a'
   });
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [companyId, setCompanyId] = useState(null);
 
@@ -122,18 +131,18 @@ function CompleteProfile({ setToken }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       const response = await api.post('/onboarding/complete-profile/details', formData);
       
       if (response.data && response.data.company_id) {
         setCompanyId(response.data.company_id);
+        showAlert('Environment variables synchronized. Provisioning visual assets...', 'success');
       } else {
         throw new Error("Failed to configure environment details.");
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Configuration error. Please verify your variables.');
+      showAlert(error.response?.data?.message || 'Configuration error. Please verify your variables.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -204,14 +213,14 @@ function CompleteProfile({ setToken }) {
                            <button 
                                 type="button" 
                                 onClick={(e) => { e.preventDefault(); setIsOpen(false); setTempColor(value); }} 
-                                className="flex-1 px-4 py-2 bg-gray-50 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] border border-gray-200 text-gray-600 font-semibold rounded-lg text-[13px] transition-colors"
+                                className="flex-1 px-4 py-2 bg-gray-50 hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] border border-gray-200 text-gray-600 font-semibold rounded-lg text-[13px] transition-colors"
                             >
                                 Cancel
                            </button>
                            <button 
                                 type="button" 
                                 onClick={handleConfirm} 
-                                className="flex-1 px-4 py-2 bg-[var(--theme-primary,#3730A3)] text-white font-bold rounded-lg text-[13px] hover:brightness-95 transition-all shadow-md"
+                                className="flex-1 px-4 py-2 bg-[var(--theme-primary)] text-white font-bold rounded-lg text-[13px] hover:brightness-95 transition-all shadow-md"
                             >
                                 OK
                            </button>
@@ -223,9 +232,6 @@ function CompleteProfile({ setToken }) {
     );
   };
 
-  if (isLoading) {
-      return <PremiumLoader message="Configuring Workspace Environment..." fullScreen={true} />;
-  }
 
   return (
     <div className="nx-root">
@@ -284,8 +290,8 @@ function CompleteProfile({ setToken }) {
 
                         {/* Brand Engine Section */}
                         <div className="mt-8 mb-4">
-                            <h3 className="text-[15px] font-bold text-gray-800 tracking-tight flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-[var(--theme-primary,#3730A3)]" /> Identity Engine
+                             <h3 className="text-[15px] font-bold text-gray-800 tracking-tight flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[var(--theme-primary)]" /> Identity Engine
                             </h3>
                             <p className="text-xs text-gray-500 font-medium">Define your foundational CSS variables for the workspace dashboard UI.</p>
                         </div>
@@ -300,10 +306,13 @@ function CompleteProfile({ setToken }) {
                             </div>
                         </div>
 
-                        {error && <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-medium mb-4 flex items-center gap-2">{error}</div>}
 
-                        <button type="submit" className="nx-btn-primary">
-                            Configure Identity <FiChevronRight size={18} />
+                        <button type="submit" className="nx-btn-primary" disabled={isLoading}>
+                            {isLoading ? (
+                                <><div className="nx-spin" /> Configuring Registry…</>
+                            ) : (
+                                <>Configure Identity <FiChevronRight size={18} /></>
+                            )}
                         </button>
                     </form>
                 </motion.div>
@@ -319,7 +328,7 @@ function CompleteProfile({ setToken }) {
                      <p className="nx-subheading">Your identity has been established. Finalize setup by uploading your corporate logo.</p>
                      
                      {/* The Logo Uploader integrates seamlessly with no full-page reloads */}
-                     <LogoUploader companyId={companyId} setToken={setToken} />
+                     <LogoUploader companyId={companyId} />
                 </motion.div>
               )}
             </AnimatePresence>

@@ -34,5 +34,5 @@ urllib3==2.6.3
 Werkzeug==3.0.6
 Flask-Migrate==4.0.7
 Authlib==1.6.9
-Flask-Migrate
-requests
+requests==2.33.1
+python-docx==1.2.0

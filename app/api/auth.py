@@ -3,7 +3,7 @@ from app import db, bcrypt
 from app.models.user import User
 from app.models.role import Role
 from app.models.company import Company
-from flask_jwt_extended import create_access_token, decode_token
+from flask_jwt_extended import create_access_token, decode_token, jwt_required, get_current_user
 
 auth_blueprint = Blueprint('auth', __name__)
 
@@ -259,3 +259,21 @@ def reset_password():
     except Exception as e:
         return jsonify({'message': 'Invalid or expired token'}), 400
 
+
+@auth_blueprint.route('/set-password', methods=['POST'])
+@jwt_required()
+def set_password():
+    data = request.get_json()
+    new_password = data.get('newPassword')
+    
+    if not new_password:
+        return jsonify({'message': 'Password is required'}), 400
+        
+    user = get_current_user()
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+        
+    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    db.session.commit()
+    
+    return jsonify({'message': 'Password has been set successfully'}), 200

@@ -24,7 +24,9 @@ const EliteSelector = ({
     placeholder, 
     icon: Icon,
     isSearchable = true,
-    className = ""
+    className = "",
+    isDisabled = false,
+    helpText = ""
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -72,9 +74,11 @@ const EliteSelector = ({
             )}
             
             <div 
-                className={`nx-ts-input-wrap cursor-pointer flex items-center justify-between transition-all px-0 ${isOpen ? 'ring-2 ring-[var(--theme-primary)] border-[var(--theme-primary)] shadow-sm' : 'border-gray-200 hover:border-[var(--theme-primary)]'}`}
-                onClick={() => setIsOpen(!isOpen)}
-                style={{ height: '52px', background: 'white', borderRadius: '14px' }}
+                className={`nx-ts-input-wrap flex items-center justify-between transition-all px-0 
+                    ${isDisabled ? 'bg-gray-50/50 cursor-not-allowed opacity-60 border-gray-200' : 'cursor-pointer hover:border-[var(--theme-primary)]'}
+                    ${isOpen && !isDisabled ? 'ring-2 ring-[var(--theme-primary)] border-[var(--theme-primary)] shadow-sm' : 'border-gray-200'}`}
+                onClick={() => !isDisabled && setIsOpen(!isOpen)}
+                style={{ height: '52px', background: isDisabled ? '#F9FAFB' : 'white', borderRadius: '14px' }}
             >
                 <div className="flex items-center flex-1 overflow-hidden px-5 gap-3">
                     {Icon && <Icon size={18} className="text-gray-300 flex-shrink-0" />}
@@ -113,7 +117,7 @@ const EliteSelector = ({
                                 <button 
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-gray-500 hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] transition-all"
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-300 hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] transition-all"
                                 >
                                     <FiX size={18} />
                                 </button>
@@ -142,7 +146,7 @@ const EliteSelector = ({
                                                     ? 'bg-gray-50/50 cursor-not-allowed opacity-60' 
                                                     : String(opt.id) === String(value) 
                                                         ? 'shadow-sm cursor-pointer' 
-                                                        : 'cursor-pointer hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)] text-gray-600'
+                                                        : 'cursor-pointer hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] text-gray-600'
                                                 }`}
                                             style={!isDeactivated && String(opt.id) === String(value) ? {
                                                 backgroundColor: 'var(--theme-primary)',
@@ -194,6 +198,11 @@ const EliteSelector = ({
                     </motion.div>
                 )}
             </AnimatePresence>
+            {helpText && (
+                <p className="mt-2 px-1 text-[11px] font-medium text-gray-400 italic">
+                    {helpText}
+                </p>
+            )}
         </div>
     );
 };

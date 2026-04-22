@@ -7,7 +7,7 @@ import { FiLock, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-ico
 
 const AcceptInvitation = () => {
     // Read token directly from URL — no React Router needed
-    const token = new URLSearchParams(window.location.search).get('token');
+    const token = new URLSearchParams(window.location.search).get('');
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');

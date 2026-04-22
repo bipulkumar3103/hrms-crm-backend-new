@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { motion } from 'framer-motion';
 import { FiBriefcase, FiGlobe, FiChevronRight, FiCheckCircle } from 'react-icons/fi';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../utils/api';
 
 /* ─── Global Styles Injection for Layout Consistency ─── */
 const injectStyles = () => {
@@ -14,7 +16,7 @@ const injectStyles = () => {
       .nx-root {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         min-height: 100vh;
-        background: #f0f4f8;
+        background: var(--theme-bg, #f0f4f8);
         display: flex; align-items: center; justify-content: center;
         padding: 24px;
         -webkit-font-smoothing: antialiased;
@@ -50,16 +52,16 @@ const injectStyles = () => {
         color: #0f172a; background: #fff; outline: none; transition: all .2s ease;
       }
       .nx-input::placeholder { color: #94a3b8; font-weight: 400; }
-      .nx-input:focus { border-color: #3730A3; box-shadow: 0 0 0 4px rgba(55,48,163,0.1); }
+      .nx-input:focus { border-color: var(--theme-primary, #3730A3); box-shadow: 0 0 0 4px var(--theme-secondary, rgba(55,48,163,0.1)); }
   
       .nx-btn-primary {
-        width: 100%; height: 46px; background: #3730A3; border: none; border-radius: 10px;
+        width: 100%; height: 46px; background: var(--theme-primary, #3730A3); border: none; border-radius: 10px;
         color: #fff; font-size: 14.5px; font-weight: 700; cursor: pointer;
         transition: all .2s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
-        box-shadow: 0 4px 12px rgba(55,48,163,0.25); margin-top: 10px;
+        box-shadow: 0 4px 12px var(--theme-secondary, rgba(55,48,163,0.25)); margin-top: 10px;
       }
-      .nx-btn-primary:hover:not(:disabled) { background: #312E81; box-shadow: 0 6px 16px rgba(55,48,163,0.35); transform: translateY(-1px); }
-      .nx-btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 8px rgba(55,48,163,0.25); }
+      .nx-btn-primary:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 6px 16px var(--theme-secondary, rgba(55,48,163,0.35)); transform: translateY(-1px); }
+      .nx-btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 8px var(--theme-secondary, rgba(55,48,163,0.25)); }
       .nx-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
   
       /* Right Panel Split */
@@ -82,7 +84,8 @@ const injectStyles = () => {
     document.head.appendChild(s);
 };
 
-const OnboardingGoogle = ({ api, saveToken }) => {
+const OnboardingGoogle = () => {
+    const { login, refreshStatus, token: authToken } = useAuth();
     const [companyName, setCompanyName] = useState('');
     const [companyDomain, setCompanyDomain] = useState('');
     const [error, setError] = useState('');
@@ -92,7 +95,7 @@ const OnboardingGoogle = ({ api, saveToken }) => {
         injectStyles();
         
         // Attempt to suggest a domain based on the user's email from the JWT
-        const token = localStorage.getItem('token');
+        const token = authToken;
         if (token) {
             try {
                 const decoded = jwtDecode(token);
@@ -129,7 +132,8 @@ const OnboardingGoogle = ({ api, saveToken }) => {
 
             if (response.data && response.data.access_token) {
                 // Save the new token which now includes the company_id and superadmin role
-                saveToken(response.data.access_token);
+                login(response.data.access_token);
+                await refreshStatus();
             }
         } catch (err) {
             const message = err.response?.data?.message || 'Failed to create company. Please try again.';

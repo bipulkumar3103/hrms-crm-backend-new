@@ -1,13 +1,48 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import extract, func
 from app import db
 from app.models.user import User
 from app.models.timesheet import Project, ProjectAssignment, Timesheet, TimesheetDay, TimePunch, ApprovalLog
 from app.utils.decorators import require_role
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
+from dateutil import parser
 
 timesheets_blueprint = Blueprint('timesheets', __name__)
+
+def parse_date_flexible(val):
+    """
+    Robust Date Parser for Enterprise Data.
+    Handles:
+    1. Standard ISO Strings (YYYY-MM-DD)
+    2. Regional Strings (MM/DD/YYYY, DD-MM-YYYY, etc.)
+    3. Excel Serial Numbers (Numbers like 45230)
+    """
+    if not val:
+        return None
+        
+    # Scenario A: Excel Serial Number (Integer or Float)
+    if isinstance(val, (int, float)) or (isinstance(val, str) and val.replace('.','',1).isdigit()):
+        try:
+            days = float(val)
+            # Excel's base date is Dec 30, 1899
+            return date(1899, 12, 30) + timedelta(days=days)
+        except:
+            pass
+            
+    # Scenario B: String Parsing (Fuzzy Detection)
+    if isinstance(val, str):
+        try:
+            return parser.parse(val).date()
+        except (ValueError, OverflowError):
+            return None
+            
+    # Scenario C: Already a date/datetime object
+    if isinstance(val, (date, datetime)):
+        return val.date() if isinstance(val, datetime) else val
+        
+    return None
 
 @timesheets_blueprint.route('/my-projects', methods=['GET'])
 @jwt_required()
@@ -29,7 +64,7 @@ def get_my_projects():
 @jwt_required()
 def list_projects():
     # Admin and HR can see all projects
-    if not (current_user.is_admin_or_super or current_user.has_role('hr')):
+    if not (current_user.is_admin_or_super or current_user.is_hr):
         return jsonify({"message": "Unauthorized"}), 403
     
     projects = Project.query.filter_by(company_id=current_user.company_id).all()
@@ -117,7 +152,7 @@ def assign_project():
         return jsonify({"message": "Cannot assign to a decommissioned project entity"}), 403
         
     # LOGIC: HR/Admin can assign anyone. Manager can only assign to their reports.
-    is_authorized = current_user.is_admin_or_super or current_user.has_role('hr') or \
+    is_authorized = current_user.is_admin_or_super or current_user.is_hr or \
                     (target_user.manager_id == current_user.id)
     
     if not is_authorized:
@@ -137,7 +172,7 @@ def assign_project():
 @jwt_required()
 def get_employees_for_assignment():
     # HR/Admin see everyone. Manager see reports.
-    if current_user.is_admin_or_super or current_user.has_role('hr'):
+    if current_user.is_admin_or_super or current_user.is_hr:
         employees = User.query.all()
     else:
         employees = User.query.filter_by(manager_id=current_user.id).all()
@@ -163,10 +198,13 @@ def submit_timesheet():
         return jsonify({"message": "Missing required fields"}), 400
 
     try:
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return jsonify({"message": "Invalid date format. Use YYYY-MM-DD"}), 400
+        start_date = parse_date_flexible(start_date_str)
+        end_date = parse_date_flexible(end_date_str)
+        
+        if not start_date or not end_date:
+            return jsonify({"message": "Invalid date format for start or end date"}), 400
+    except Exception as e:
+        return jsonify({"message": f"Date synchronization failure: {str(e)}"}), 400
 
     # 1. 31-day limit check
     if (end_date - start_date).days > 31:
@@ -216,7 +254,10 @@ def submit_timesheet():
     total_hours = 0
     for day in days_data:
         try:
-            d_date = datetime.strptime(day['date'], '%Y-%m-%d').date()
+            d_date = parse_date_flexible(day.get('date'))
+            if not d_date:
+                continue
+            
             d_hours = float(day.get('hours', 0))
             d_ot = float(day.get('ot_hours', 0))
             
@@ -251,16 +292,35 @@ def get_my_submissions():
     user_id = get_jwt_identity()
     sheets = Timesheet.query.filter_by(user_id=user_id).order_by(Timesheet.created_at.desc()).all()
     
-    return jsonify([{
-        "id": s.id,
-        "project_name": s.project.name,
-        "project_is_active": s.project.is_active,
-        "start_date": str(s.start_date),
-        "end_date": str(s.end_date),
-        "status": s.status,
-        "total_hours": s.total_hours,
-        "created_at": str(s.created_at)
-    } for s in sheets]), 200
+    res = []
+    from app.models.timesheet import ApprovalLog
+    for s in sheets:
+        latest_log = ApprovalLog.query.filter_by(timesheet_id=s.id, action=s.status).order_by(ApprovalLog.timestamp.desc()).first()
+        if not latest_log:
+            latest_log = ApprovalLog.query.filter_by(timesheet_id=s.id).filter(ApprovalLog.action.in_(['APPROVED', 'REJECTED'])).order_by(ApprovalLog.timestamp.desc()).first()
+            
+        reviewer_data = None
+        if latest_log and latest_log.approver:
+            reviewer_data = {
+                "name": f"{latest_log.approver.first_name or ''} {latest_log.approver.last_name or ''}".strip() or latest_log.approver.email,
+                "emp_id": f"EMP-{latest_log.approver.id:04d}",
+                "department": latest_log.approver.department or "Core Management",
+                "avatarUrl": latest_log.approver.avatar_medium_url or None
+            }
+
+        res.append({
+            "id": s.id,
+            "project_name": s.project.name,
+            "project_is_active": s.project.is_active,
+            "start_date": str(s.start_date),
+            "end_date": str(s.end_date),
+            "status": s.status,
+            "total_hours": s.total_hours,
+            "created_at": str(s.created_at),
+            "reviewer": reviewer_data
+        })
+        
+    return jsonify(res), 200
 
 @timesheets_blueprint.route('/review-queue', methods=['GET'])
 @jwt_required()
@@ -269,7 +329,7 @@ def get_review_queue():
     user = User.query.get(user_id)
     
     # Logic: If Manager, see reports. If HR, see all PENDING.
-    is_hr = user.has_role('hr') or user.is_admin_or_super
+    is_hr = user.is_hr or user.is_admin_or_super
     
     query = Timesheet.query.filter_by(status='PENDING')
     
@@ -310,7 +370,7 @@ def take_action():
         
     # Permission check: Manager or HR
     user = current_user
-    is_authorized = (sheet.user.manager_id == user.id) or user.has_role('hr') or user.is_admin_or_super
+    is_authorized = (sheet.user.manager_id == user.id) or user.is_hr or user.is_admin_or_super
     
     if not is_authorized:
         return jsonify({"message": "Unauthorized to review this timesheet"}), 403
@@ -342,7 +402,7 @@ def get_timesheet_details(sheet_id):
     # Permission check: Owner, Manager, or HR
     is_authorized = (sheet.user_id == int(user_id)) or \
                     (sheet.user.manager_id == int(user_id)) or \
-                    current_user.has_role('hr') or \
+                    current_user.is_hr or \
                     current_user.is_admin_or_super
     
     if not is_authorized:
@@ -350,13 +410,25 @@ def get_timesheet_details(sheet_id):
         
     days = TimesheetDay.query.filter_by(timesheet_id=sheet_id).order_by(TimesheetDay.date.asc()).all()
     
+    # Fetch latest review comment, if any
+    from app.models.timesheet import ApprovalLog
+    latest_log = ApprovalLog.query.filter_by(timesheet_id=sheet_id, action=sheet.status).order_by(ApprovalLog.timestamp.desc()).first()
+    
+    # Check fallback if no specific action matches
+    if not latest_log:
+        latest_log = ApprovalLog.query.filter_by(timesheet_id=sheet_id).order_by(ApprovalLog.timestamp.desc()).first()
+        
+    review_comments = latest_log.comments if latest_log else None
+    
     return jsonify({
         "id": sheet.id,
         "project_name": sheet.project.name,
         "project_is_active": sheet.project.is_active,
         "start_date": str(sheet.start_date),
         "end_date": str(sheet.end_date),
+        "total_hours": sheet.total_hours,
         "status": sheet.status,
+        "review_comments": review_comments,
         "days": [{
             "date": str(d.date),
             "hours": d.hours,
@@ -393,7 +465,10 @@ def resubmit_timesheet():
         
         total_hours = 0
         for day in days_data:
-            d_date = datetime.strptime(day['date'], '%Y-%m-%d').date()
+            d_date = parse_date_flexible(day.get('date'))
+            if not d_date:
+                continue
+                
             d_hours = float(day.get('hours', 0))
             d_ot = float(day.get('ot_hours', 0))
             
@@ -426,3 +501,45 @@ def resubmit_timesheet():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Resubmission failed: {str(e)}"}), 500
+
+@timesheets_blueprint.route('/stats', methods=['GET'])
+@jwt_required()
+def get_performance_stats():
+    user_id = get_jwt_identity()
+    today = date.today()
+    
+    # Define current month range
+    month = today.month
+    year = today.year
+    
+    # 1. Total Cumulative Hours (MTD)
+    # Statuses that contribute to performance: PENDING, APPROVED
+    mtd_sheets = Timesheet.query.filter(
+        Timesheet.user_id == user_id,
+        Timesheet.status.in_(['PENDING', 'APPROVED']),
+        extract('month', Timesheet.start_date) == month,
+        extract('year', Timesheet.start_date) == year
+    ).all()
+    
+    total_hours = sum(s.total_hours for s in mtd_sheets)
+    
+    # 2. Unique Active Days (MTD)
+    active_days = db.session.query(func.count(TimesheetDay.date.distinct())).join(Timesheet).filter(
+        Timesheet.user_id == user_id,
+        Timesheet.status.in_(['PENDING', 'APPROVED']),
+        extract('month', TimesheetDay.date) == month,
+        extract('year', TimesheetDay.date) == year
+    ).scalar() or 0
+    
+    # 3. Enterprise Metrics
+    target_hours = 160.0 # Enterprise standard target
+    efficiency_raw = (total_hours / target_hours) * 100 if target_hours > 0 else 0
+    
+    return jsonify({
+        "total_hours": round(total_hours, 1),
+        "target_hours": target_hours,
+        "active_days": active_days,
+        "efficiency_score": round(efficiency_raw, 1),
+        "efficiency_label": f"{round(efficiency_raw, 1)}% Efficient",
+        "period": today.strftime('%B %Y')
+    }), 200

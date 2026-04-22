@@ -1,16 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { api } from '../../../utils/api';
 import {
     FiSend, FiClock, FiCheckCircle, FiAlertCircle,
     FiTrash2, FiUpload, FiChevronDown, FiSearch, FiFolder,
-    FiCalendar, FiChevronLeft, FiChevronRight, FiX
+    FiCalendar, FiChevronLeft, FiChevronRight, FiX,
+    FiActivity, FiZap, FiPieChart, FiCpu, FiStar, FiCopy, FiList
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import EliteSelector from '../../common/EliteSelector';
 import EliteDatePicker from '../../common/EliteDatePicker';
 import * as XLSX from 'xlsx';
+import { useAlert } from '../../../context/AlertContext';
 
-const TimesheetConsole = ({ user }) => {
+const TimesheetConsole = ({ user: initialUser, isAdminMode, perfStats, refreshStats }) => {
+    const { showAlert } = useAlert();
+
     const [projects, setProjects] = useState([]);
     const [formData, setFormData] = useState({
         project_id: '',
@@ -18,16 +22,59 @@ const TimesheetConsole = ({ user }) => {
         end_date: '',
         days: []
     });
-    const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [focusedRow, setFocusedRow] = useState(null);
     const fileInputRef = useRef(null);
+
+    // Dynamic Greeting Monitor
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Pulse every minute
+        return () => clearInterval(timer);
+    }, []);
+
+    const greetingMsg = useMemo(() => {
+        const hour = currentTime.getHours();
+        if (hour < 12) return "Good Morning";
+        if (hour < 17) return "Good Afternoon";
+        return "Good Evening";
+    }, [currentTime]);
+
+    // Handle "View as Employee" simulated identity
+    const displayName = useMemo(() => {
+        const realName = initialUser?.first_name || 'Team Member';
+        const isActuallyAdmin = initialUser?.roles?.some(r => ['admin', 'superadmin'].includes(r));
+
+        if (isActuallyAdmin && isAdminMode === false) {
+            return "Elite Associate (Mock View)";
+        }
+        return realName;
+    }, [initialUser, isAdminMode]);
+
+    const metrics = useMemo(() => {
+        const totalHours = formData.days.reduce((sum, day) => sum + (parseFloat(day.hours) || 0), 0);
+        const activeDays = formData.days.length;
+        const avgUtilization = activeDays > 0 ? (totalHours / (activeDays * 8) * 100).toFixed(0) : 0;
+        return { totalHours, activeDays, avgUtilization };
+    }, [formData.days]);
 
     useEffect(() => {
         api.get('/timesheets/my-projects')
             .then(res => setProjects(res.data))
             .catch(err => console.error("Failed to load projects", err));
     }, []);
+
+    // Quick Actions: Flash Fill
+    const flashFill = () => {
+        if (formData.days.length === 0) {
+            showAlert("Please select a date range first.", "info");
+            return;
+        }
+        const newDays = formData.days.map(day => ({ ...day, hours: 8 }));
+        setFormData({ ...formData, days: newDays });
+        showAlert("Applied standard 8h day to all entries.", "success");
+    };
 
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
@@ -42,11 +89,10 @@ const TimesheetConsole = ({ user }) => {
             const data = XLSX.utils.sheet_to_json(ws);
 
             if (data.length === 0) {
-                setMessage("Error: The selected file appears to be empty.");
+                showAlert("The selected file appears to be empty.", "error");
                 return;
             }
 
-            // Map columns from Excel
             const mappedDays = data.map(row => ({
                 date: row['Date'] || row['date'] || '',
                 hours: parseFloat(row['Hours Worked'] || row['hours'] || 0),
@@ -54,11 +100,10 @@ const TimesheetConsole = ({ user }) => {
             })).filter(day => day.date);
 
             if (mappedDays.length === 0) {
-                setMessage("Error: Could not find valid dates in the Excel file. Please use 'Date' column.");
+                showAlert("Could not find valid dates in the Excel file.", "error");
                 return;
             }
 
-            // Set range based on imported data
             const dates = mappedDays.map(d => new Date(d.date)).sort((a, b) => a - b);
             const start = dates[0].toISOString().split('T')[0];
             const end = dates[dates.length - 1].toISOString().split('T')[0];
@@ -69,7 +114,7 @@ const TimesheetConsole = ({ user }) => {
                 end_date: end,
                 days: mappedDays
             });
-            setMessage("✓ Excel data imported! Please review and select a project.");
+            showAlert("Dataset updated successfully.", "success");
         };
         reader.readAsBinaryString(file);
     };
@@ -85,12 +130,12 @@ const TimesheetConsole = ({ user }) => {
             const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
 
             if (diffDays > 31) {
-                setMessage("Error: Timesheet span cannot exceed 31 days.");
+                showAlert("Maximum span is 31 days per submission.", "error");
                 setFormData(newFormData);
                 return;
             }
             if (diffDays <= 0) {
-                setMessage("Error: Invalid date range.");
+                showAlert("Please check your start and end dates.", "error");
                 setFormData(newFormData);
                 return;
             }
@@ -106,7 +151,6 @@ const TimesheetConsole = ({ user }) => {
                 });
             }
             newFormData.days = days;
-            setMessage('');
         }
         setFormData(newFormData);
     };
@@ -116,10 +160,11 @@ const TimesheetConsole = ({ user }) => {
         setIsSubmitting(true);
         try {
             await api.post('/timesheets/submit', formData);
-            setMessage("✓ Timesheet submitted for approval!");
+            showAlert("Timesheet successfully sent for approval.", "success");
             setFormData({ project_id: '', start_date: '', end_date: '', days: [] });
+            if (refreshStats) refreshStats();
         } catch (err) {
-            setMessage("Error: Submission failed. " + (err.response?.data?.message || err.message));
+            showAlert(err.response?.data?.message || "Something went wrong during submission.", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -132,221 +177,196 @@ const TimesheetConsole = ({ user }) => {
     };
 
     return (
-        <div className="nx-ts-animate w-full">
-            {/* Unified Administrative Toolkit Structure */}
+        <div className="nx-ts-animate w-full flex flex-col gap-6 pb-12">
+
+            {/* --- SUBMISSION HUB (Matrix Workspace) --- */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full"
-                style={{ 
-                    background: 'white',
-                    border: '1px solid #f1f5f9',
-                    borderRadius: '24px',
-                    overflow: 'visible',
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.04)'
-                }}
+                className="w-full bg-white rounded-[32px] border border-slate-100 shadow-sm transition-all hover:shadow-xl hover:shadow-slate-200/30"
             >
-                {/* Section Header — Company Theme Sync */}
-                <div
-                    className="flex items-center justify-between px-4 sm:px-8 py-5 sm:py-6"
-                    style={{ 
-                        backgroundColor: 'var(--theme-primary)',
-                        borderRadius: '24px 24px 0 0'
-                    }}
-                >
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                            <FiClock size={16} className="sm:hidden text-white" />
-                            <FiClock size={18} className="hidden sm:block text-white" />
+                {/* Hub Identity Header */}
+                <div className="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between rounded-t-[31px]">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-[var(--theme-primary)] border border-slate-100">
+                            <FiSend size={20} />
                         </div>
-                        <div className="min-w-0 flex-1">
-                            <div className="text-white font-bold text-sm sm:text-[15px] tracking-tight leading-none truncate">Submit New Timesheet</div>
-                            <div className="text-white/60 text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.15em] mt-1 whitespace-nowrap overflow-hidden text-ellipsis">Primary Entry & Validation Protocol</div>
+                        <div>
+                            <div className="text-slate-800 font-black text-base tracking-tight leading-none uppercase">Submission Workspace</div>
+                            <div className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                                {greetingMsg}, <span className="text-[var(--theme-primary)]">{displayName}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex gap-2 sm:gap-3 shrink-0">
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: 'none' }}
-                            accept=".xlsx, .xls, .csv"
-                            onChange={handleFileUpload}
-                        />
+                    <div className="flex items-center gap-3">
+                        <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".xlsx, .xls, .csv" onChange={handleFileUpload} />
                         <button
                             type="button"
-                            className="flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all bg-white/10 text-white border border-white/20 hover:bg-white/20 active:scale-95"
                             onClick={() => fileInputRef.current.click()}
-                            title="Import Protocol"
+                            className="bg-white hover:bg-slate-50 text-slate-600 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-100 shadow-sm"
                         >
-                            <FiUpload size={14} className="shrink-0" />
-                            <span className="hidden xs:inline">Import Protocol</span>
-                            <span className="xs:hidden">Import</span>
+                            <FiUpload size={14} className="text-[var(--theme-primary)]" /> Import Data Payload
                         </button>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    {/* Two-Panel Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-100" style={{ borderRadius: '0 0 24px 24px', overflow: 'visible' }}>
-                        
-                        {/* Panel 1: Protocol Configuration */}
-                        <div className="p-6 sm:p-8 space-y-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--theme-secondary, #ede9fe)' }}>
-                                    <FiFolder size={13} style={{ color: 'var(--theme-primary)' }} />
+                <form onSubmit={handleSubmit} className="p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        {/* INPUT BLOCK */}
+                        <div className="lg:col-span-8 space-y-10">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                                <div className="sm:col-span-2">
+                                    <EliteSelector
+                                        label="Primary Project Assignment"
+                                        placeholder="Select Operational Project"
+                                        options={projects}
+                                        value={formData.project_id}
+                                        onChange={(id) => setFormData({ ...formData, project_id: id })}
+                                        icon={FiFolder}
+                                    />
                                 </div>
-                                <h3 className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--theme-primary)' }}>Instance Configuration</h3>
-                            </div>
-
-                            <EliteSelector
-                                label="Target Identifier / Project"
-                                placeholder="Select Active Project"
-                                options={projects}
-                                value={formData.project_id}
-                                onChange={(id) => setFormData({ ...formData, project_id: id })}
-                                icon={FiFolder}
-                            />
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <EliteDatePicker 
-                                    label="Protocol Start"
+                                <EliteDatePicker
+                                    label="Authorization Start"
                                     value={formData.start_date}
+                                    icon={FiCalendar}
                                     onChange={(date) => handleDateChange({ target: { name: 'start_date', value: date } })}
                                 />
-                                <EliteDatePicker 
-                                    label="Protocol End"
+                                <EliteDatePicker
+                                    label="Authorization End"
                                     value={formData.end_date}
+                                    icon={FiCalendar}
                                     onChange={(date) => handleDateChange({ target: { name: 'end_date', value: date } })}
                                 />
                             </div>
-                        </div>
 
-                        {/* Panel 2: Secondary Logic & Submission */}
-                        <div className={`p-6 sm:p-8 flex flex-col ${formData.days.length > 0 ? 'justify-start' : 'justify-between'}`}>
-                            <div>
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--theme-secondary, #ede9fe)' }}>
-                                        <FiSend size={13} style={{ color: 'var(--theme-primary)' }} />
-                                    </div>
-                                    <h3 className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--theme-primary)' }}>Submission Gateway</h3>
-                                </div>
-
-                                {formData.days.length === 0 ? (
-                                    <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                                        <FiClock className="mx-auto mb-3 text-gray-300" size={32} />
-                                        <p className="text-sm font-semibold text-gray-400 italic">Configure a date range or import a protocol to begin entry.</p>
-                                    </div>
-                                ) : (
-                                    <div className="p-6 bg-[var(--theme-secondary)] rounded-2xl border border-[var(--theme-primary)]/20 space-y-3">
-                                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-[var(--theme-primary)]">
-                                            <span>Active Duration</span>
-                                            <span className="bg-white px-2 py-0.5 rounded-md shadow-sm">{formData.days.length} Days</span>
-                                        </div>
-                                        <div className="text-gray-500 text-xs font-semibold italic">Protocol generated. Please verify entries below before synchronization.</div>
-                                        
-                                        <button
-                                            type="button"
-                                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-red-500 border border-red-100 text-[10px] font-bold uppercase tracking-widest hover:bg-red-50 transition-all mt-4"
-                                            onClick={() => setFormData({ project_id: '', start_date: '', end_date: '', days: [] })}
-                                        >
-                                            <FiTrash2 size={12} /> Clear Registry Entry
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-8">
+                            <div className="flex items-center gap-4 pt-6 border-t border-slate-50">
                                 <button
-                                    type="submit"
-                                    disabled={isSubmitting || !formData.project_id || formData.days.length === 0 || message.startsWith('Error')}
-                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase transition-all duration-200"
-                                    style={{
-                                        height: '52px', borderRadius: '14px', border: 'none',
-                                        backgroundColor: (!formData.project_id || formData.days.length === 0 || message.startsWith('Error')) ? '#f1f5f9' : 'var(--theme-primary)',
-                                        color: (!formData.project_id || formData.days.length === 0 || message.startsWith('Error')) ? '#94a3b8' : '#ffffff',
-                                        cursor: (!formData.project_id || formData.days.length === 0 || message.startsWith('Error')) ? 'not-allowed' : 'pointer',
-                                        opacity: isSubmitting ? 0.75 : 1,
-                                    }}
+                                    type="button"
+                                    onClick={flashFill}
+                                    className="px-6 py-3 rounded-xl bg-[var(--theme-primary)]/5 text-[var(--theme-primary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--theme-primary)] hover:text-white transition-all flex items-center gap-2 border border-[var(--theme-primary)]/10"
                                 >
-                                    {isSubmitting
-                                        ? <><div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> <span className="hidden xs:inline">Transmitting...</span><span className="xs:hidden">Pushing...</span></>
-                                        : <><FiSend size={14} /><span className="hidden xs:inline">Push to Review Queue</span><span className="xs:hidden">Send Protocol</span></>
-                                    }
+                                    <FiZap size={14} /> Flash-Fill Allocation (8h)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, days: [] })}
+                                    className="px-6 py-3 rounded-xl text-slate-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 hover:text-red-500 transition-all flex items-center gap-2"
+                                >
+                                    <FiTrash2 size={14} /> Reset Workflow
                                 </button>
                             </div>
+                        </div>
+
+                        {/* SUBMIT BLOCK */}
+                        <div className="lg:col-span-4 flex flex-col justify-end">
+                            <div className="p-6 bg-slate-50/50 rounded-2xl border border-slate-100 mb-6">
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 px-1">Summary Protocol</h4>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center text-[13px] font-bold">
+                                        <span className="text-slate-500">Captured Effort</span>
+                                        <span className="text-slate-800">{metrics.totalHours}h</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[13px] font-bold">
+                                        <span className="text-slate-500">Active Nodes</span>
+                                        <span className="text-slate-800">{metrics.activeDays} Days</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting || !formData.project_id || formData.days.length === 0}
+                                className="w-full h-[72px] rounded-2xl flex items-center justify-center gap-3 text-[12px] font-black uppercase tracking-[0.2em] transition-all duration-300 shadow-xl"
+                                style={{
+                                    backgroundColor: (!formData.project_id || formData.days.length === 0) ? 'var(--theme-bg)' : 'var(--theme-primary)',
+                                    color: (!formData.project_id || formData.days.length === 0) ? 'var(--theme-text)' : '#ffffff',
+                                    opacity: (!formData.project_id || formData.days.length === 0) ? 0.3 : 1,
+                                    boxShadow: (!formData.project_id || formData.days.length === 0) ? 'none' : '0 10px 30px -5px var(--theme-primary-border)',
+                                    border: 'none',
+                                    cursor: (!formData.project_id || formData.days.length === 0) ? 'not-allowed' : 'pointer'
+                                }}
+                            >
+                                {isSubmitting ? (
+                                    <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <FiSend size={18} />
+                                )}
+                                {isSubmitting ? "Transmitting..." : "Authorize Submission"}
+                            </button>
                         </div>
                     </div>
                 </form>
             </motion.div>
 
-            {/* Preview Section - Aligned with Project Registry List Style */}
+
+            {/* --- ACTIVITY LOG REGISTRY (CARDS) --- */}
             <AnimatePresence>
-                {formData.days.length > 0 && !message.startsWith('Error') && (
+                {formData.days.length > 0 && (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }}
+                        initial={{ opacity: 0, scale: 0.99 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        className="mt-8"
+                        exit={{ opacity: 0, scale: 0.99 }}
+                        className="w-full bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden"
                     >
-                        <div 
-                            className="bg-white rounded-[24px] border border-[#f1f5f9] shadow-sm overflow-hidden"
-                        >
-                            <div
-                                className="flex items-center justify-between px-8 py-5"
-                                style={{ 
-                                    backgroundColor: 'var(--theme-primary)',
-                                }}
-                            >
-                                <div className="flex items-center gap-3 sm:gap-4">
-                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                                        <FiClock size={16} className="sm:hidden text-white" />
-                                        <FiClock size={18} className="hidden sm:block text-white" />
-                                    </div>
-                                    <div>
-                                        <div className="text-white font-bold text-sm sm:text-[15px] tracking-tight leading-none">Entry Preview & Metadata Logging</div>
-                                        <div className="text-white/60 text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.15em] mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">Real-time Protocol Verification</div>
-                                    </div>
+                        <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/20 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-[var(--theme-primary)] border border-slate-100">
+                                    <FiList size={18} />
                                 </div>
-                                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">{formData.days.length} Active Records</span>
+                                <div>
+                                    <h2 className="text-sm font-black text-slate-800 tracking-tight uppercase">Daily Effort Registry</h2>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 opacity-60 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--theme-primary)] animate-pulse" /> Validating {formData.days.length} entries
+                                    </p>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Desktop Table: Hidden on Mobile */}
-                            <div className="hidden md:block overflow-x-auto nx-ts-scrollable-console nx-ts-scroll-common" style={{ maxHeight: '500px' }}>
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-50/50 border-b border-gray-100">
-                                            <th className="px-8 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-[#94a3b8] w-[180px]">Chronology</th>
-                                            <th className="px-8 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Entry Definition / Task Details</th>
-                                            <th className="px-8 py-4 text-center text-[10px] font-bold uppercase tracking-widest text-[#94a3b8] w-[120px]">Quantum (Hrs)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {formData.days.map((day, idx) => (
-                                            <tr 
-                                                key={idx} 
-                                                className={`transition-all duration-200 ${focusedRow === idx ? 'bg-[var(--theme-primary)] text-white shadow-lg' : 'hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)]'}`}
-                                            >
-                                                <td className="px-8 py-4">
-                                                    <div className={`text-sm font-bold ${focusedRow === idx ? 'text-white' : 'text-gray-700'}`}>{day.date}</div>
-                                                    <div className={`text-[10px] font-semibold uppercase tracking-tighter mt-0.5 ${focusedRow === idx ? 'text-white/70' : 'text-gray-400'}`}>Active Protocol</div>
-                                                </td>
-                                                <td className="px-8 py-4">
-                                                    <input
-                                                        className={`w-full bg-transparent border-none outline-none text-sm font-semibold placeholder-gray-300 transition-colors italic ${focusedRow === idx ? 'text-white placeholder-white/30' : 'text-gray-600'}`}
-                                                        value={day.notes || ''}
-                                                        placeholder="Specify resource utilization..."
-                                                        onFocus={() => setFocusedRow(idx)}
-                                                        onBlur={() => setFocusedRow(null)}
-                                                        onChange={e => updateDay(idx, 'notes', e.target.value)}
-                                                    />
-                                                </td>
-                                                <td className="px-8 py-4">
-                                                    <div className="flex items-center justify-center">
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/10">
+                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-slate-400 w-[220px]">Temporal Node</th>
+                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Telemetry</th>
+                                        <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 w-[140px]">Quantum (h)</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {formData.days.map((day, idx) => (
+                                        <tr key={idx} className={`transition-colors duration-200 ${focusedRow === idx ? 'bg-[var(--theme-primary)]/[0.02]' : 'hover:bg-slate-50/30'}`}>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${focusedRow === idx ? 'bg-[var(--theme-primary)] text-white shadow-lg shadow-[var(--theme-primary)]/20 scale-110' : 'bg-slate-50 text-slate-300'}`}>
+                                                        <FiCalendar size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <div className={`text-[13px] font-black transition-colors ${focusedRow === idx ? 'text-[var(--theme-primary)]' : 'text-slate-700'}`}>
+                                                            {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                        </div>
+                                                        <div className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                                                            <FiStar size={8} /> Ref D-{idx + 1}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <input
+                                                    className="w-full bg-transparent border-none outline-none text-[13px] font-bold text-slate-600 placeholder-slate-200 focus:text-slate-800 transition-all px-4 py-3 rounded-xl focus:bg-white focus:shadow-sm"
+                                                    value={day.notes || ''}
+                                                    placeholder="Detail operational activity..."
+                                                    onFocus={() => setFocusedRow(idx)}
+                                                    onBlur={() => setFocusedRow(null)}
+                                                    onChange={e => updateDay(idx, 'notes', e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center justify-center">
+                                                    <div className={`relative group/input transition-all ${focusedRow === idx ? 'scale-110' : ''}`}>
                                                         <input
-                                                            className={`w-16 rounded-lg py-1.5 text-center text-sm font-bold transition-all outline-none border ${focusedRow === idx ? 'bg-white/20 border-white/40 text-white focus:bg-white/30 focus:border-white' : 'bg-white border-gray-100 text-[var(--theme-primary)] focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)]/10'}`}
+                                                            className={`w-20 h-12 rounded-xl text-center text-[14px] font-black outline-none border transition-all shadow-sm
+                                                                ${focusedRow === idx 
+                                                                    ? 'bg-white border-[var(--theme-primary)] text-[var(--theme-primary)] ring-4 ring-[var(--theme-primary)]/5' 
+                                                                    : 'bg-slate-50/50 border-slate-100 text-slate-500 group-hover/input:border-slate-200'}`}
                                                             type="number"
                                                             step="0.5"
                                                             value={day.hours}
@@ -355,69 +375,16 @@ const TimesheetConsole = ({ user }) => {
                                                             onChange={e => updateDay(idx, 'hours', parseFloat(e.target.value) || 0)}
                                                         />
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Mobile Card View: Hidden on Tablet/Desktop */}
-                            <div className="md:hidden divide-y divide-gray-50 max-h-[500px] overflow-y-auto nx-ts-scroll-common">
-                                {formData.days.map((day, idx) => (
-                                    <div 
-                                        key={idx} 
-                                        className={`p-5 transition-all duration-200 ${focusedRow === idx ? 'bg-[var(--theme-primary)] text-white' : 'bg-white'}`}
-                                    >
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <div className={`text-xs font-bold ${focusedRow === idx ? 'text-white' : 'text-gray-800'}`}>{day.date}</div>
-                                                <div className={`text-[9px] font-bold uppercase tracking-widest mt-0.5 ${focusedRow === idx ? 'text-white/60' : 'text-gray-400'}`}>Protocol Reference</div>
-                                            </div>
-                                            <div className="w-16">
-                                                <input
-                                                    className={`w-full rounded-lg py-2 text-center text-xs font-bold transition-all outline-none border ${focusedRow === idx ? 'bg-white/20 border-white/40 text-white' : 'bg-gray-50 border-gray-100 text-[var(--theme-primary)]'}`}
-                                                    type="number"
-                                                    step="0.5"
-                                                    value={day.hours}
-                                                    onFocus={() => setFocusedRow(idx)}
-                                                    onBlur={() => setFocusedRow(null)}
-                                                    onChange={e => updateDay(idx, 'hours', parseFloat(e.target.value) || 0)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="relative">
-                                            <input
-                                                className={`w-full bg-transparent border-none outline-none text-xs font-medium placeholder-gray-300 transition-colors italic ${focusedRow === idx ? 'text-white placeholder-white/30' : 'text-gray-500'}`}
-                                                value={day.notes || ''}
-                                                placeholder="Specify resource utilization..."
-                                                onFocus={() => setFocusedRow(idx)}
-                                                onBlur={() => setFocusedRow(null)}
-                                                onChange={e => updateDay(idx, 'notes', e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {message && (
-                <motion.div
-                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className={`fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-8 sm:right-8 z-50 py-4 px-6 rounded-2xl shadow-2xl border flex items-center justify-between sm:justify-start gap-4 ${message.startsWith('Error') ? 'bg-red-50 border-red-100 text-red-600' : 'bg-white border-[var(--theme-primary)] nx-ts-text-primary'}`}
-                    style={!message.startsWith('Error') ? { color: 'var(--theme-primary)' } : {}}
-                >
-                    <div className="flex items-center gap-3">
-                        {message.startsWith('Error') ? <FiAlertCircle size={20} /> : <FiCheckCircle size={20} />}
-                        <span className="text-[12px] sm:text-[13px] font-bold">{message}</span>
-                    </div>
-                    <button onClick={() => setMessage('')} className="shrink-0 p-1.5 hover:bg-black/5 rounded-full transition-colors"><FiX size={16} /></button>
-                </motion.div>
-            )}
         </div>
     );
 };

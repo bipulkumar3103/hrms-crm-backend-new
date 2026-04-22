@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../utils/api';
-import { FiUser, FiMail, FiShield, FiCheckCircle, FiEdit2, FiSave, FiX, FiPhone, FiBriefcase, FiMapPin, FiGrid, FiCalendar, FiHome, FiFileText, FiCamera } from 'react-icons/fi';
+import { FiUser, FiMail, FiShield, FiCheckCircle, FiEdit2, FiSave, FiX, FiPhone, FiBriefcase, FiMapPin, FiGrid, FiCalendar, FiHome, FiFileText, FiCamera, FiLayers } from 'react-icons/fi';
 import PremiumLoader from '../PremiumLoader';
+import { useAuth } from '../../context/AuthContext';
+import EliteDatePicker from '../common/EliteDatePicker';
 
-const InputField = ({ label, type="text", value, onChange }) => (
+const InputField = ({ label, type="text", value, onChange, disabled=false }) => (
     <div className="mb-4">
         <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">{label}</label>
         <input 
             type={type}
             value={value} 
             onChange={onChange}
-            className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:border-[var(--theme-primary)] focus:ring-2 focus:ring-[var(--theme-primary)] outline-none transition-all font-semibold text-gray-800 text-[14px] shadow-sm"
+            disabled={disabled}
+            className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all font-semibold text-[14px] shadow-sm
+                ${disabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-100' : 'bg-white border-gray-200 focus:border-[var(--theme-primary)] focus:ring-4 focus:ring-[var(--theme-primary)]/10 text-gray-800'}
+            `}
         />
     </div>
 );
@@ -27,8 +32,9 @@ const DisplayField = ({ icon: Icon, label, value }) => (
     </div>
 );
 
-function UserProfile({ token }) {
-    const [userData, setUserData] = useState(null);
+function UserProfile() {
+    const { token, user: authUser } = useAuth();
+    const [userData, setUserData] = useState(authUser);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
@@ -58,7 +64,8 @@ function UserProfile({ token }) {
                 address_permanent: res.data.address_permanent || '',
                 pan_number: res.data.pan_number || '',
                 aadhar_number: res.data.aadhar_number || '',
-                uan: res.data.uan || ''
+                uan: res.data.uan || '',
+                manager_name: res.data.manager_name || 'Unassigned / Direct Report'
             });
         } catch (err) {
             console.error(err);
@@ -116,6 +123,10 @@ function UserProfile({ token }) {
         setEditForm(prev => ({ ...prev, [field]: value }));
     };
 
+    const isPrivileged = userData?.roles?.includes('admin') || userData?.roles?.includes('superadmin');
+    const isHr = userData?.department?.toUpperCase().includes('HR');
+    const canEditOrg = isPrivileged || isHr;
+
     return (
         <div className="mx-auto w-full">
             {saveStatus && (
@@ -130,20 +141,20 @@ function UserProfile({ token }) {
                 </div>
             )}
 
-            <div className="bg-white rounded-[24px] shadow-[0_4px_34px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden relative">
+            <div className="bg-white rounded-[40px] shadow-[0_40px_100px_rgba(0,0,0,0.06)] border border-gray-100/60 overflow-hidden relative">
                 
                 {/* Enterprise Header Area */}
-                <div className="h-40 relative overflow-hidden" style={{ background: 'var(--theme-primary)' }}>
+                <div className="h-56 relative overflow-hidden" style={{ background: 'var(--theme-primary)' }}>
                     <button 
                         onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
-                        className="absolute top-5 right-5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center transition-all shadow-md z-20"
+                        className="absolute top-8 right-8 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-widest flex items-center transition-all shadow-2xl active:scale-95"
                     >
-                        {isEditing ? <><FiX className="mr-2" size={16}/> Discard Changes</> : <><FiEdit2 className="mr-2" size={16}/> Edit Full Profile</>}
+                        {isEditing ? <><FiX className="mr-2" size={16}/> Discard Changes</> : <><FiEdit2 className="mr-2" size={16}/> Edit Full Identity</>}
                     </button>
                     
                     {/* Background decorations */}
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dimension.png')] bg-repeat"></div>
-                    <div className="absolute right-0 bottom-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+                    <div className="absolute right-0 bottom-0 w-96 h-96 bg-white opacity-10 rounded-full blur-[120px] transform translate-x-1/3 translate-y-1/3"></div>
                 </div>
                 
                 {/* Main Profile Body */}
@@ -220,8 +231,9 @@ function UserProfile({ token }) {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                             <InputField label="Legal First Name" value={editForm.first_name} onChange={(e) => handleEditChange('first_name', e.target.value)} />
                                             <InputField label="Legal Last Name" value={editForm.last_name} onChange={(e) => handleEditChange('last_name', e.target.value)} />
-                                            <InputField label="Job Title" value={editForm.job_title} onChange={(e) => handleEditChange('job_title', e.target.value)} />
-                                            <InputField label="Department" value={editForm.department} onChange={(e) => handleEditChange('department', e.target.value)} />
+                                            <InputField label="Job Title" value={editForm.job_title} disabled={!canEditOrg} onChange={(e) => handleEditChange('job_title', e.target.value)} />
+                                            <InputField label="Department" value={editForm.department} disabled={!canEditOrg} onChange={(e) => handleEditChange('department', e.target.value)} />
+                                            <InputField label="Reporting Manager" value={editForm.manager_name} disabled={true} />
                                             <InputField label="Base Work Location" value={editForm.location} onChange={(e) => handleEditChange('location', e.target.value)} />
                                             <InputField label="Work Phone Number" value={editForm.phone_number} onChange={(e) => handleEditChange('phone_number', e.target.value)} />
                                         </div>
@@ -230,7 +242,11 @@ function UserProfile({ token }) {
                                     <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 shadow-inner">
                                         <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider"><FiShield className="mr-2 text-[var(--theme-primary)]"/> Statutory & Personal Data</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-                                            <InputField label="Date of Birth" value={editForm.dob} type="date" onChange={(e) => handleEditChange('dob', e.target.value)} />
+                                            <EliteDatePicker 
+                                                label="Date of Birth" 
+                                                value={editForm.dob} 
+                                                onChange={(val) => handleEditChange('dob', val)} 
+                                            />
                                             <InputField label="PAN Number" value={editForm.pan_number} onChange={(e) => handleEditChange('pan_number', e.target.value)} />
                                             <InputField label="Aadhar Number" value={editForm.aadhar_number} onChange={(e) => handleEditChange('aadhar_number', e.target.value)} />
                                             <InputField label="UAN (PF Number)" value={editForm.uan} onChange={(e) => handleEditChange('uan', e.target.value)} />
@@ -241,23 +257,26 @@ function UserProfile({ token }) {
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-end sticky bottom-4 z-50">
+                                    <div className="flex justify-end sticky bottom-8 z-50">
                                         <button 
                                             onClick={handleSave}
-                                            className="px-10 py-4 rounded-xl text-white font-extrabold transition-all shadow-xl hover:scale-105 active:scale-95 flex items-center text-[15px]"
+                                            className="px-12 py-5 rounded-[24px] text-white font-black uppercase tracking-widest transition-all shadow-[0_20px_50px_var(--theme-primary-border)] hover:scale-105 active:scale-95 flex items-center text-[13px]"
                                             style={{ backgroundColor: 'var(--theme-primary)' }}
                                         >
-                                            <FiSave className="mr-3" size={20}/> Synchronize All Changes to Registry
+                                            <FiSave className="mr-3" size={20}/> Synchronize Identity Registry
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="space-y-8">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <DisplayField icon={FiBriefcase} label="Functional Designation" value={userData?.job_title} />
+                                        <DisplayField icon={FiLayers} label="Department Cluster" value={userData?.department} />
                                         <DisplayField icon={FiMail} label="Corporate Email" value={userData?.email} />
                                         <DisplayField icon={FiPhone} label="Direct Line" value={userData?.phone_number} />
-                                        <DisplayField icon={FiBriefcase} label="Office Location" value={userData?.location} />
+                                        <DisplayField icon={FiMapPin} label="Office Location" value={userData?.location} />
                                         <DisplayField icon={FiCalendar} label="Date of Birth" value={userData?.dob} />
+                                        <DisplayField icon={FiShield} label="Reporting Manager" value={userData?.manager_name} />
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

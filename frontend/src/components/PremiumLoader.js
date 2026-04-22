@@ -52,7 +52,7 @@ const PremiumLoader = ({ message = "Loading...", fullScreen = true }) => {
 
     if (fullScreen) {
         return (
-            <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#f0f4f8]/80 backdrop-blur-md">
+            <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[var(--theme-bg,#f0f4f8)]/80 backdrop-blur-md">
                 <LoaderElement />
             </div>
         );

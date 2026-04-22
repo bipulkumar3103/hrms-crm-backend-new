@@ -1,127 +1,82 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { RequireAuth, PublicOnly, OnboardingGuard } from './components/common/NavigationGuard';
+
+// Components
 import Login from './components/Login';
 import Register from './components/Register';
-import CompleteProfile from './components/CompleteProfile';
 import AdminDashboard from './components/admin/Dashboard';
 import OnboardingGoogle from './components/onboarding/OnboardingGoogle';
-import PremiumLoader from './components/PremiumLoader';
-import AcceptInvitation from './components/AcceptInvitation';
-import { useAlert } from './context/AlertContext';
-import { ConfirmationProvider } from './context/ConfirmationContext';
+import CompleteProfile from './components/CompleteProfile';
+import SetPassword from './components/SetPassword';
 import PremiumAlert from './components/PremiumAlert';
 import PremiumConfirmation from './components/PremiumConfirmation';
+import { ConfirmationProvider } from './context/ConfirmationContext';
+import { AlertProvider } from './context/AlertContext';
 
-import { api } from './utils/api';
+// Dashboard Sub-Modules
+import EnterpriseOverview from './components/admin/EnterpriseOverview';
+import EmployeeRegistry from './components/admin/EmployeeRegistry';
+import OrganizationTree from './components/admin/OrganizationTree';
+import OrganizationRegistry from './components/admin/OrganizationRegistry';
+import OrganizationProfile from './components/admin/OrganizationProfile';
+import UserProfile from './components/admin/UserProfile';
+import UIBuilder from './components/admin/UIBuilder';
+import CraftBuilder from './components/admin/CraftBuilder/CraftBuilder';
+import ProjectAdmin from './components/enterprise/timesheets/ProjectAdmin';
+import TimesheetModule from './components/enterprise/timesheets/TimesheetModule';
 
 function App() {
-  const { showAlert } = useAlert();
-  // Stable ref so the URL-error effect doesn't re-run when showAlert identity changes
-  const showAlertRef = useRef(showAlert);
-  useEffect(() => { showAlertRef.current = showAlert; }, [showAlert]);
+    return (
+        <AlertProvider>
+            <ConfirmationProvider>
+                <PremiumAlert />
+                <Router>
+                    <AuthProvider>
+                        <Routes>
+                            {/* Public Routes */}
+                            <Route path="/auth" element={<PublicOnly />}>
+                                <Route path="login" element={<Login />} />
+                                <Route path="register" element={<Register />} />
+                            </Route>
 
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  // If user landed directly on /accept-invitation, lock into that view immediately
-  const isAcceptInvite = window.location.pathname.startsWith('/accept-invitation');
-  const [view, setView] = useState(isAcceptInvite ? 'accept-invitation' : 'login');
-  const [isLoading, setIsLoading] = useState(false);
+                            {/* Unified invitation Flow */}
+                            <Route path="/invite/accept" element={<SetPassword mode="invitation" />} />
+                            <Route path="/accept-invitation" element={<SetPassword mode="invitation" />} />
 
-  const saveToken = (newToken) => {
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-  };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setView('login');
-  };
+                            {/* Setup/Onboarding Flow (Guarded) */}
+                            <Route path="/setup" element={<OnboardingGuard />}>
+                                <Route path="set-password" element={<SetPassword />} />
+                                <Route path="set_password" element={<Navigate to="/setup/set-password" replace />} />
+                                <Route path="onboarding" element={<OnboardingGoogle />} />
+                                <Route path="profile" element={<CompleteProfile />} />
+                            </Route>
 
-  useEffect(() => {
-    // Don't process OAuth tokens/errors when on the invitation page
-    if (isAcceptInvite) return;
+                            {/* Main Dashboard (Guarded) */}
+                            <Route path="/dashboard" element={<RequireAuth><OnboardingGuard><AdminDashboard /></OnboardingGuard></RequireAuth>}>
+                                <Route index element={<EnterpriseOverview />} />
+                                <Route path="employees" element={<EmployeeRegistry />} />
+                                <Route path="org-structure" element={<OrganizationTree />} />
+                                <Route path="org-registry" element={<OrganizationRegistry />} />
+                                <Route path="company-profile" element={<OrganizationProfile />} />
+                                <Route path="profile" element={<UserProfile />} />
+                                <Route path="reports" element={<UIBuilder />} />
+                                <Route path="craft" element={<CraftBuilder />} />
+                                <Route path="projects" element={<ProjectAdmin />} />
+                                <Route path="timesheets" element={<TimesheetModule />} />
+                            </Route>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlToken = urlParams.get('token');
-    const urlError = urlParams.get('error');
-
-    if (urlToken) {
-      saveToken(urlToken);
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (urlError) {
-      showAlertRef.current(
-        urlError === 'email_exists'
-          ? 'An account with this email already exists. Please log in with your password.'
-          : 'Authentication failed.',
-        'error'
-      );
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (isAcceptInvite) return;
-
-    const checkStatus = async () => {
-      if (token) {
-        setIsLoading(true);
-        try {
-          // Verify with backend
-          const response = await api.get('/onboarding/check-status');
-          const { has_company, profile_complete } = response.data;
-          
-          if (!has_company) {
-            setView('onboarding-google');
-          } else if (!profile_complete) {
-            setView('complete-profile');
-          } else {
-            setView('dashboard');
-          }
-        } catch (e) {
-          console.error('Session validation failed', e);
-          logout();
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setView('login');
-        setIsLoading(false);
-      }
-    };
-    checkStatus();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  const renderView = () => {
-    if (isLoading) {
-      return <PremiumLoader message="Initializing Secure Environment..." fullScreen />;
-    }
-
-    switch (view) {
-      case 'accept-invitation':
-        return <AcceptInvitation />;
-      case 'login':
-        return <Login setToken={saveToken} setView={setView} />;
-      case 'register':
-        return <Register setView={setView} />;
-      case 'onboarding-google':
-        return <OnboardingGoogle api={api} setToken={saveToken} />;
-      case 'complete-profile':
-        return <CompleteProfile api={api} setToken={saveToken} />;
-      case 'dashboard':
-        return <AdminDashboard api={api} token={token} logout={logout} />;
-      default:
-        return <Login setToken={saveToken} setView={setView} />;
-    }
-  };
-
-  return (
-    <ConfirmationProvider>
-      <PremiumAlert />
-      <div className="App">{renderView()}</div>
-    </ConfirmationProvider>
-  );
+                            {/* Fallback Redirects */}
+                            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                        </Routes>
+                    </AuthProvider>
+                </Router>
+            </ConfirmationProvider>
+        </AlertProvider>
+    );
 }
 
-export default App;
+export default App;

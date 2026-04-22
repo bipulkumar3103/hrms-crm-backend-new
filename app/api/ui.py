@@ -134,9 +134,25 @@ def get_ui_context():
         'last_name': user.last_name,
         'full_name': f"{user.first_name} {user.last_name}",
         'email': user.email,
-        'job_title': user.job_title,
-        'department': user.department,
+        'job_title': user.designation_relationship.name if user.designation_relationship else (user.job_title or 'Employee'),
+        'department': user.dept_relationship.name if user.dept_relationship else (user.department or 'Unassigned'),
+        'department_id': user.department_id,
+        'designation_id': user.designation_id,
+        'manager_id': user.manager_id,
         'avatar_url': user.avatar_medium_url,
+        
+        # Extended Organization Object for Tree Support
+        'organization': {
+            'department': {
+                'id': user.department_id,
+                'name': user.dept_relationship.name if user.dept_relationship else user.department
+            } if user.department_id or user.department else None,
+            'designation': {
+                'id': user.designation_id,
+                'name': user.designation_relationship.name if user.designation_relationship else user.job_title
+            } if user.designation_id or user.job_title else None,
+            'manager_id': user.manager_id
+        },
         
         # Company theme & branding - Used for Component Styling (theme_primary_color)
         'company_name': company.name,

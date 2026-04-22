@@ -26,7 +26,10 @@ def init_app(app):
             'scope': 'openid email profile'
         }
     )
-    print("--- PRINT DEBUG: Google OAuth Initialized ---\n")
+    # Enable insecure transport for local development (fixes invalid_grant on http)
+    os.environ['AUTHLIB_INSECURE_TRANSPORT'] = 'true'
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    print("--- PRINT DEBUG: Google OAuth Initialized with Insecure Transport ---\n")
 
 @google_blueprint.route('/login/google')
 def login():

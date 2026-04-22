@@ -2,6 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api, API_PATH } from '../utils/api';
 import PremiumLoader from './PremiumLoader';
+import { useAlert } from '../context/AlertContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 /* ─── Font injection ─── */
 const injectFonts = () => {
@@ -142,14 +145,14 @@ const injectStyles = () => {
     .nx-forgot-link {
       font-size: 13px;
       font-weight: 500;
-      color: #4f46e5;
+      color: var(--theme-primary, #4f46e5);
       background: none; border: none;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       padding: 0;
       transition: color .15s;
     }
-    .nx-forgot-link:hover { color: #3730a3; }
+    .nx-forgot-link:hover { opacity: 0.8; }
 
     .nx-input {
       width: 100%;
@@ -166,8 +169,8 @@ const injectStyles = () => {
     }
     .nx-input::placeholder { color: #9ca3af; }
     .nx-input:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+      border-color: var(--theme-primary, #4f46e5);
+      box-shadow: 0 0 0 3px var(--theme-secondary, rgba(79,70,229,0.12));
     }
     .nx-input.err { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
 
@@ -200,7 +203,7 @@ const injectStyles = () => {
       transition: transform .2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .nx-toggle input:checked + .nx-slider { background: #4f46e5; }
+    .nx-toggle input:checked + .nx-slider { background: var(--theme-primary); }
     .nx-toggle input:checked + .nx-slider::after { transform: translateX(18px); }
     .nx-toggle-label { font-size: 13.5px; color: #374151; font-weight: 400; cursor: pointer; user-select: none; }
 
@@ -208,7 +211,7 @@ const injectStyles = () => {
     .nx-btn-primary {
       width: 100%;
       height: 44px;
-      background: #3730A3;
+      background: var(--theme-primary);
       border: none; border-radius: 9px;
       color: #fff;
       font-family: 'Inter', sans-serif;
@@ -220,8 +223,8 @@ const injectStyles = () => {
       margin-bottom: 16px;
     }
     .nx-btn-primary:hover:not(:disabled) {
-      background: #312E81;
-      box-shadow: 0 4px 14px rgba(55, 48, 163, 0.35);
+      opacity: 0.9;
+      box-shadow: var(--theme-primary-glow);
       transform: translateY(-1px);
     }
     .nx-btn-primary:active:not(:disabled) { transform: translateY(0); }
@@ -277,7 +280,7 @@ const injectStyles = () => {
       flex-shrink: 0;
     }
     .nx-left-footer button {
-      color: #4f46e5;
+      color: var(--theme-primary);
       font-weight: 600;
       background: none; border: none;
       cursor: pointer; padding: 0;
@@ -288,7 +291,7 @@ const injectStyles = () => {
       transition: color .15s;
       margin-left: 4px;
     }
-    .nx-left-footer button:hover { color: #3730a3; }
+    .nx-left-footer button:hover { opacity: 0.8; }
 
     /* Spinner */
     .nx-spin {
@@ -303,11 +306,11 @@ const injectStyles = () => {
        RIGHT PANEL
     ═══════════════════════════ */
     .nx-right {
-      flex: 1; background: #1e1b4b; position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
+      flex: 1; background: var(--theme-primary); position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
     }
     .nx-right-bg { 
       position: absolute; inset: 0; 
-      background: #020617;
+      background: var(--theme-accent);
       opacity: 0.95;
     }
 
@@ -427,7 +430,7 @@ const injectStyles = () => {
     .nx-modal-bg.open .nx-modal { transform: translateY(0) scale(1); opacity: 1; }
     .nx-modal-icon-box {
       width: 46px; height: 46px; border-radius: 12px;
-      background: #eef2ff;
+      background: var(--theme-secondary);
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 16px;
     }
@@ -452,14 +455,14 @@ const injectStyles = () => {
     .nx-m-cancel:hover { background: #f9fafb; border-color: #d1d5db; }
     .nx-m-send {
       flex: 1; height: 42px;
-      background: #4f46e5; border: none;
+      background: var(--theme-primary); border: none;
       border-radius: 9px; color: #fff;
       font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
       cursor: pointer;
       transition: background .15s, box-shadow .15s, opacity .15s;
       display: flex; align-items: center; justify-content: center; gap: 7px;
     }
-    .nx-m-send:hover:not(:disabled) { background: #4338ca; box-shadow: 0 4px 14px rgba(79,70,229,0.28); }
+    .nx-m-send:hover:not(:disabled) { opacity: 0.9; box-shadow: var(--theme-secondary-glow); }
     .nx-m-send:disabled { opacity: .5; cursor: not-allowed; }
     .nx-spin-w {
       width: 14px; height: 14px; border-radius: 50%;
@@ -489,13 +492,13 @@ const IcoErr = () => (
 );
 const IcoMail = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M3 8l9 6 9-6M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="#4f46e5" strokeWidth="1.6" strokeLinejoin="round"/>
+    <path d="M3 8l9 6 9-6M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="var(--theme-primary, #4f46e5)" strokeWidth="1.6" strokeLinejoin="round"/>
   </svg>
 );
 const IcoCheck = () => (
   <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-    <circle cx="8" cy="8" r="7" stroke="#4f46e5" strokeWidth="1.4"/>
-    <path d="M5 8l2 2 4-4" stroke="#4f46e5" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="8" cy="8" r="7" stroke="var(--theme-primary, #4f46e5)" strokeWidth="1.4"/>
+    <path d="M5 8l2 2 4-4" stroke="var(--theme-primary, #4f46e5)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 const IcoQ = () => (
@@ -521,15 +524,15 @@ const IcoGoogle = () => (
 
 /* ── Forgot Password Modal ── */
 function ForgotModal({ open, onClose }) {
+  const { showAlert } = useAlert();
   const [fpEmail, setFpEmail]     = useState('');
   const [fpLoading, setFpLoading] = useState(false);
   const [fpSuccess, setFpSuccess] = useState(false);
-  const [fpError, setFpError]     = useState('');
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (open) {
-      setFpEmail(''); setFpSuccess(false); setFpError(''); setFpLoading(false);
+      setFpEmail(''); setFpSuccess(false); setFpLoading(false);
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [open]);
@@ -541,15 +544,14 @@ function ForgotModal({ open, onClose }) {
   }, [onClose]);
 
   const handleSend = async () => {
-    if (!fpEmail.trim()) { setFpError('Please enter your email address.'); return; }
-    setFpLoading(true); setFpError('');
+    if (!fpEmail.trim()) { showAlert('Please enter your email address.', 'error'); return; }
+    setFpLoading(true);
     try {
-      // ── Wire your real API here ──
       await api.post('/auth/forgot-password', { email: fpEmail });
-      // await new Promise(r => setTimeout(r, 1100)); // placeholder
       setFpSuccess(true);
+      showAlert(`Recovery email dispatched to ${fpEmail}`, 'success');
     } catch (err) {
-      setFpError(err.response?.data?.message || 'Something went wrong. Try again.');
+      showAlert(err.response?.data?.message || 'Synchronization failure. Please try again.', 'error');
     } finally {
       setFpLoading(false);
     }
@@ -580,20 +582,14 @@ function ForgotModal({ open, onClose }) {
               link to reset your password.
             </p>
 
-            {fpError && (
-              <div className="nx-alert err" style={{ marginBottom: 14 }}>
-                <IcoErr /> {fpError}
-              </div>
-            )}
-
             <label className="nx-label">Email address</label>
             <input
               ref={inputRef}
               type="email"
-              className={`nx-input${fpError ? ' err' : ''}`}
+              className="nx-input"
               placeholder="you@company.com"
               value={fpEmail}
-              onChange={e => { setFpEmail(e.target.value); setFpError(''); }}
+              onChange={e => { setFpEmail(e.target.value); }}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
             />
 
@@ -698,12 +694,14 @@ function RightPanel() {
 /* ══════════════════════════════════════
    MAIN LOGIN COMPONENT
 ══════════════════════════════════════ */
-function Login({ setToken, setView }) {
+function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [email, setEmail]         = useState('');
   const [password, setPassword]   = useState('');
   const [remember, setRemember]   = useState(false);
-  const [error, setError]         = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(null); // 'workspace' | 'google' | null
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => { injectFonts(); injectStyles(); }, []);
@@ -711,21 +709,23 @@ function Login({ setToken, setView }) {
   /* ── original login logic — untouched ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); setError('');
+    setIsLoading('workspace');
     try {
       const res = await api.post('/auth/login', { email, password });
-      setToken(res.data.access_token);
+      login(res.data.access_token);
+      showAlert('Welcome back! Initializing secure session...', 'success');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+      showAlert(err.response?.data?.message || 'Authentication failure. Please verify credentials.', 'error');
       console.error('Login failed', err);
     } finally {
-      setIsLoading(false);
+      setIsLoading(null);
     }
   };
 
   /* ── Google logic with Loader ── */
   const handleGoogleLogin = () => {
-    setIsLoading(true);
+    setIsLoading('google');
     const host = window.location.host;
     let backendUrl;
     if (host.includes('cloudworkstations.dev') || host.includes('idx.dev')) {
@@ -737,9 +737,6 @@ function Login({ setToken, setView }) {
     window.location.href = backendUrl;
   };
 
-  if (isLoading) {
-    return <PremiumLoader message="Authenticating Credentials..." fullScreen />;
-  }
 
   return (
     <div className="nx-root">
@@ -765,12 +762,6 @@ function Login({ setToken, setView }) {
               Enter your email to receive a one-time passcode, or sign in with your password.
             </p>
 
-            {error && (
-              <div className="nx-alert err">
-                <IcoErr /> {error}
-              </div>
-            )}
-
             <form onSubmit={handleSubmit}>
               {/* Email */}
               <div className="nx-field">
@@ -780,12 +771,12 @@ function Login({ setToken, setView }) {
                 <input
                   id="nx-email"
                   type="email"
-                  className={`nx-input${error ? ' err' : ''}`}
+                  className="nx-input"
                   placeholder="amelie@company.com"
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={e => { setEmail(e.target.value); setError(''); }}
+                  onChange={e => { setEmail(e.target.value); }}
                 />
               </div>
 
@@ -804,12 +795,12 @@ function Login({ setToken, setView }) {
                 <input
                   id="nx-pass"
                   type="password"
-                  className={`nx-input${error ? ' err' : ''}`}
+                  className="nx-input"
                   placeholder="••••••••••"
                   autoComplete="current-password"
                   required
                   value={password}
-                  onChange={e => { setPassword(e.target.value); setError(''); }}
+                  onChange={e => { setPassword(e.target.value); }}
                 />
               </div>
 
@@ -829,8 +820,8 @@ function Login({ setToken, setView }) {
               </div>
 
               {/* Sign in */}
-              <button type="submit" className="nx-btn-primary" disabled={isLoading}>
-                {isLoading
+              <button type="submit" className="nx-btn-primary" disabled={!!isLoading}>
+                {isLoading === 'workspace'
                   ? <><div className="nx-spin" /> Signing in…</>
                   : 'Sign in to workspace'}
               </button>
@@ -839,14 +830,22 @@ function Login({ setToken, setView }) {
             <div className="nx-divider"><span>or</span></div>
 
             {/* Google */}
-            <button className="nx-btn-secondary" onClick={handleGoogleLogin}>
-              <IcoGoogle /> Sign in with Google
+            <button 
+              className="nx-btn-secondary" 
+              onClick={handleGoogleLogin} 
+              disabled={!!isLoading}
+            >
+              {isLoading === 'google' ? (
+                <><div className="nx-spin" style={{ borderTopColor: 'var(--theme-primary, #4f46e5)', borderLeftColor: 'var(--theme-secondary, rgba(79,70,229,0.2))' }} /> Authenticating...</>
+              ) : (
+                <><IcoGoogle /> Sign in with Google</>
+              )}
             </button>
 
             {/* Register */}
             <div className="nx-left-footer" style={{ marginTop: 28 }}>
               Need an account?
-              <button type="button" onClick={() => setView('register')}>Register here</button>
+              <button type="button" onClick={() => navigate('/auth/register')}>Register here</button>
             </div>
           </div>
         </div>
