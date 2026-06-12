@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useEditor } from '@craftjs/core';
 import * as Icons from 'react-icons/fi';
-import { FiSettings, FiMousePointer, FiPlus, FiTrash2, FiSearch, FiCheck, FiCopy, FiChevronDown, FiXCircle, FiMonitor, FiTablet, FiSmartphone, FiX } from 'react-icons/fi';
+import { FiSettings, FiMousePointer, FiRefreshCw, FiPlus, FiTrash2, FiSearch, FiCheck, FiCopy, FiChevronDown, FiXCircle, FiMonitor, FiTablet, FiSmartphone, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../../utils/api';
 
@@ -12,15 +12,15 @@ const EliteUnitInput = ({ value, onChange, propName }) => {
     if (str === 'auto') return { num: '', unit: 'auto' };
     const match = str.match(/^([\d.-]+)([a-zA-Z%]*)$/);
     if (!match) return { num: '', unit: 'px' };
-    return { 
-      num: match[1], 
-      unit: match[2] || 'px' 
+    return {
+      num: match[1],
+      unit: match[2] || 'px'
     };
   };
 
   const { num, unit } = parseValue(value);
   const units = ['px', 'rem', '%', 'vw', 'vh'];
-  
+
   const handleUpdate = (newNum, newUnit) => {
     onChange(`${newNum}${newUnit || unit}`);
   };
@@ -45,7 +45,7 @@ const EliteUnitInput = ({ value, onChange, propName }) => {
           {/* Numeric Input with Steer Arrows */}
           {!isAuto ? (
             <div className="flex items-center bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm group-hover:border-[var(--theme-primary)]/20">
-              <input 
+              <input
                 type="number"
                 value={num}
                 step={step}
@@ -53,13 +53,13 @@ const EliteUnitInput = ({ value, onChange, propName }) => {
                 className="w-14 pl-2 py-1.5 bg-transparent text-sm font-semibold text-slate-900 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <div className="flex flex-col border-l border-gray-100">
-                <button 
+                <button
                   onClick={() => handleUpdate(Number(num || 0) + step)}
                   className="px-1.5 py-0.5 hover:bg-gray-50 text-gray-400 hover:text-[var(--theme-primary)] transition-colors border-b border-gray-100"
                 >
                   <Icons.FiChevronUp size={10} />
                 </button>
-                <button 
+                <button
                   onClick={() => handleUpdate(Math.max(0, Number(num || 0) - step))}
                   className="px-1.5 py-0.5 hover:bg-gray-50 text-gray-400 hover:text-[var(--theme-primary)] transition-colors"
                 >
@@ -74,14 +74,14 @@ const EliteUnitInput = ({ value, onChange, propName }) => {
           )}
 
           <div className="flex bg-gray-100 p-0.5 rounded-lg border border-gray-200 shadow-inner">
-            <button 
+            <button
               onClick={nextUnit}
               title="Cycle Units"
               className={`px-2 py-1 flex items-center justify-center text-[10px] font-semibold rounded-md transition-all ${!isAuto ? 'bg-white text-[var(--theme-primary)] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
             >
               {isAuto ? 'px' : unit}
             </button>
-            <button 
+            <button
               onClick={(e) => { e.stopPropagation(); handleUpdate('', 'auto'); }}
               className={`px-2 py-1 flex items-center justify-center text-[10px] font-semibold rounded-md transition-all ${isAuto ? 'bg-[var(--theme-primary)] text-white shadow-sm' : 'text-gray-400 hover:text-[var(--theme-primary)]'}`}
             >
@@ -185,14 +185,21 @@ const EliteColorPicker = ({ value, onChange }) => {
   const inputRef = React.useRef();
 
   return (
-    <div className="flex items-center gap-3 animate-in fade-in zoom-in duration-200">
+    <div className="flex items-center gap-3 animate-in fade-in zoom-in duration-200 relative">
       <div
         onClick={() => inputRef.current?.click()}
-        className="w-12 h-12 rounded-2xl border-2 border-white shadow-xl cursor-pointer transition-transform hover:scale-105 active:scale-95 flex-shrink-0"
+        className="w-12 h-12 rounded-2xl border-2 border-white shadow-xl cursor-pointer transition-transform hover:scale-105 active:scale-95 flex-shrink-0 z-10 relative"
         style={{
           backgroundColor: value || '#000000',
           boxShadow: `0 10px 15px -3px ${value}40, 0 4px 6px -4px ${value}40`
         }}
+      />
+      <input
+        ref={inputRef}
+        type="color"
+        value={value?.startsWith('#') ? value : '#000000'}
+        onChange={(e) => onChange(e.target.value)}
+        className="absolute left-0 top-0 w-12 h-12 opacity-0 pointer-events-none"
       />
       <div className="relative flex-1">
         <input
@@ -204,13 +211,6 @@ const EliteColorPicker = ({ value, onChange }) => {
         />
         <FiPlus className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" />
       </div>
-      <input
-        ref={inputRef}
-        type="color"
-        value={value?.startsWith('#') ? value : '#000000'}
-        onChange={(e) => onChange(e.target.value)}
-        className="hidden"
-      />
     </div>
   );
 };
@@ -221,6 +221,7 @@ const EliteDropdown = ({ value, onChange, options, propName, colorMap, hideCusto
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const [openUp, setOpenUp] = useState(false);
   const isColor = propName?.toLowerCase().includes('color') || propName?.toLowerCase().includes('background');
   const isIcon = propName === 'icon';
@@ -230,15 +231,20 @@ const EliteDropdown = ({ value, onChange, options, propName, colorMap, hideCusto
   );
 
   useEffect(() => {
-    if (isOpen) {
-      if (containerRef.current) {
+    if (isOpen && containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom;
-        // In this high-density scrollable sidebar, we ALWAYS favor DOWN.
-        // Opening UP hits the sticky header and gets clipped.
-        setOpenUp(spaceBelow < 150 && rect.top > 500); 
-      }
-      setTimeout(() => searchInputRef.current?.focus(), 100);
+        const spaceAbove = rect.top;
+        const shouldOpenUp = spaceBelow < 250 && spaceAbove > spaceBelow;
+        
+        setCoords({
+            top: shouldOpenUp ? rect.top : rect.bottom,
+            left: rect.left,
+            width: rect.width
+        });
+        setOpenUp(shouldOpenUp);
+        
+        setTimeout(() => searchInputRef.current?.focus(), 100);
     } else {
       setSearchTerm('');
       setHighlightedIndex(0);
@@ -378,7 +384,7 @@ const EliteDropdown = ({ value, onChange, options, propName, colorMap, hideCusto
                     className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-transparent rounded-xl text-[10px] font-semibold text-gray-800 outline-none focus:bg-white focus:border-[var(--theme-primary)]/20 transition-all"
                   />
                 </div>
-                <button 
+                <button
                   onClick={() => setIsOpen(false)}
                   className="ml-2 p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
                 >
@@ -445,90 +451,114 @@ const EliteDropdown = ({ value, onChange, options, propName, colorMap, hideCusto
   );
 };
 
-const EliteSearchSelect = ({ value, onChange, placeholder = "Select a data path...", availablePaths = [] }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const EliteSearchSelect = ({ value, onChange, onScan, isScanning, placeholder = "Select or type technical key...", availablePaths = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUp, setOpenUp] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldOpenUp = spaceBelow < 250 && spaceAbove > spaceBelow;
+      
+      setCoords({
+        top: shouldOpenUp ? rect.top : rect.bottom,
+        left: rect.left,
+        width: rect.width
+      });
+      setOpenUp(shouldOpenUp);
+    }
+  }, [isOpen]);
 
   const hasPaths = availablePaths.length > 0;
 
   return (
-    <div className="relative">
-      <div
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-4 py-3 border rounded-2xl text-xs font-medium transition-all cursor-pointer flex justify-between items-center group
-          ${hasPaths ? 'bg-gray-50 border-gray-100 hover:border-[var(--theme-primary)] text-gray-800' : 'bg-amber-50/30 border-amber-100 text-amber-600'}
-        `}
-      >
-        <span className={value ? 'text-gray-800' : (hasPaths ? 'text-gray-400 italic' : 'text-amber-500 font-medium')}>
-          {value || (hasPaths ? placeholder : "⚠️ Scan API First")}
-        </span>
-        <FiChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''} ${hasPaths ? 'text-gray-400 group-hover:text-[var(--theme-primary)]' : 'text-amber-400'}`} size={14} />
+    <div className="relative" ref={containerRef}>
+      <div className="relative group">
+        <input
+          type="text"
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsOpen(true)}
+          placeholder={hasPaths ? placeholder : (isScanning ? "Scanning..." : "Type ID Key (e.g. first_name)")}
+          className={`w-full px-4 py-3 border rounded-2xl text-xs font-semibold transition-all outline-none shadow-sm
+            ${hasPaths ? 'bg-white border-gray-100 focus:border-[var(--theme-primary)]' : 'bg-amber-50/20 border-amber-100 focus:border-amber-400 text-amber-900'}
+          `}
+        />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {isScanning && <div className="w-3 h-3 border-2 border-[var(--theme-primary)] border-t-transparent rounded-full animate-spin"></div>}
+          <FiChevronDown
+            className={`cursor-pointer transition-transform ${isOpen ? 'rotate-180 text-[var(--theme-primary)]' : 'text-gray-300'}`}
+            size={14}
+            onClick={() => setIsOpen(!isOpen)}
+          />
+        </div>
       </div>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[100] overflow-hidden flex flex-col max-h-[320px]"
-          >
-            {!hasPaths ? (
-              <div className="p-8 text-center bg-amber-50/10">
-                <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mx-auto mb-4 animate-pulse">
-                  <FiSearch size={20} />
-                </div>
-                <p className="text-[11px] font-semibold text-amber-600 uppercase tracking-widest mb-1.5">No structure discovered</p>
-                <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
-                  Enter an API endpoint in the <span className="text-[var(--theme-primary)] font-medium">DataSource</span> field and click the <span className="text-[var(--theme-primary)] font-medium">Search</span> icon to populate this list.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="p-3 border-b border-gray-50 bg-gray-50/30">
-                  <div className="relative">
-                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
-                    <input
-                      type="text"
-                      placeholder="Search rediscovered paths..."
-                      autoFocus
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-8 pr-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-medium focus:ring-1 focus:ring-[var(--theme-primary)] focus:border-transparent outline-none"
-                      onClick={(e) => e.stopPropagation()}
-                    />
+          <>
+            <div className="fixed inset-0 z-[1999]" onClick={() => setIsOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: openUp ? -10 : 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: openUp ? -10 : 10, scale: 0.95 }}
+              className={`absolute left-0 right-0 ${openUp ? 'bottom-full mb-3' : 'top-full mt-2'} bg-white border border-gray-100 rounded-2xl shadow-2xl z-[2000] overflow-hidden flex flex-col max-h-[320px]`}
+            >
+              {!hasPaths ? (
+                <div className="p-6 text-center bg-gray-50/50">
+                  <div className="w-10 h-10 bg-white border border-gray-100 rounded-full flex items-center justify-center text-gray-300 mx-auto mb-3">
+                    <FiSearch size={16} />
                   </div>
-                </div>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Live Discovery Off</p>
+                  <p className="text-[9px] text-gray-400 font-medium leading-relaxed mb-4">
+                    Link a <span className="text-[var(--theme-primary)]">DataSource</span> to see suggestions here.
+                  </p>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
-                  {availablePaths
-                    .filter(p => p.path.toLowerCase().includes(searchTerm.toLowerCase()))
-                    .map((meta, idx) => (
-                      <button
-                        key={idx}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onChange(meta.path);
-                          setIsOpen(false);
-                          setSearchTerm('');
-                        }}
-                        className={`w-full text-left p-3 rounded-xl transition-all hover:bg-[var(--theme-secondary,#d3d1ff)] hover:text-[var(--theme-primary)]/80 group flex flex-col space-y-1
-                          ${value === meta.path ? 'bg-[var(--theme-secondary)]/30' : ''}
-                        `}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span className={`text-[11px] font-medium ${value === meta.path ? 'text-[var(--theme-primary)]' : 'text-gray-700'}`}>{meta.path}</span>
-                          <span className="text-[9px] font-semibold uppercase text-gray-300 group-hover:text-[var(--theme-primary)] transition-colors opacity-60 tracking-widest">{meta.type}</span>
-                        </div>
-                        <div className="text-[10px] text-gray-400 truncate font-medium flex items-center gap-1.5 italic opacity-80">
-                          <span className="text-[var(--theme-primary)] not-italic opacity-40 font-semibold">❯</span> {meta.sample}
-                        </div>
-                      </button>
-                    ))}
+                  {onScan && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onScan(); }}
+                      disabled={isScanning}
+                      className="w-full py-2.5 bg-white border border-gray-200 text-[var(--theme-primary)] text-[10px] font-bold rounded-xl hover:bg-[var(--theme-primary)] hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isScanning ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <FiRefreshCw size={12} />}
+                      Scan Remote Schema
+                    </button>
+                  )}
                 </div>
-              </>
-            )}
-          </motion.div>
+              ) : (
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
+                  <div className="px-3 py-2 border-b border-gray-50 bg-gray-50/30">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">Discovered Paths</span>
+                  </div>
+                  {availablePaths.map((meta, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChange(meta.path);
+                        setIsOpen(false);
+                      }}
+                      className={`w-full text-left p-3 rounded-xl transition-all hover:bg-[var(--theme-secondary)] hover:text-[var(--theme-primary)] group flex flex-col space-y-1
+                        ${value === meta.path ? 'bg-[var(--theme-secondary)]/50' : ''}
+                      `}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className={`text-[11px] font-bold ${value === meta.path ? 'text-[var(--theme-primary)]' : 'text-gray-700'}`}>{meta.path}</span>
+                        <span className="text-[9px] font-black uppercase text-gray-300 group-hover:text-[var(--theme-primary)]/40 transition-colors tracking-widest">{meta.type}</span>
+                      </div>
+                      <div className="text-[10px] text-gray-400 truncate font-medium flex items-center gap-1.5 italic opacity-60">
+                        <span className="text-[var(--theme-primary)] not-italic opacity-40 font-bold">❯</span> {meta.sample}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
@@ -596,7 +626,7 @@ export const SettingsPanel = () => {
         if (k.startsWith('theme_') && companyTheme[k]) {
           const varName = `--${k.replace('_color', '').replace(/_/g, '-')}`;
           root.style.setProperty(varName, companyTheme[k]);
-          
+
           // Add a faded version for shadows/borders
           root.style.setProperty(`${varName}-faint`, `${companyTheme[k]}20`);
         }
@@ -724,17 +754,17 @@ export const SettingsPanel = () => {
     const isDataSource = prop === 'dataSource';
     const isPath = isPathField(prop);
     const key = getPropKey(prop);
-    
+
     // Value resolution: Check for override first, then fall back to tablet, then desktop
     const getResolvedValue = () => {
       if (selected.props[key] !== undefined) return selected.props[key];
-      
+
       // Inheritance logic
       if (activeDevice === 'mobile') {
         const tabletKey = `${prop}Tablet`;
         if (selected.props[tabletKey] !== undefined) return selected.props[tabletKey];
       }
-      
+
       return selected.props[prop] || '';
     };
 
@@ -768,6 +798,8 @@ export const SettingsPanel = () => {
             <EliteSearchSelect
               value={value}
               onChange={(val) => updateProp(prop, val)}
+              onScan={handleScanAPI}
+              isScanning={isScanning}
               availablePaths={availablePaths}
             />
             {value && (
@@ -784,7 +816,7 @@ export const SettingsPanel = () => {
             hideCustom={prop === 'fullWidth' || prop === 'showIcon'}
           />
         ) : ['width', 'height', 'padding', 'margin', 'gap', 'borderRadius', 'fontSize', 'iconSize', 'borderWidth'].some(f => prop.toLowerCase().includes(f.toLowerCase())) ? (
-          <EliteUnitInput 
+          <EliteUnitInput
             value={value}
             onChange={(val) => updateProp(prop, val)}
             propName={prop}
@@ -880,6 +912,8 @@ export const SettingsPanel = () => {
                         <EliteSearchSelect
                           value={item[f.key] || ''}
                           availablePaths={availablePaths}
+                          onScan={handleScanAPI}
+                          isScanning={isScanning}
                           onChange={(val) => {
                             const updates = { [f.key]: val };
                             const labelField = itemFields.find(field => field.key === 'header' || field.key === 'label');
@@ -919,19 +953,18 @@ export const SettingsPanel = () => {
 
   return isEnabled && selected ? (
     <div className="w-[300px] bg-white border-l border-gray-100 flex flex-col h-full shadow-sm animate-in fade-in slide-in-from-right-4 duration-300 relative">
-      {/* Device Switcher Header: Exclusive to Enterprise Divs */}
-      {selected.name === 'CraftContainer' && (
+      {/* Device Switcher Header: Enabled for Containers and Cards */}
+      {(selected.name === 'CraftContainer' || selected.name === 'CraftCard') && (
         <div className="p-2 bg-gray-50/50 border-b border-gray-100">
           <div className="flex bg-white p-1 rounded-2xl border border-gray-100 shadow-sm">
             {devices.map((device) => (
               <button
                 key={device.id}
                 onClick={() => setActiveDevice(device.id)}
-                className={`flex-1 flex items-center justify-center py-2 px-3 rounded-xl transition-all ${
-                  activeDevice === device.id
+                className={`flex-1 flex items-center justify-center py-2 px-3 rounded-xl transition-all ${activeDevice === device.id
                     ? 'bg-[var(--theme-primary)] text-white shadow-lg'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <device.icon size={14} />
                 <span className="ml-2 text-[9px] font-semibold hidden lg:block">{device.label}</span>
@@ -957,7 +990,7 @@ export const SettingsPanel = () => {
           {Object.keys(selected.props).map((prop) => {
             // Skip breakpoint-specific keys in the main list
             if (['Tablet', 'Mobile'].some(suffix => prop.endsWith(suffix))) return null;
-            
+
             // Enterprise Protocol: Hide titles for structural containers
             if (selected.name === 'CraftContainer' && (prop === 'title' || prop === 'subtitle')) return null;
 
@@ -981,11 +1014,11 @@ export const SettingsPanel = () => {
                 <div key="icon-infrastructure" className="space-y-4 pt-4 border-t border-gray-100 animate-in slide-in-from-bottom-2 duration-500">
                   <div className="flex justify-between items-center group">
                     <label className="text-[10px] font-semibold text-slate-900 group-hover:text-[var(--theme-primary)] transition-colors">Icon Infrastructure</label>
-                    <div 
+                    <div
                       onClick={() => updateProp('showIcon', !showIcon)}
                       className={`w-9 h-5 rounded-full relative cursor-pointer transition-all duration-500 ${showIcon ? 'bg-[var(--theme-primary)] shadow-lg shadow-[var(--theme-primary)]/20' : 'bg-gray-200'}`}
                     >
-                      <motion.div 
+                      <motion.div
                         initial={false}
                         animate={{ x: showIcon ? 18 : 3 }}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -993,7 +1026,7 @@ export const SettingsPanel = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className={`space-y-4 transition-all duration-500 ${!showIcon ? 'opacity-20 pointer-events-none grayscale' : ''}`}>
                     {renderSimpleInput('icon', 'Library Selector')}
                     <div className="grid grid-cols-2 gap-4">
@@ -1004,7 +1037,7 @@ export const SettingsPanel = () => {
               );
             }
             if (prop === 'showIcon' || prop === 'iconSize') return null; // Handled in the elite group
-            
+
             // Intelligent Layout Governance: Hide noStack if flexWrap is already wrapping
             if (prop === 'noStack' && selected.props.flexWrap === 'wrap') return null;
 
@@ -1012,8 +1045,8 @@ export const SettingsPanel = () => {
           })}
         </div>
 
-        {/* Specialized Box Model for Containers */}
-        {selected.name === 'CraftContainer' && (
+        {/* Specialized Box Model for Containers and Cards */}
+        {(selected.name === 'CraftContainer' || selected.name === 'CraftCard') && (
           <div className="space-y-6 pt-6 border-t border-gray-100">
             <div className="space-y-4">
               <label className="block text-[10px] font-semibold text-slate-900">Dimensions & Geometry</label>
@@ -1024,9 +1057,13 @@ export const SettingsPanel = () => {
                 {renderSimpleInput('width', 'Width')}
                 {renderSimpleInput('height', 'Height')}
               </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-[10px] font-semibold text-slate-900">Surface & Aesthetics</label>
               <div className="space-y-4">
-                {renderSimpleInput('borderRadius', 'Radius')}
-                {renderSimpleInput('backgroundColor', 'BG Color')}
+                {renderSimpleInput('backgroundColor', 'Background Color')}
+                {renderSimpleInput('borderRadius', 'Corner Radius')}
               </div>
             </div>
 
@@ -1047,18 +1084,20 @@ export const SettingsPanel = () => {
               {renderSimpleInput('borderColor', 'Border Color')}
             </div>
 
-            <div className="space-y-4">
-              <label className="block text-[10px] font-semibold text-slate-900">Flex Layout Engine</label>
-              <div className="grid grid-cols-2 gap-4">
-                {renderSimpleInput('flexDirection', 'Layout Direction')}
-                {renderSimpleInput('gap', 'Gap Spacing')}
+            {selected.name === 'CraftContainer' && (
+              <div className="space-y-4">
+                <label className="block text-[10px] font-semibold text-slate-900">Flex Layout Engine</label>
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('flexDirection', 'Layout Direction')}
+                  {renderSimpleInput('gap', 'Gap Spacing')}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {renderSimpleInput('alignItems', 'Item Distribution')}
+                  {renderSimpleInput('justifyContent', 'Axis Alignment')}
+                </div>
+                {renderSimpleInput('flexWrap', 'Reflow Policy')}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {renderSimpleInput('alignItems', 'Item Distribution')}
-                {renderSimpleInput('justifyContent', 'Axis Alignment')}
-              </div>
-              {renderSimpleInput('flexWrap', 'Reflow Policy')}
-            </div>
+            )}
           </div>
         )}
 

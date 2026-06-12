@@ -26,6 +26,7 @@ import UIBuilder from './components/admin/UIBuilder';
 import CraftBuilder from './components/admin/CraftBuilder/CraftBuilder';
 import ProjectAdmin from './components/enterprise/timesheets/ProjectAdmin';
 import TimesheetModule from './components/enterprise/timesheets/TimesheetModule';
+import DynamicPage from './components/DynamicPage';
 
 function App() {
     return (
@@ -66,6 +67,12 @@ function App() {
                                 <Route path="craft" element={<CraftBuilder />} />
                                 <Route path="projects" element={<ProjectAdmin />} />
                                 <Route path="timesheets" element={<TimesheetModule />} />
+                                <Route path="*" element={<DynamicPage />} />
+                            </Route>
+
+                            {/* Direct Employee Routes (Craft Pages outside /dashboard prefix) */}
+                            <Route path="/employee" element={<RequireAuth><OnboardingGuard><AdminDashboard /></OnboardingGuard></RequireAuth>}>
+                                <Route path="*" element={<DynamicPage />} />
                             </Route>
 
                             {/* Fallback Redirects */}

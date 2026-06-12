@@ -4,7 +4,7 @@ import {
     FiSend, FiClock, FiCheckCircle, FiAlertCircle,
     FiTrash2, FiUpload, FiChevronDown, FiSearch, FiFolder,
     FiCalendar, FiChevronLeft, FiChevronRight, FiX,
-    FiActivity, FiZap, FiPieChart, FiCpu, FiStar, FiCopy, FiList
+    FiActivity, FiZap, FiPieChart, FiCpu, FiStar, FiCopy, FiList, FiDownload
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import EliteSelector from '../../common/EliteSelector';
@@ -93,11 +93,20 @@ const TimesheetConsole = ({ user: initialUser, isAdminMode, perfStats, refreshSt
                 return;
             }
 
-            const mappedDays = data.map(row => ({
-                date: row['Date'] || row['date'] || '',
-                hours: parseFloat(row['Hours Worked'] || row['hours'] || 0),
-                notes: row['Task Description'] || row['notes'] || row['Task'] || ''
-            })).filter(day => day.date);
+            const mappedDays = data.map(row => {
+                // Enterprise Robust Mapping Logic
+                const d = row['Date'] || row['date'] || row['DATE'] || row['Day'] || '';
+                const h = row['Hours Worked'] || row['hours'] || row['Hours'] || row['H'] || row['Effort'] || 0;
+                const ot = row['Overtime'] || row['OT'] || row['ot_hours'] || row['Overtime Hours'] || 0;
+                const n = row['Task Description'] || row['notes'] || row['Task'] || row['Activity'] || row['Comments'] || row['WORK DONE'] || '';
+                
+                return {
+                    date: d,
+                    hours: parseFloat(h) || 0,
+                    ot_hours: parseFloat(ot) || 0,
+                    notes: n
+                };
+            }).filter(day => day.date);
 
             if (mappedDays.length === 0) {
                 showAlert("Could not find valid dates in the Excel file.", "error");
@@ -192,21 +201,34 @@ const TimesheetConsole = ({ user: initialUser, isAdminMode, perfStats, refreshSt
                             <FiSend size={20} />
                         </div>
                         <div>
-                            <div className="text-slate-800 font-black text-base tracking-tight leading-none uppercase">Submission Workspace</div>
-                            <div className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                            <div className="text-slate-800 font-black text-base tracking-tight leading-none uppercase">Mission Workspace</div>
+                            <div className="text-slate-400 text-[9px] font-bold uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
                                 {greetingMsg}, <span className="text-[var(--theme-primary)]">{displayName}</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
+                        <a 
+                            href="https://hrms-crm-bucket.s3.ap-south-1.amazonaws.com/templates/timesheet_template.xlsx" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-white hover:bg-slate-50 text-slate-600 px-4 sm:px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-100 shadow-sm"
+                            title="Download Sample Template"
+                        >
+                            <FiDownload size={14} className="text-blue-500" />
+                            <span className="hidden sm:inline">Download Template</span>
+                        </a>
+
                         <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".xlsx, .xls, .csv" onChange={handleFileUpload} />
                         <button
                             type="button"
                             onClick={() => fileInputRef.current.click()}
-                            className="bg-white hover:bg-slate-50 text-slate-600 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-100 shadow-sm"
+                            className="bg-white hover:bg-slate-50 text-slate-600 px-4 sm:px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-100 shadow-sm"
+                            title="Import Data Payload"
                         >
-                            <FiUpload size={14} className="text-[var(--theme-primary)]" /> Import Data Payload
+                            <FiUpload size={14} className="text-[var(--theme-primary)]" />
+                            <span className="hidden sm:inline">Import Data Payload</span>
                         </button>
                     </div>
                 </div>

@@ -1,0 +1,446 @@
+STYLE: Title
+TEXT: NexusOS Enterprise HRMS
+--------------------
+STYLE: Normal
+TEXT: Comprehensive Technical Architecture & Operations Manual
+--------------------
+STYLE: Normal
+TEXT: 
+
+
+
+
+
+--------------------
+STYLE: Normal
+TEXT: Version 1.0.0-ELITE
+--------------------
+STYLE: Normal
+TEXT: Published: April 2026
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Heading 1
+TEXT: Architect's Preface
+--------------------
+STYLE: Normal
+TEXT: This document serves as the definitive source of truth for the NexusOS Enterprise HRMS infrastructure. As we transition into the next phase of operational scaling, it is imperative that the foundational protocols—ranging from multi-tenant identity engineering to the Elite Builder logic layer—are understood at a granular level. 
+
+Every module documented herein has been engineered with a focus on 'Security-by-Design' and High-Availability. This manual is intended for stakeholders, system administrators, and lead engineers.
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 1: Initial Provisioning & Identity
+--------------------
+STYLE: Heading 2
+TEXT: Secure Authentication
+--------------------
+STYLE: Normal
+TEXT: The NexusOS ecosystem begins with a high-fidelity authentication gate. This interface supports multi-tenant login, allowing users to enter via corporate credentials or unified Google OAuth.
+
+New Company have to register first they can register manually or by using signin with google option also if company not found then create a new company from the @examplecompany.com example mark as user as the superadmin.
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Secure Authentication - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Security Hardening
+--------------------
+STYLE: Normal
+TEXT: For accounts registered via third-party OAuth providers, NexusOS enforces an immediate security hardening protocol. Users must establish a 'Backup Password' to ensure account recovery and maximum enterprise security.
+--------------------
+STYLE: Normal
+TEXT: 
+if user don’t create password then they must have set new password.
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Security Hardening - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Tenant Identification
+--------------------
+STYLE: Normal
+TEXT: The organization data module establishes the foundational identity of the workspace. This includes corporate addressing and contact information used across the system's reporting engines.
+--------------------
+STYLE: Normal
+TEXT: 
+after password successfully creation it will go to company creation page if first time or new 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Tenant Identification - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Identity Engine (Theming)
+--------------------
+STYLE: Normal
+TEXT: NexusOS utilizes a dynamic Identity Engine that allows administrators to define foundational CSS variables. These variables brand the entire workspace dashboard UI in real-time.
+--------------------
+STYLE: Normal
+TEXT: 
+here the whole dynamic theme is selected as per the company later the whole ui will render on the company theme color
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Identity Engine (Theming) - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Visual Asset Management
+--------------------
+STYLE: Normal
+TEXT: Administrators can finalize their tenant identity by uploading corporate logos. The system recommends transparent SVG/PNG assets for seamless integration into the UI.
+ company logo wgich is used later in the whole panel according to the uses
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Visual Asset Management - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 2: Communication Infrastructure
+--------------------
+STYLE: Heading 2
+TEXT: Administration Setup Summary
+--------------------
+STYLE: Normal
+TEXT: Once core identity is established, the system provides a summary of the administration setup, indicating the tenant is ready for infrastructure provisioning.
+
+ after full setup it will go to the dashboard page 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Administration Setup Summary - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: SMTP Protocol Establishment
+--------------------
+STYLE: Normal
+TEXT: A critical prerequisite for team collaboration. Before invitations can be sent, administrators must securely establish SMTP parameters.
+--------------------
+STYLE: Normal
+TEXT: After click on invite personal if company set the email setp then it is good if not then they have to setup first 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: SMTP Protocol Establishment - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 3: Team Governance
+--------------------
+STYLE: Heading 2
+TEXT: Corporate Nexus Dashboard
+--------------------
+STYLE: Normal
+TEXT: The main dashboard serves as the Operational Intelligence Framework. Note that metrics like Total Workforce and Operational Health are currently rendered with Optimized Static Data as industry benchmarks.
+
+ please look the below the theme is based on the company theme
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Corporate Nexus Dashboard - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Invite Personnel Workflow
+--------------------
+STYLE: Normal
+TEXT: This module handles the secure deployment of new team members, including role mapping and departmental association.
+
+ after successful email setup they can send the invitation link to therir employee
+--------------------
+STYLE: Normal
+TEXT: 
+
+
+an invitataion link send to the email after that user can create their password and start using 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Invite Personnel Workflow - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Secure Link Formulation
+--------------------
+STYLE: Normal
+TEXT: Generates a unique, secure invitation token for recipients to bypass standard registration.
+--------------------
+STYLE: Normal
+TEXT: 
+this is the email which is dynaic on the basis of company theme 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Secure Link Formulation - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 4: Structural Architecture
+--------------------
+STYLE: Heading 2
+TEXT: Personnel Matrix Flow
+--------------------
+STYLE: Normal
+TEXT: The Live Network module provides an interactive Personnel Matrix for structural governance at scale.
+
+ this is the live employee organization tree you can easily decide the hierarchy if you are superadmin or admin you can decide by the ui ….by simply connecting the node and deattch by deleteing there node …. Employee can only view
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Personnel Matrix Flow - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Node Detail View
+--------------------
+STYLE: Normal
+TEXT: Deep dive into specific organizational nodes and their reporting lines.
+--------------------
+STYLE: Normal
+TEXT: 
+this is the department wise organization network view 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Node Detail View - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 5: Operational Monitoring
+--------------------
+STYLE: Heading 2
+TEXT: Attendance Protocol Console
+--------------------
+STYLE: Normal
+TEXT: Enforces strict time tracking with Punch In/Out protocols.
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: From here you can add department this is possible for admins only add department view department designation and all 
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Attendance Protocol Console - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 2
+TEXT: Timesheet Control Console
+--------------------
+STYLE: Normal
+TEXT: Strategic console for resource auditing, tracking total effort and active nodes.
+
+here you can select the project assign to you you have to select and you and manually fill the timesheet and send to your reporting manager or hr department to approve and if you want to upload a excel sheet you can it will filled automatically the sample excel sheet download option is also available and after submiiting it is end for approval you reporting manager of approved or reject
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Timesheet Control Console - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Here the repoting manager will approve  or reject from there profile 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Here you can view the status of you timesheet approval you can see who approved and it rejected you can see the reason and then fix and send for reapprovals 
+
+
+
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 6: Advanced Intelligence (Elite Builder)
+--------------------
+STYLE: Heading 2
+TEXT: Elite Builder: Architect Mode
+--------------------
+STYLE: Normal
+TEXT: The Low-Code heart of the system for engineering UI components and data flows.
+--------------------
+STYLE: Normal
+TEXT: This is build by the admin panel for there employee  employee/newsample
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Elite Builder: Architect Mode - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: This is the render ui and this is as of now in the development phase working on the rendering because this is the core of our saas app
+
+--------------------
+STYLE: Heading 2
+TEXT: Form Analysis Engine
+--------------------
+STYLE: Normal
+TEXT: Monitors real-time administrative data flow and analyzes form submissions across the protocol layer.
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Form Analysis Engine - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------
+STYLE: Heading 1
+TEXT: Chapter 7: Final Status
+--------------------
+STYLE: Heading 2
+TEXT: Final Dashboard Status
+--------------------
+STYLE: Normal
+TEXT: Overview of a healthy, fully provisioned enterprise ecosystem.
+--------------------
+STYLE: Normal
+TEXT: This is as of now the employee dashboard as of now 
+
+--------------------
+STYLE: Normal
+TEXT: 
+--------------------
+STYLE: Normal
+TEXT: Figure: Final Dashboard Status - Interface Capture
+--------------------
+STYLE: Normal
+TEXT: 
+
+--------------------

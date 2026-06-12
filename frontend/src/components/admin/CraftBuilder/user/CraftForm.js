@@ -85,6 +85,7 @@ CraftForm.craft = {
     title: 'Employee Onboarding',
     submitLabel: 'Finalize Deployment',
     submitEndpoint: '/api/v1/employees/onboard',
+    dataSource: '/api/v1/employees',
     fields: [
         { label: "Identity Key", name: "full_name", type: "text", placeholder: "Personnel Name", required: true },
         { label: "Security Email", name: "email", type: "email", placeholder: "corporate@access.link", required: true },

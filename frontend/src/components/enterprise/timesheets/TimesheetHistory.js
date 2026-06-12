@@ -182,7 +182,7 @@ const TimesheetHistory = ({ user }) => {
                                             </td>
                                             <td className="px-8 py-6">
                                                 {s.reviewer ? (
-                                                    <div 
+                                                    <div
                                                         onClick={() => setSelectedReviewer(s.reviewer)}
                                                         className="flex items-center gap-3 cursor-pointer group/rev"
                                                     >
@@ -245,14 +245,14 @@ const TimesheetHistory = ({ user }) => {
             {/* HIGH-FIDELITY PORTAL MODAL */}
             {selectedSheet && createPortal(
                 <div className="fixed inset-0 z-[99999] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-10" onClick={() => setSelectedSheet(null)}>
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.9, y: 30 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[32px] shadow-2xl overflow-hidden flex flex-col"
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Modal Header */}
-                        <div className={`px-10 py-10 flex items-center justify-between ${isResubmitting ? 'bg-red-500' : 'bg-[var(--theme-primary)]'} text-white relative overflow-hidden`}>
+                        <div className={`px-10 py-14 flex items-center justify-between ${isResubmitting ? 'bg-red-500' : 'bg-[var(--theme-primary)]'} text-white relative overflow-hidden`}>
                             <div className="relative z-10 flex items-center gap-6">
                                 <div className="w-16 h-16 rounded-[24px] bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-2xl">
                                     {isResubmitting ? <FiEdit3 size={28} /> : <FiCalendar size={28} />}
@@ -379,7 +379,7 @@ const TimesheetHistory = ({ user }) => {
                                     disabled={detailsLoading}
                                     onClick={handleConfirmResubmit}
                                 >
-                                    {detailsLoading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <FiSend size={16} />} 
+                                    {detailsLoading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <FiSend size={16} />}
                                     {detailsLoading ? 'Synchronizing Pipeline...' : 'Authorize Global Resubmission'}
                                 </button>
                             )}
@@ -392,7 +392,7 @@ const TimesheetHistory = ({ user }) => {
             {/* ELITE REVIEWER PROFILE MODAL */}
             {selectedReviewer && createPortal(
                 <div className="fixed inset-0 z-[100000] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-10" onClick={() => setSelectedReviewer(null)}>
-                     <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.9, y: 30 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         className="bg-white w-full max-w-[320px] rounded-[32px] shadow-2xl relative overflow-hidden"
@@ -400,27 +400,27 @@ const TimesheetHistory = ({ user }) => {
                     >
                         {/* Header Background */}
                         <div className="h-[120px] bg-gradient-to-br from-[var(--theme-primary)] to-indigo-900 relative">
-                             <button onClick={() => setSelectedReviewer(null)} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shadow-sm">
-                                 <FiX size={16} />
-                             </button>
+                            <button onClick={() => setSelectedReviewer(null)} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors shadow-sm">
+                                <FiX size={16} />
+                            </button>
                         </div>
                         {/* Body */}
                         <div className="px-8 pb-8 flex flex-col items-center text-center relative -mt-[48px]">
                             <div className="w-24 h-24 rounded-[32px] bg-white p-1.5 shadow-xl mb-5 relative z-10">
-                               <div className="w-full h-full rounded-[24px] bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-50">
-                                {selectedReviewer.avatarUrl ? (
-                                    <img src={selectedReviewer.avatarUrl} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="text-3xl font-black text-slate-300">{selectedReviewer.name.charAt(0).toUpperCase()}</span>
-                                )}
-                               </div>
+                                <div className="w-full h-full rounded-[24px] bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-50">
+                                    {selectedReviewer.avatarUrl ? (
+                                        <img src={selectedReviewer.avatarUrl} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-3xl font-black text-slate-300">{selectedReviewer.name.charAt(0).toUpperCase()}</span>
+                                    )}
+                                </div>
                             </div>
                             <h3 className="text-[22px] font-black text-slate-800 tracking-tight leading-none mb-2">{selectedReviewer.name}</h3>
                             <p className="text-[10px] font-black text-[var(--theme-primary)] uppercase tracking-widest mb-6">{selectedReviewer.department}</p>
-                            
+
                             <div className="w-full p-5 bg-slate-50 rounded-2xl flex justify-between items-center border border-slate-100/50">
-                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Employee ID</span>
-                                 <span className="text-[13px] font-black text-slate-700 tracking-tight">{selectedReviewer.emp_id}</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Employee ID</span>
+                                <span className="text-[13px] font-black text-slate-700 tracking-tight">{selectedReviewer.emp_id}</span>
                             </div>
                         </div>
                     </motion.div>

@@ -100,29 +100,29 @@ const TimesheetModule = () => {
                         </div>
                     </div>
 
-                    {/* GLASS DASHBOARD NAVIGATION */}
-                    <nav className="relative z-10 flex items-center gap-1.5 p-1.5 bg-white/10 backdrop-blur-md rounded-[24px] border border-white/20 shadow-xl w-full xl:w-auto overflow-x-auto whitespace-nowrap scrollbar-hide">
-                        <TabButton
-                            active={activeTab === 'console'}
+                    {/* ELITE SOPHISTICATED NAVIGATION */}
+                    <nav className="relative z-10 flex items-center gap-1.5 p-1.5 bg-white/5 backdrop-blur-xl rounded-[24px] border border-white/10 shadow-2xl w-full xl:w-auto overflow-x-auto xl:overflow-visible whitespace-nowrap scrollbar-hide">
+                        <TabButton 
+                            active={activeTab === 'console'} 
                             onClick={() => setActiveTab('console')}
                             icon={<FiLayers size={16} />}
-                            label="Sheets"
-                            fullLabel="Submission"
+                            label="Mission"
+                            fullLabel="Mission Workspace"
                         />
                         <TabButton
                             active={activeTab === 'history'}
                             onClick={() => setActiveTab('history')}
                             icon={<FiSearch size={16} />}
-                            label="History"
-                            fullLabel="Audit"
+                            label="Audit"
+                            fullLabel="Historical Audit"
                         />
                         {(isHrOrAdmin || isManager) && (
-                            <TabButton
-                                active={activeTab === 'approvals'}
+                            <TabButton 
+                                active={activeTab === 'approvals'} 
                                 onClick={() => setActiveTab('approvals')}
                                 icon={<FiCheckSquare size={16} />}
-                                label="Review"
-                                fullLabel="Aprove TimeSheet"
+                                label="Queue"
+                                fullLabel="Authorization Queue"
                             />
                         )}
                     </nav>
@@ -193,21 +193,21 @@ const TimesheetModule = () => {
 const TabButton = ({ active, onClick, icon, label, fullLabel }) => (
     <button
         type="button"
-        className={`relative group px-4 sm:px-6 py-3 rounded-[18px] text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2.5 flex-1 xl:flex-none ${active ? 'text-white' : 'text-white/60 hover:text-white'}`}
+        className={`relative group px-5 sm:px-8 py-3 rounded-[20px] text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider transition-all duration-500 flex items-center justify-center gap-3 flex-1 xl:flex-none ${active ? 'text-white' : 'text-white/40 hover:text-white/70'}`}
         onClick={onClick}
     >
         {active && (
             <motion.div
                 layoutId="activeTabGlow"
-                className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-[18px] shadow-lg border border-white/20"
-                transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                className="absolute inset-0 bg-white/10 backdrop-blur-3xl rounded-[20px] shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-white/20"
+                transition={{ type: "spring", stiffness: 450, damping: 40 }}
             />
         )}
-        <span className={`relative z-10 transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110 group-active:scale-95'}`}>
+        <span className={`relative z-10 transition-all duration-500 ${active ? 'scale-105' : 'group-hover:scale-105 group-active:scale-95'}`}>
             {icon}
         </span>
-        <span className="relative z-10 hidden sm:inline">{fullLabel}</span>
-        <span className="relative z-10 sm:hidden">{label}</span>
+        <span className="relative z-10 hidden lg:inline">{fullLabel}</span>
+        <span className="relative z-10 lg:hidden">{label}</span>
     </button>
 );
 

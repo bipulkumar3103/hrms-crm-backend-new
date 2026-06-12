@@ -155,10 +155,10 @@ const EmployeeRegistry = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1, duration: 0.5 }}
-                    className="w-full bg-white border border-slate-100 rounded-[32px] shadow-sm transition-all hover:shadow-xl hover:shadow-slate-200/30 relative z-20 overflow-hidden"
+                    className="w-full bg-white border border-slate-100 rounded-[32px] shadow-sm transition-all hover:shadow-xl hover:shadow-slate-200/30 relative z-20"
                 >
                     {/* HUB COMMAND HEADER */}
-                    <div className="px-8 py-8 bg-[var(--theme-primary)] text-white flex items-center justify-between relative overflow-hidden">
+                    <div className="px-8 py-8 bg-[var(--theme-primary)] text-white flex items-center justify-between relative overflow-hidden rounded-t-[32px]">
                         <div className="relative z-10 flex items-center gap-6">
                             <div className="w-14 h-14 rounded-[20px] bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-2xl">
                                 <FiSettings size={26} className="text-white" />

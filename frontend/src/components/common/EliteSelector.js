@@ -66,7 +66,7 @@ const EliteSelector = ({
     });
 
     return (
-        <div className={`nx-ts-form-group relative ${className}`} ref={selectorRef}>
+        <div className={`nx-ts-form-group relative ${className} ${isOpen ? 'z-[100]' : 'z-auto'}`} ref={selectorRef}>
             {label && (
                 <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-2 block px-1">
                     {label}

@@ -5,12 +5,12 @@ import PremiumLoader from '../PremiumLoader';
 import { useAuth } from '../../context/AuthContext';
 import EliteDatePicker from '../common/EliteDatePicker';
 
-const InputField = ({ label, type="text", value, onChange, disabled=false }) => (
+const InputField = ({ label, type = "text", value, onChange, disabled = false }) => (
     <div className="mb-4">
         <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">{label}</label>
-        <input 
+        <input
             type={type}
-            value={value} 
+            value={value}
             onChange={onChange}
             disabled={disabled}
             className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all font-semibold text-[14px] shadow-sm
@@ -23,7 +23,7 @@ const InputField = ({ label, type="text", value, onChange, disabled=false }) => 
 const DisplayField = ({ icon: Icon, label, value }) => (
     <div className="flex items-start bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
         <div className="mt-0.5 p-2 rounded-lg mr-3" style={{ backgroundColor: 'var(--theme-secondary)', color: 'var(--theme-primary)' }}>
-            <Icon size={18}/>
+            <Icon size={18} />
         </div>
         <div>
             <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
@@ -37,12 +37,12 @@ function UserProfile() {
     const [userData, setUserData] = useState(authUser);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
+
     const [isEditing, setIsEditing] = useState(false);
     const fileInputRef = useRef(null);
     const [avatarUploadStatus, setAvatarUploadStatus] = useState('');
 
-    const [editForm, setEditForm] = useState({ 
+    const [editForm, setEditForm] = useState({
         first_name: '', last_name: '', phone_number: '', job_title: '', department: '', location: '',
         dob: '', address_temporary: '', address_permanent: '', pan_number: '', aadhar_number: '', uan: ''
     });
@@ -52,8 +52,8 @@ function UserProfile() {
         try {
             const res = await api.get('/users/me');
             setUserData(res.data);
-            setEditForm({ 
-                first_name: res.data.first_name || '', 
+            setEditForm({
+                first_name: res.data.first_name || '',
                 last_name: res.data.last_name || '',
                 phone_number: res.data.phone_number || '',
                 job_title: res.data.job_title || '',
@@ -103,7 +103,7 @@ function UserProfile() {
         try {
             setAvatarUploadStatus('Uploading...');
             await api.post('/uploads/user-avatar', formData, {
-                headers: { 
+                headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -131,7 +131,7 @@ function UserProfile() {
         <div className="mx-auto w-full">
             {saveStatus && (
                 <div className={`mb-6 p-4 rounded-xl text-sm font-semibold flex items-center shadow-sm ${saveStatus.includes('Failed') ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-[var(--theme-secondary)] text-[var(--theme-primary)] border border-[var(--theme-primary)]/20'}`}>
-                    <FiCheckCircle className="mr-2" size={18}/> {saveStatus}
+                    <FiCheckCircle className="mr-2" size={18} /> {saveStatus}
                 </div>
             )}
 
@@ -142,30 +142,34 @@ function UserProfile() {
             )}
 
             <div className="bg-white rounded-[40px] shadow-[0_40px_100px_rgba(0,0,0,0.06)] border border-gray-100/60 overflow-hidden relative">
-                
+
                 {/* Enterprise Header Area */}
-                <div className="h-56 relative overflow-hidden" style={{ background: 'var(--theme-primary)' }}>
-                    <button 
+                <div className="h-44 relative overflow-hidden" style={{ background: 'var(--theme-primary)' }}>
+                    <button
                         onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
-                        className="absolute top-8 right-8 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-widest flex items-center transition-all shadow-2xl active:scale-95"
+                        className="absolute top-6 right-6 sm:top-8 sm:right-8 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white px-4 sm:px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-widest flex items-center transition-all shadow-2xl active:scale-95"
                     >
-                        {isEditing ? <><FiX className="mr-2" size={16}/> Discard Changes</> : <><FiEdit2 className="mr-2" size={16}/> Edit Full Identity</>}
+                        {isEditing ? (
+                            <><FiX className="sm:mr-2" size={16} /> <span className="hidden sm:inline">Discard Changes</span></>
+                        ) : (
+                            <><FiEdit2 className="sm:mr-2" size={16} /> <span className="hidden sm:inline">Edit Full Identity</span></>
+                        )}
                     </button>
-                    
+
                     {/* Background decorations */}
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dimension.png')] bg-repeat"></div>
                     <div className="absolute right-0 bottom-0 w-96 h-96 bg-white opacity-10 rounded-full blur-[120px] transform translate-x-1/3 translate-y-1/3"></div>
                 </div>
-                
+
                 {/* Main Profile Body */}
                 <div className="px-8 pb-10">
                     <div className="flex flex-col lg:flex-row gap-10 relative z-10 w-full">
-                        
+
                         {/* Avatar Column */}
                         <div className="lg:w-1/4 -mt-20 flex flex-col items-center">
                             <div className="relative group">
                                 <div className="w-40 h-40 rounded-[32px] bg-white p-2 shadow-xl mb-6 cursor-pointer transform group-hover:scale-105 transition-all duration-300">
-                                    <div 
+                                    <div
                                         className="w-full h-full bg-gray-50 rounded-[24px] flex items-center justify-center text-[54px] text-[var(--theme-primary)] font-bold tracking-tighter border border-gray-100 overflow-hidden relative"
                                         onClick={() => fileInputRef.current.click()}
                                     >
@@ -174,26 +178,26 @@ function UserProfile() {
                                         ) : (
                                             <>{userData?.first_name?.[0]}{userData?.last_name?.[0]}</>
                                         )}
-                                        
+
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white flex-col">
-                                            <FiCamera size={28} className="mb-2"/>
+                                            <FiCamera size={28} className="mb-2" />
                                             <span className="text-[11px] uppercase font-bold tracking-widest">Update Photo</span>
                                         </div>
                                     </div>
                                 </div>
-                                <input 
-                                    type="file" 
-                                    ref={fileInputRef} 
-                                    className="hidden" 
-                                    accept="image/*" 
-                                    onChange={handleAvatarUpload} 
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleAvatarUpload}
                                 />
                             </div>
-                            
+
                             {!isEditing && (
                                 <div className="w-full bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-4">
                                     <div className="w-full bg-green-50 text-green-700 px-4 py-2 rounded-xl text-[12px] font-extrabold flex items-center justify-center">
-                                        <FiCheckCircle className="mr-2" size={16}/> Active Employee
+                                        <FiCheckCircle className="mr-2" size={16} /> Active Employee
                                     </div>
                                     <div className="w-full pt-2">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 text-center">System Roles</p>
@@ -227,7 +231,7 @@ function UserProfile() {
                             {isEditing ? (
                                 <div className="space-y-8">
                                     <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 shadow-inner">
-                                        <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider"><FiEdit2 className="mr-2 text-[var(--theme-primary)]"/> Basic & Work Identity</h3>
+                                        <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider"><FiEdit2 className="mr-2 text-[var(--theme-primary)]" /> Basic & Work Identity</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                             <InputField label="Legal First Name" value={editForm.first_name} onChange={(e) => handleEditChange('first_name', e.target.value)} />
                                             <InputField label="Legal Last Name" value={editForm.last_name} onChange={(e) => handleEditChange('last_name', e.target.value)} />
@@ -240,12 +244,12 @@ function UserProfile() {
                                     </div>
 
                                     <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 shadow-inner">
-                                        <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider"><FiShield className="mr-2 text-[var(--theme-primary)]"/> Statutory & Personal Data</h3>
+                                        <h3 className="text-[16px] font-extrabold text-gray-800 mb-6 flex items-center border-b border-gray-200 pb-3 uppercase tracking-wider"><FiShield className="mr-2 text-[var(--theme-primary)]" /> Statutory & Personal Data</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-                                            <EliteDatePicker 
-                                                label="Date of Birth" 
-                                                value={editForm.dob} 
-                                                onChange={(val) => handleEditChange('dob', val)} 
+                                            <EliteDatePicker
+                                                label="Date of Birth"
+                                                value={editForm.dob}
+                                                onChange={(val) => handleEditChange('dob', val)}
                                             />
                                             <InputField label="PAN Number" value={editForm.pan_number} onChange={(e) => handleEditChange('pan_number', e.target.value)} />
                                             <InputField label="Aadhar Number" value={editForm.aadhar_number} onChange={(e) => handleEditChange('aadhar_number', e.target.value)} />
@@ -258,12 +262,12 @@ function UserProfile() {
                                     </div>
 
                                     <div className="flex justify-end sticky bottom-8 z-50">
-                                        <button 
+                                        <button
                                             onClick={handleSave}
                                             className="px-12 py-5 rounded-[24px] text-white font-black uppercase tracking-widest transition-all shadow-[0_20px_50px_var(--theme-primary-border)] hover:scale-105 active:scale-95 flex items-center text-[13px]"
                                             style={{ backgroundColor: 'var(--theme-primary)' }}
                                         >
-                                            <FiSave className="mr-3" size={20}/> Synchronize Identity Registry
+                                            <FiSave className="mr-3" size={20} /> Synchronize Identity Registry
                                         </button>
                                     </div>
                                 </div>

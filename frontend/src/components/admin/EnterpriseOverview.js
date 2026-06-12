@@ -8,7 +8,8 @@ import {
     FiCornerUpRight
 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { FiExternalLink } from 'react-icons/fi';
 
 const MetricCard = ({ icon: Icon, label, value, trend, trendValue, color }) => (
     <motion.div 
@@ -169,6 +170,7 @@ const EnterpriseOverview = () => {
         { icon: FiMail, label: "Unread Intel", value: "2", trend: "down", trendValue: "-5", color: "var(--theme-accent)" }
     ];
 
+    const navigate = useNavigate();
     const metrics = isAdmin ? adminMetrics : employeeMetrics;
 
     return (
@@ -184,6 +186,12 @@ const EnterpriseOverview = () => {
                     </p>
                 </div>
                 <div className="flex gap-3">
+                    <button 
+                        onClick={() => navigate('/employee/newsample')}
+                        className="px-5 py-2.5 bg-[var(--theme-secondary)] border border-[var(--theme-primary)]/20 rounded-xl text-[12px] font-bold text-[var(--theme-primary)] shadow-sm flex items-center gap-2 hover:bg-[var(--theme-primary)] hover:text-white transition-all active:scale-95 group"
+                    >
+                        <FiExternalLink size={16} className="group-hover:rotate-12 transition-transform"/> Launch Newsample
+                    </button>
                     <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-[12px] font-bold text-gray-600 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-all active:scale-95">
                         <FiClock size={16}/> {isAdmin ? 'Historical View' : 'My History'}
                     </button>
